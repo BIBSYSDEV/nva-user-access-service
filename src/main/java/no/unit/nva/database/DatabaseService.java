@@ -26,10 +26,6 @@ public class DatabaseService {
         mapper= new DynamoDBMapper(client);
     }
 
-    public void insertUser(UserDb user){
-        mapper.save(user);
-    }
-
     public UserDto getUser(String id){
 
         UserDb userId = new UserDb();
