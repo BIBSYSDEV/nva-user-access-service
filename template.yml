@@ -9,16 +9,16 @@ Resources:
     Properties:
       TableName: UsersRoles
       AttributeDefinitions:
-        - AttributeName: EntityId
+        - AttributeName: PK1A
           AttributeType: S
-        - AttributeName: Type
+        - AttributeName: PK1B
           AttributeType: S
       BillingMode: PROVISIONED
       ProvisionedThroughput:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
       KeySchema:
-        - AttributeName: EntityId
+        - AttributeName: PK1A
           KeyType: HASH
-        - AttributeName: Type
+        - AttributeName: PK1B
           KeyType: RANGE
