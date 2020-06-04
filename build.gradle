@@ -43,9 +43,6 @@ dependencies {
 
 }
 
-
-
-
 task copyNativeDeps(type: Copy) {
     from(configurations.testImplementation) {
         include "*.dylib"
@@ -59,7 +56,6 @@ test.dependsOn copyNativeDeps
 test.doFirst {
     systemProperty "java.library.path", 'build/dynamodb-local'
 }
-
 
 test {
     useJUnitPlatform()
@@ -95,6 +91,7 @@ tasks.withType(Checkstyle) {
     }
 }
 
+// jacoco configuration
 check.dependsOn jacocoTestCoverageVerification
 jacocoTestCoverageVerification.dependsOn(jacocoTestReport)
 
