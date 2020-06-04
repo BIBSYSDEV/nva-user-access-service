@@ -22,7 +22,6 @@ import nva.commons.utils.JacocoGenerated;
 @DynamoDBTyped
 public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
 
-    public static final String ROLE_DELIMITER = ",";
     public static final String TYPE = "USER";
     public static final String INVALID_USER_EMPTY_USERNAME = "Invalid user entry: Empty username is not allowed";
     public static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey of user should start with \"USER\"";
@@ -60,6 +59,7 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
 
     @JacocoGenerated
     @DynamoDBAttribute(attributeName = "type")
+    @Override
     public String getType() {
         return TYPE;
     }
@@ -178,7 +178,6 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
         private String institution;
         private List<RoleDb> roles;
         private String primaryHashKey;
-        private static final String EMPTY_STRING = "";
 
         private Builder() {
         }

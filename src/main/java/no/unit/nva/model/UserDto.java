@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 public class UserDto {
 
     public static final String MISSING_FIELD_ERROR = "Invalid User. Missing obligatory field: ";
+    public static final String ERROR_DUE_TO_INVALID_ROLE =
+        "Failure while trying to create user with role without rolename";
     private String username;
 
     private String institution;
@@ -57,8 +59,9 @@ public class UserDto {
             .collect(Collectors.toList());
     }
 
-    /*This exception should not happen as a RoleDb  should always convert to a */
-    private static IllegalStateException unexpectedException(Failure<RoleDto> failure) {
+    /*This exception should not happen as a RoleDb  should always convert to a RoleDto */
+    private static <T> IllegalStateException unexpectedException(Failure<T> failure) {
+        logger.error(ERROR_DUE_TO_INVALID_ROLE);
         throw new IllegalStateException(failure.getException());
     }
 
@@ -105,14 +108,11 @@ public class UserDto {
                 .stream()
                 .flatMap(Collection::stream)
                 .map(attempt(RoleDto::toRoleDb))
-                .map(eff -> eff.orElseThrow(this::unexpectedInvalidRoleException))
+                .map(eff -> eff.orElseThrow(UserDto::unexpectedException))
                 .collect(Collectors.toList());
     }
 
-    private IllegalStateException unexpectedInvalidRoleException(Failure<RoleDb> failure) {
-        logger.error("Failure while trying to create a Role without a name.", failure.getException());
-        return new IllegalStateException(failure.getException());
-    }
+
 
     public Builder copy() {
         return new Builder()
@@ -131,9 +131,9 @@ public class UserDto {
             return false;
         }
         UserDto userDto = (UserDto) o;
-        return Objects.equals(getUsername(), userDto.getUsername()) &&
-            Objects.equals(getInstitution(), userDto.getInstitution()) &&
-            Objects.equals(getRoles(), userDto.getRoles());
+        return Objects.equals(getUsername(), userDto.getUsername())
+            && Objects.equals(getInstitution(), userDto.getInstitution())
+            && Objects.equals(getRoles(), userDto.getRoles());
     }
 
     @Override

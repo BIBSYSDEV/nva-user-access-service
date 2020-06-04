@@ -33,7 +33,7 @@ public class GetUserFt extends DatabaseTest {
     }
 
     @Given("a user with username {string}")
-    public void a_user_with_username(String username) throws InvalidUserException, InvalidRoleException {
+    public void aUserWithUsername(String username) throws InvalidUserException, InvalidRoleException {
         RoleDto role = RoleDto.newBuilder().withName("CREATOR").build();
         UserDto userDto = UserDto.newBuilder()
             .withUsername(username)
@@ -46,12 +46,12 @@ public class GetUserFt extends DatabaseTest {
     }
 
     @When("handler receives a request for accessing the user details")
-    public void handler_receives_a_request_for_accessing_user_details() throws InvalidUserException {
+    public void handlerReceivesARequestForAccessingUserDetails() throws InvalidUserException {
         this.user = db.getUser(username).get();
     }
 
     @Then("the handler returns the user details")
-    public void the_handler_returns_the_user_details() {
+    public void theHandlerReturnsTheUserDetails() {
         assertThat(user.getUsername(), is(equalTo(this.username)));
     }
 }

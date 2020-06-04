@@ -26,7 +26,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     public static final String INVALID_USER_IN_DATABASE = "Invalid user stored in the database:";
     public static final String MISSING_USERNAME = "missing username";
     private AmazonDynamoDB client;
-    private DynamoDBMapper mapper;
+    private final DynamoDBMapper mapper;
 
     @JacocoGenerated
     public DatabaseServiceImpl() {
@@ -39,6 +39,11 @@ public class DatabaseServiceImpl implements DatabaseService {
         mapper = new DynamoDBMapper(client);
     }
 
+    public DatabaseServiceImpl(DynamoDBMapper mapper) {
+        this.mapper = mapper;
+    }
+
+    @Override
     public Optional<UserDto> getUser(String username) throws InvalidUserException {
 
         UserDb searchObject = UserDto.newBuilder().withUsername(username)
@@ -67,6 +72,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         return comparisonCondition;
     }
 
+    @Override
     public void addUser(UserDto user) throws InvalidUserException {
         mapper.save(user.toUserDb());
     }

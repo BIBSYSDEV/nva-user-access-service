@@ -5,6 +5,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.hamcrest.core.IsSame.sameInstance;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.text.IsEmptyString.emptyString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -98,6 +99,13 @@ public class RoleDbTest extends DatabaseTest {
         Executable action = () -> RoleDb.newBuilder().withName(blankString).build();
         InvalidRoleException exception = assertThrows(InvalidRoleException.class, action);
         assertThat(exception.getMessage(), containsString(Builder.EMPTY_ROLE_NAME_ERROR));
+    }
+
+    @Test
+    public void copyReturnsBuilderContainingAllFieldValuesOfOriginalItem() throws InvalidRoleException {
+        RoleDb copyRole = sampleRole.copy().build();
+        assertThat(copyRole, is(equalTo(sampleRole)));
+        assertThat(copyRole, is(not(sameInstance(sampleRole))));
     }
 
     private RoleDb createSampleRole() throws InvalidRoleException {

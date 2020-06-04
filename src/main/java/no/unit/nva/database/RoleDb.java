@@ -53,6 +53,7 @@ public class RoleDb implements WithCopy<RoleDb.Builder>, WithType, DynamoEntry {
 
     @JacocoGenerated
     @DynamoDBAttribute(attributeName = "type")
+    @Override
     public String getType() {
         return TYPE;
     }
@@ -91,6 +92,7 @@ public class RoleDb implements WithCopy<RoleDb.Builder>, WithType, DynamoEntry {
         // DO NOTHING
     }
 
+    @Override
     public Builder copy() {
         Builder builder = new Builder()
             .withName(this.name);
