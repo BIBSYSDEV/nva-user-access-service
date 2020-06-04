@@ -30,7 +30,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: jacksonVersion
 
 
-    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: 'f4bc3ee5e'
+    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: '0.3.5'
 
     testImplementation group: 'com.amazonaws', name: 'DynamoDBLocal', version: '1.12.0'
     testImplementation group: 'com.almworks.sqlite4java', name: 'sqlite4java', version: '1.0.392'
@@ -43,12 +43,7 @@ dependencies {
 
 }
 
-configurations.testImplementation.canBeResolved = true
-configurations {
-    cucumberRuntime {
-        extendsFrom testImplementation
-    }
-}
+
 
 
 task copyNativeDeps(type: Copy) {
@@ -124,6 +119,13 @@ jacocoTestCoverageVerification {
 }
 
 
+// Cucumber configurations
+configurations.testImplementation.canBeResolved = true
+configurations {
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
+}
 
 task cucumber() {
     dependsOn assemble, compileTestJava
