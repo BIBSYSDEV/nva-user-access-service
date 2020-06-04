@@ -24,7 +24,7 @@ public class GetUserHandler extends ApiGatewayHandler<Void, UserDto> {
 
     public GetUserHandler(Environment environment, Logger logger, DatabaseService dbService) {
         super(Void.class, environment, logger);
-        this.dbService= dbService;
+        this.dbService = dbService;
     }
 
     @Override

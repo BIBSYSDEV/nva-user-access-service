@@ -28,7 +28,6 @@ public class DatabaseServiceImpl implements DatabaseService {
     private AmazonDynamoDB client;
     private DynamoDBMapper mapper;
 
-
     @JacocoGenerated
     public DatabaseServiceImpl() {
         client = AmazonDynamoDBClientBuilder.defaultClient();
@@ -36,33 +35,33 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     public DatabaseServiceImpl(AmazonDynamoDB localDynamo) {
-        this.client=localDynamo;
-        mapper= new DynamoDBMapper(client);
+        this.client = localDynamo;
+        mapper = new DynamoDBMapper(client);
     }
 
     public Optional<UserDto> getUser(String username) throws InvalidUserException {
 
-         UserDb searchObject = UserDto.newBuilder().withUsername(username)
-             .build().toUserDb();
+        UserDb searchObject = UserDto.newBuilder().withUsername(username)
+            .build().toUserDb();
         Condition comparisonCondition = entityTypeAsRangeKey();
-        DynamoDBQueryExpression<UserDb> query= new DynamoDBQueryExpression<UserDb>()
+        DynamoDBQueryExpression<UserDb> query = new DynamoDBQueryExpression<UserDb>()
             .withHashKeyValues(searchObject)
-            .withRangeKeyCondition(RANGE_KEY_NAME,comparisonCondition );
+            .withRangeKeyCondition(RANGE_KEY_NAME, comparisonCondition);
         List<UserDb> result = mapper.query(UserDb.class, query);
         UserDto user = result.stream()
             .map(attempt(UserDto::fromUserDb))
-            .map(eff->eff.orElseThrow(this::unexpectedException))
+            .map(eff -> eff.orElseThrow(this::unexpectedException))
             .collect(SingletonCollector.collectOrElse(null));
         return Optional.ofNullable(user);
     }
 
     private IllegalStateException unexpectedException(Failure<UserDto> failure) {
-        logger.error(INVALID_USER_IN_DATABASE+MISSING_USERNAME);
-        throw new IllegalStateException(INVALID_USER_IN_DATABASE,failure.getException());
+        logger.error(INVALID_USER_IN_DATABASE + MISSING_USERNAME);
+        throw new IllegalStateException(INVALID_USER_IN_DATABASE, failure.getException());
     }
 
     private Condition entityTypeAsRangeKey() {
-        Condition comparisonCondition= new Condition();
+        Condition comparisonCondition = new Condition();
         comparisonCondition.setComparisonOperator(ComparisonOperator.EQ);
         comparisonCondition.setAttributeValueList(List.of(new AttributeValue(UserDb.TYPE)));
         return comparisonCondition;

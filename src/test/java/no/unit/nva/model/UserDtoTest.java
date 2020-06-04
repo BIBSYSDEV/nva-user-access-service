@@ -34,18 +34,18 @@ public class UserDtoTest {
     public void builderReturnsUserDtoWhenInstitutionIsEmpty() throws InvalidUserException {
         UserDto user = UserDto.newBuilder().withUsername(SOME_USERNAME)
             .withRoles(sampleRoles).build();
-        assertThat(user.getUsername(),is(equalTo(SOME_USERNAME)));
-        assertThat(user.getRoles(),is(equalTo(sampleRoles)));
-        assertThat(user.getInstitution(),is(equalTo(null)));
+        assertThat(user.getUsername(), is(equalTo(SOME_USERNAME)));
+        assertThat(user.getRoles(), is(equalTo(sampleRoles)));
+        assertThat(user.getInstitution(), is(equalTo(null)));
     }
 
     @Test
     public void builderReturnsUserDtoWhenIRolesIsEmpty() throws InvalidUserException {
         UserDto user = UserDto.newBuilder().withUsername(SOME_USERNAME)
             .withInstitution(SOME_INSTITUTION).build();
-        assertThat(user.getUsername(),is(equalTo(SOME_USERNAME)));
-        assertThat(user.getRoles(),is(equalTo(Collections.emptyList())));
-        assertThat(user.getInstitution(),is(equalTo(SOME_INSTITUTION)));
+        assertThat(user.getUsername(), is(equalTo(SOME_USERNAME)));
+        assertThat(user.getRoles(), is(equalTo(Collections.emptyList())));
+        assertThat(user.getInstitution(), is(equalTo(SOME_INSTITUTION)));
     }
 
     @ParameterizedTest
@@ -60,7 +60,7 @@ public class UserDtoTest {
     public void toUserDbReturnsValidUserDbWhenUserDtoIsValid() throws InvalidUserException {
         UserDto userOnlyWithOnlyUsername = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
         UserDto actualUserOnlyWithName = convertToUserDbAndBack(userOnlyWithOnlyUsername);
-        assertThat(actualUserOnlyWithName,is(equalTo(userOnlyWithOnlyUsername)));
+        assertThat(actualUserOnlyWithName, is(equalTo(userOnlyWithOnlyUsername)));
     }
 
     private UserDto convertToUserDbAndBack(UserDto userDto) throws InvalidUserException {

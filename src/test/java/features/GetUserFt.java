@@ -16,7 +16,6 @@ import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 
-
 public class GetUserFt extends DatabaseTest {
 
     private String username;
@@ -26,8 +25,8 @@ public class GetUserFt extends DatabaseTest {
     private UserDto user;
 
     @BeforeEach
-    public void init(){
-        db =new DatabaseServiceImpl(initializeDatabase());
+    public void init() {
+        db = new DatabaseServiceImpl(initializeDatabase());
     }
 
     public GetUserFt() {
@@ -35,8 +34,8 @@ public class GetUserFt extends DatabaseTest {
 
     @Given("a user with username {string}")
     public void a_user_with_username(String username) throws InvalidUserException, InvalidRoleException {
-        RoleDto role =  RoleDto.newBuilder().withName("CREATOR").build();
-        UserDto userDto =UserDto.newBuilder()
+        RoleDto role = RoleDto.newBuilder().withName("CREATOR").build();
+        UserDto userDto = UserDto.newBuilder()
             .withUsername(username)
             .withInstitution("NTNU")
             .withRoles(Collections.singletonList(role))
@@ -44,16 +43,15 @@ public class GetUserFt extends DatabaseTest {
 
         db.addUser(userDto);
         this.username = username;
-
     }
 
     @When("handler receives a request for accessing the user details")
     public void handler_receives_a_request_for_accessing_user_details() throws InvalidUserException {
-        this.user= db.getUser(username).get();
+        this.user = db.getUser(username).get();
     }
 
     @Then("the handler returns the user details")
     public void the_handler_returns_the_user_details() {
-        assertThat(user.getUsername(),is(equalTo(this.username)));
+        assertThat(user.getUsername(), is(equalTo(this.username)));
     }
 }

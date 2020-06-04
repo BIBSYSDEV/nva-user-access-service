@@ -67,7 +67,7 @@ public class RoleDto {
         }
 
         public RoleDto build() throws InvalidRoleException {
-            if(StringUtils.isEmpty(this.name)){
+            if (StringUtils.isEmpty(this.name)) {
                 throw new InvalidRoleException(MISSING_ROLE_NAME_ERROR);
             }
             return new RoleDto(this);

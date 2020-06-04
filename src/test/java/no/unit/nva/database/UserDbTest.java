@@ -30,8 +30,6 @@ public class UserDbTest extends DatabaseTest {
     public static final String SOME_INSTITUTION = "SomeInstitution";
     public static final List<RoleDb> SAMPLE_ROLES = createSampleRoles();
 
-
-
     public static final String GETTER_GET_PREFIX = "get";
     public static final String GETTER_IS_PREFIX = "is";
     public static final String NON_EMPTY_FIELD_REQUIREMENT = "Test requires all fields to be non-empty.";
@@ -72,7 +70,7 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    public void getHashKeyKeyShouldReturnTypeAndUsernameConcatenation()  {
+    public void getHashKeyKeyShouldReturnTypeAndUsernameConcatenation() {
         String expectedHashKey = String.join(UserDb.FIELD_DELIMITER, UserDb.TYPE, SOME_USERNAME);
         assertThat(sampleUser.getPrimaryHashKey(), is(equalTo(expectedHashKey)));
     }
@@ -117,7 +115,6 @@ public class UserDbTest extends DatabaseTest {
             .withRoles(roles)
             .build();
     }
-
 
     private void assertThatNoPublicFieldIsNull(UserDb insertedUser) {
         Method[] methods = insertedUser.getClass().getMethods();

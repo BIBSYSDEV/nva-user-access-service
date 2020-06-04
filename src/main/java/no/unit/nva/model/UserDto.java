@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.UserDb;
-import no.unit.nva.database.exceptions.InvalidRoleException;
 import no.unit.nva.database.exceptions.InvalidUserException;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.StringUtils;
@@ -54,7 +53,7 @@ public class UserDto {
             .stream()
             .flatMap(userDb1 -> userDb1.getRoles().stream())
             .map(attempt(RoleDto::fromRoleDb))
-            .map(eff-> eff.orElseThrow(UserDto::unexpectedException))
+            .map(eff -> eff.orElseThrow(UserDto::unexpectedException))
             .collect(Collectors.toList());
     }
 
@@ -75,7 +74,6 @@ public class UserDto {
 
         return userDb.build();
     }
-
 
     public String getUsername() {
         return username;
@@ -101,19 +99,18 @@ public class UserDto {
         this.roles = roles;
     }
 
-
     private List<RoleDb> createRoleDb() {
         return
             Optional.ofNullable(this.roles)
                 .stream()
                 .flatMap(Collection::stream)
                 .map(attempt(RoleDto::toRoleDb))
-                .map(eff->eff.orElseThrow(this::unexpectedInvalidRoleException))
+                .map(eff -> eff.orElseThrow(this::unexpectedInvalidRoleException))
                 .collect(Collectors.toList());
     }
 
     private IllegalStateException unexpectedInvalidRoleException(Failure<RoleDb> failure) {
-        logger.error("Failure while trying to create a Role without a name.",failure.getException());
+        logger.error("Failure while trying to create a Role without a name.", failure.getException());
         return new IllegalStateException(failure.getException());
     }
 
@@ -171,8 +168,8 @@ public class UserDto {
         }
 
         public UserDto build() throws InvalidUserException {
-            if(StringUtils.isEmpty(username)){
-                throw  new InvalidUserException(MISSING_FIELD_ERROR+"username");
+            if (StringUtils.isEmpty(username)) {
+                throw new InvalidUserException(MISSING_FIELD_ERROR + "username");
             }
             return new UserDto(this);
         }

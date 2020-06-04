@@ -60,9 +60,9 @@ public class RoleDbTest extends DatabaseTest {
     }
 
     @Test
-    public void buildWithoutRoleNameShouldThrowException(){
+    public void buildWithoutRoleNameShouldThrowException() {
         Executable action = () -> RoleDb.newBuilder().build();
-        assertThrows(InvalidRoleException.class,action);
+        assertThrows(InvalidRoleException.class, action);
     }
 
     @Test
@@ -93,11 +93,11 @@ public class RoleDbTest extends DatabaseTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings={" ","\t","\n"})
+    @ValueSource(strings = {" ", "\t", "\n"})
     public void setPrimaryHashKeyThrowsExceptionWhenInputIsBlankOrNullString(String blankString) {
-        Executable action = ()->RoleDb.newBuilder().withName(blankString).build();
+        Executable action = () -> RoleDb.newBuilder().withName(blankString).build();
         InvalidRoleException exception = assertThrows(InvalidRoleException.class, action);
-        assertThat(exception.getMessage(),containsString(Builder.EMPTY_ROLE_NAME_ERROR));
+        assertThat(exception.getMessage(), containsString(Builder.EMPTY_ROLE_NAME_ERROR));
     }
 
     private RoleDb createSampleRole() throws InvalidRoleException {

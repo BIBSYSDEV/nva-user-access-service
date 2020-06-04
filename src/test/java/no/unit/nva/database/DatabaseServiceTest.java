@@ -100,9 +100,8 @@ public class DatabaseServiceTest extends DatabaseTest {
         UserDto initialUser = createSampleUser();
         UserDto updatedUser = initialUser.copy().withInstitution("someOtherInstitution").build();
 
-        assertThat(updatedUser,is(not(equalTo(initialUser))));
+        assertThat(updatedUser, is(not(equalTo(initialUser))));
         db.updateUser(updatedUser);
-
     }
 
     private UserDto userWithoutUsername() throws InvalidUserException {

@@ -1,7 +1,6 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
@@ -120,12 +119,11 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
     }
 
     /**
-     * Do not use this function. This function is defined only for internal usage (by DynamoDB).
-     * The function does not reset the primaryKey once it has been set.
-     * It does not throw an Exception because this method is supposed ot be used only by DynamoDb.
-     * For any other purpose use the {@link UserDb.Builder}
-     * @param primaryKey the primaryKey
+     * Do not use this function. This function is defined only for internal usage (by DynamoDB). The function does not
+     * reset the primaryKey once it has been set. It does not throw an Exception because this method is supposed ot be
+     * used only by DynamoDb. For any other purpose use the {@link UserDb.Builder}
      *
+     * @param primaryKey the primaryKey
      */
     public void setPrimaryHashKey(String primaryKey) throws InvalidUserException {
         if (primaryKeyHasNotBeenSet()) {

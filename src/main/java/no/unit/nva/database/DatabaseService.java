@@ -6,7 +6,7 @@ import no.unit.nva.model.UserDto;
 
 public interface DatabaseService {
 
-    String TABLE_NAME= "UsersRoles";
+    String TABLE_NAME = "UsersRoles";
 
     Optional<UserDto> getUser(String username) throws InvalidUserException;
 

@@ -20,13 +20,10 @@ import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
 
 public abstract class DatabaseTest {
 
     protected AmazonDynamoDB localDynamo;
-
-
 
     public final AmazonDynamoDB initializeDatabase() {
 
@@ -48,9 +45,10 @@ public abstract class DatabaseTest {
     }
 
     @AfterEach
-    public void closeDB(){
-        if(nonNull(localDynamo))
-        localDynamo.shutdown();
+    public void closeDB() {
+        if (nonNull(localDynamo)) {
+            localDynamo.shutdown();
+        }
     }
 
     private static CreateTableResult createTable(AmazonDynamoDB ddb, String tableName, String hashKeyName,
@@ -74,6 +72,4 @@ public abstract class DatabaseTest {
 
         return ddb.createTable(request);
     }
-
-
 }
