@@ -1,5 +1,8 @@
 plugins {
     id 'java'
+    id 'jacoco'
+    id 'checkstyle'
+    id 'pmd'
 
 }
 
@@ -27,7 +30,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: jacksonVersion
 
 
-    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: '0.3.4'
+    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: 'f4bc3ee5e'
 
     testImplementation group: 'com.amazonaws', name: 'DynamoDBLocal', version: '1.12.0'
     testImplementation group: 'com.almworks.sqlite4java', name: 'sqlite4java', version: '1.0.392'
@@ -38,21 +41,15 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: jupiterVersion
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
 
-
 }
 
-
+configurations.testImplementation.canBeResolved = true
 configurations {
     cucumberRuntime {
         extendsFrom testImplementation
     }
 }
 
-test {
-    useJUnitPlatform()
-}
-
-configurations.testImplementation.canBeResolved = true
 
 task copyNativeDeps(type: Copy) {
     from(configurations.testImplementation) {
@@ -67,6 +64,65 @@ test.dependsOn copyNativeDeps
 test.doFirst {
     systemProperty "java.library.path", 'build/dynamodb-local'
 }
+
+
+test {
+    useJUnitPlatform()
+    failFast = true
+    testLogging {
+        events 'skipped', 'passed', 'failed'
+    }
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
+pmd {
+    ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
+    ruleSets = []
+    ignoreFailures = false
+}
+
+checkstyle {
+    configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
+    showViolations = true
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        xml.enabled false
+        html.enabled true
+        html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
+    }
+}
+
+check.dependsOn jacocoTestCoverageVerification
+jacocoTestCoverageVerification.dependsOn(jacocoTestReport)
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'METHOD'
+                value = 'COVEREDRATIO'
+                minimum = 1.00
+            }
+        }
+
+        rule {
+            limit {
+                counter = 'CLASS'
+                value = 'COVEREDRATIO'
+                minimum = 1.00
+            }
+        }
+    }
+}
+
 
 
 task cucumber() {
