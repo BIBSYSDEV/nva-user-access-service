@@ -11,6 +11,7 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 import java.util.List;
 import java.util.Optional;
+import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import no.unit.nva.database.exceptions.InvalidUserException;
 import no.unit.nva.model.UserDto;
 import nva.commons.utils.JacocoGenerated;
@@ -84,6 +85,6 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public UserDto updateUser(UserDto user) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }
