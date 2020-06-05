@@ -8,7 +8,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.core.IsSame.sameInstance;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.text.IsEmptyString.emptyString;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
@@ -39,7 +39,8 @@ public class RoleDbTest extends DatabaseTest {
 
     @Test
     void roleDbHasBuilder() {
-        assertDoesNotThrow(RoleDb::newBuilder);
+        RoleDb.Builder builder = RoleDb.newBuilder();
+        assertNotNull(builder);
     }
 
     @Test

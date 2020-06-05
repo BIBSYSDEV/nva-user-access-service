@@ -30,7 +30,7 @@ public abstract class DatabaseTest {
      *
      * @return a client connected to the local database
      */
-    public final AmazonDynamoDB initializeTestDatabase() {
+    public AmazonDynamoDB initializeTestDatabase() {
 
         localDynamo = DynamoDBEmbedded.create().amazonDynamoDB();
 

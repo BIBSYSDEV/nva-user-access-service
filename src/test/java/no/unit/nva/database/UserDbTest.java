@@ -10,12 +10,14 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import no.unit.nva.database.UserDb.Builder;
 import no.unit.nva.database.exceptions.InvalidRoleException;
 import no.unit.nva.database.exceptions.InvalidUserException;
 import nva.commons.utils.attempt.Try;
@@ -31,7 +33,6 @@ public class UserDbTest extends DatabaseTest {
     public static final String SOME_INSTITUTION = "SomeInstitution";
     public static final List<RoleDb> SAMPLE_ROLES = createSampleRoles();
 
-    public static final String BLANK_STRING = " ";
     private UserDb dynamoFunctionalityTestUser;
     private UserDb sampleUser;
 
@@ -43,13 +44,19 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    void setUsernameShouldAddUsernameToUserObject() throws InvalidUserException {
+    public void userDbHasABuilder() {
+        Builder builder = UserDb.newBuilder();
+        assertNotNull(builder);
+    }
+
+    @Test
+    void setUsernameShouldAddUsernameToUserObject() {
         dynamoFunctionalityTestUser.setUsername(SOME_USERNAME);
         assertThat(dynamoFunctionalityTestUser.getUsername(), is(equalTo(SOME_USERNAME)));
     }
 
     @Test
-    void getUsernameShouldGetTheSetUsernameToUserObject() throws InvalidUserException {
+    void getUsernameShouldGetTheSetUsernameToUserObject() {
         assertThat(dynamoFunctionalityTestUser.getUsername(), is(nullValue()));
 
         dynamoFunctionalityTestUser.setUsername(SOME_USERNAME);
@@ -81,7 +88,7 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    void userDbShouldBeWriteableToDatabase() throws InvalidUserException {
+    void userDbShouldBeWriteableToDatabase() {
         DynamoDBMapper mapper = clientToLocalDatabase();
         assertDoesNotThrow(() -> mapper.save(sampleUser));
     }
@@ -102,7 +109,7 @@ public class UserDbTest extends DatabaseTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    void builderShouldThrowExceptionWhenUsernameIsNotValid(String invalidUsername) throws InvalidUserException {
+    void builderShouldThrowExceptionWhenUsernameIsNotValid(String invalidUsername) {
 
         Executable action = () -> UserDb.newBuilder()
             .withUsername(invalidUsername)

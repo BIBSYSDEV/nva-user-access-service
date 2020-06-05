@@ -8,6 +8,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsSame.sameInstance;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
@@ -41,6 +42,7 @@ public class UserDtoTest {
     @Test
     void userDtoShouldHaveABuilder() {
         Builder builder = UserDto.newBuilder();
+        assertNotNull(builder);
     }
 
     @Test
@@ -82,8 +84,8 @@ public class UserDtoTest {
         throws InvalidUserException {
         RoleDb invalidRole = new RoleDb();
         invalidRole.setName(invalidRoleName);
-        List<RoleDb> invlalidRoles = Collections.singletonList(invalidRole);
-        UserDb userDbWithInvalidRole = UserDb.newBuilder().withUsername(SOME_USERNAME).withRoles(invlalidRoles).build();
+        List<RoleDb> invalidRoles = Collections.singletonList(invalidRole);
+        UserDb userDbWithInvalidRole = UserDb.newBuilder().withUsername(SOME_USERNAME).withRoles(invalidRoles).build();
 
         Executable action = () -> UserDto.fromUserDb(userDbWithInvalidRole);
         RuntimeException exception = assertThrows(RuntimeException.class, action);
@@ -96,10 +98,10 @@ public class UserDtoTest {
         throws InvalidUserException, InvalidRoleException {
         RoleDto invalidRole = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
         invalidRole.setName(invalidRoleName);
-        List<RoleDto> invlalidRoles = Collections.singletonList(invalidRole);
-        UserDto userWithInvalidRole = UserDto.newBuilder().withUsername(SOME_USERNAME).withRoles(invlalidRoles).build();
+        List<RoleDto> invalidRoles = Collections.singletonList(invalidRole);
+        UserDto userWithInvalidRole = UserDto.newBuilder().withUsername(SOME_USERNAME).withRoles(invalidRoles).build();
 
-        Executable action = () -> userWithInvalidRole.toUserDb();
+        Executable action = userWithInvalidRole::toUserDb;
         RuntimeException exception = assertThrows(RuntimeException.class, action);
         assertThat(exception.getCause(), is(instanceOf(InvalidRoleException.class)));
     }
