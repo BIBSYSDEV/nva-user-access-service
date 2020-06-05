@@ -16,6 +16,7 @@ import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 
+@SuppressWarnings({"MissingJavadocMethod", "MethodName"})
 public class GetUserFt extends DatabaseTest {
 
     private String username;
@@ -33,7 +34,7 @@ public class GetUserFt extends DatabaseTest {
     }
 
     @Given("a user with username {string}")
-    public void aUserWithUsername(String username) throws InvalidUserException, InvalidRoleException {
+    void userWithUsername(String username) throws InvalidUserException, InvalidRoleException {
         RoleDto role = RoleDto.newBuilder().withName("CREATOR").build();
         UserDto userDto = UserDto.newBuilder()
             .withUsername(username)

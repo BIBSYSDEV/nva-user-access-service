@@ -63,6 +63,13 @@ public class RoleDb implements WithCopy<RoleDb.Builder>, WithType, DynamoEntry {
         this.name = name;
     }
 
+    /**
+     * Do not use this method. This is only for usage by the DynamoDbMapper. Sets the hash key value for the database
+     * entry. This is the hashKey for the table and not any secondary index.
+     *
+     * @param primaryHashKey the primary hash key saved in the database
+     * @throws InvalidRoleException when the role is invalid.
+     */
     @JacocoGenerated
     public void setPrimaryHashKey(String primaryHashKey) throws InvalidRoleException {
         if (primaryHashKeyHasNotBeenSet()) {

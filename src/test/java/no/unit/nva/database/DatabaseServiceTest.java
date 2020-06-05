@@ -3,7 +3,6 @@ package no.unit.nva.database;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNot.not;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
@@ -92,16 +91,7 @@ public class DatabaseServiceTest extends DatabaseTest {
     @Test
     public void dbServiceShouldHaveAMethodForUpdatingExistingUser() throws InvalidRoleException, InvalidUserException {
         UserDto user = createSampleUser();
-        db.updateUser(user);
-    }
-
-    @Test
-    public void updateShouldUpdateUserInDatabase() throws InvalidRoleException, InvalidUserException {
-        UserDto initialUser = createSampleUser();
-        UserDto updatedUser = initialUser.copy().withInstitution("someOtherInstitution").build();
-
-        assertThat(updatedUser, is(not(equalTo(initialUser))));
-        db.updateUser(updatedUser);
+        assertThrows(RuntimeException.class, () -> db.updateUser(user));
     }
 
     private UserDto userWithoutUsername() throws InvalidUserException {

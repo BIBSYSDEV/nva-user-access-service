@@ -32,50 +32,50 @@ public class RoleDbTest extends DatabaseTest {
     }
 
     @BeforeEach
-    public void init() {
+    void init() {
         initializeTestDatabase();
         mapper = new DynamoDBMapper(localDynamo);
     }
 
     @Test
-    public void roleDbHasBuilder() {
+    void roleDbHasBuilder() {
         assertDoesNotThrow(RoleDb::newBuilder);
     }
 
     @Test
-    public void roleDbHasRoleName() throws InvalidRoleException {
+    void roleDbHasRoleName() throws InvalidRoleException {
         RoleDb roleDb = createSampleRole();
         assertThat(roleDb.getName(), is(equalTo(SOME_ROLE_NAME)));
     }
 
     @Test
-    public void builderSetsTheRolename() throws InvalidRoleException {
+    void builderSetsTheRolename() throws InvalidRoleException {
         RoleDb role = RoleDb.newBuilder().withName(SOME_ROLE_NAME).build();
         assertThat(role.getName(), is(equalTo(SOME_ROLE_NAME)));
     }
 
     @Test
-    public void buildReturnsObjectWithInitializedPrimaryHashKey() throws InvalidRoleException {
+    void buildReturnsObjectWithInitializedPrimaryHashKey() throws InvalidRoleException {
         RoleDb role = RoleDb.newBuilder().withName(SOME_ROLE_NAME).build();
         assertThat(role.getPrimaryHashKey(), is(not(nullValue())));
         assertThat(role.getPrimaryHashKey(), is(not(emptyString())));
     }
 
     @Test
-    public void buildWithoutRoleNameShouldThrowException() {
+    void buildWithoutRoleNameShouldThrowException() {
         Executable action = () -> RoleDb.newBuilder().build();
         assertThrows(InvalidRoleException.class, action);
     }
 
     @Test
-    public void roleDbRoleNameIsSavedInDatabase() {
+    void roleDbRoleNameIsSavedInDatabase() {
         mapper.save(sampleRole);
         RoleDb retrievedRole = mapper.load(RoleDb.class, sampleRole.getPrimaryHashKey());
         assertThat(retrievedRole, is(equalTo(sampleRole)));
     }
 
     @Test
-    public void getPrimaryHashKeyReturnsStringContainingRoleName() {
+    void getPrimaryHashKeyReturnsStringContainingRoleName() {
         assertThat(sampleRole.getPrimaryHashKey(), containsString(sampleRole.getName()));
     }
 
@@ -85,7 +85,7 @@ public class RoleDbTest extends DatabaseTest {
     }
 
     @Test
-    public void setPrimaryHashKeyShouldNotChangeTheValueOfAlreadySetPrimaryHashKey() throws InvalidRoleException {
+    void setPrimaryHashKeyShouldNotChangeTheValueOfAlreadySetPrimaryHashKey() throws InvalidRoleException {
         String someOtherHashKey = "SomeOtherHashKey";
         sampleRole.setPrimaryHashKey(someOtherHashKey);
         assertThat(sampleRole.getPrimaryHashKey(), is(not(equalTo(someOtherHashKey))));
@@ -96,14 +96,14 @@ public class RoleDbTest extends DatabaseTest {
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "\t", "\n"})
-    public void setPrimaryHashKeyThrowsExceptionWhenInputIsBlankOrNullString(String blankString) {
+    void setPrimaryHashKeyThrowsExceptionWhenInputIsBlankOrNullString(String blankString) {
         Executable action = () -> RoleDb.newBuilder().withName(blankString).build();
         InvalidRoleException exception = assertThrows(InvalidRoleException.class, action);
         assertThat(exception.getMessage(), containsString(Builder.EMPTY_ROLE_NAME_ERROR));
     }
 
     @Test
-    public void copyReturnsBuilderContainingAllFieldValuesOfOriginalItem() throws InvalidRoleException {
+    void copyReturnsBuilderContainingAllFieldValuesOfOriginalItem() throws InvalidRoleException {
         RoleDb copyRole = sampleRole.copy().build();
         assertThat(copyRole, is(equalTo(sampleRole)));
         assertThat(copyRole, is(not(sameInstance(sampleRole))));

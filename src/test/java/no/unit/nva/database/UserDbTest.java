@@ -31,7 +31,6 @@ public class UserDbTest extends DatabaseTest {
     public static final String SOME_INSTITUTION = "SomeInstitution";
     public static final List<RoleDb> SAMPLE_ROLES = createSampleRoles();
 
-
     public static final String BLANK_STRING = " ";
     private UserDb dynamoFunctionalityTestUser;
     private UserDb sampleUser;
@@ -44,13 +43,13 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    public void setUsernameShouldAddUsernameToUserObject() throws InvalidUserException {
+    void setUsernameShouldAddUsernameToUserObject() throws InvalidUserException {
         dynamoFunctionalityTestUser.setUsername(SOME_USERNAME);
         assertThat(dynamoFunctionalityTestUser.getUsername(), is(equalTo(SOME_USERNAME)));
     }
 
     @Test
-    public void getUsernameShouldGetTheSetUsernameToUserObject() throws InvalidUserException {
+    void getUsernameShouldGetTheSetUsernameToUserObject() throws InvalidUserException {
         assertThat(dynamoFunctionalityTestUser.getUsername(), is(nullValue()));
 
         dynamoFunctionalityTestUser.setUsername(SOME_USERNAME);
@@ -58,18 +57,18 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    public void getTypeShouldReturnConstantTypeValue() {
+    void getTypeShouldReturnConstantTypeValue() {
         assertThat(dynamoFunctionalityTestUser.getType(), is(equalTo(UserDb.TYPE)));
     }
 
     @Test
-    public void setTypeShouldNotChangeTheReturnedTypeValue() {
+    void setTypeShouldNotChangeTheReturnedTypeValue() {
         dynamoFunctionalityTestUser.setType("NotExpectedType");
         assertThat(dynamoFunctionalityTestUser.getType(), is(equalTo(UserDb.TYPE)));
     }
 
     @Test
-    public void getHashKeyKeyShouldReturnTypeAndUsernameConcatenation() {
+    void getHashKeyKeyShouldReturnTypeAndUsernameConcatenation() {
         String expectedHashKey = String.join(UserDb.FIELD_DELIMITER, UserDb.TYPE, SOME_USERNAME);
         assertThat(sampleUser.getPrimaryHashKey(), is(equalTo(expectedHashKey)));
     }
@@ -82,13 +81,13 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    public void userDbShouldBeWriteableToDatabase() throws InvalidUserException {
+    void userDbShouldBeWriteableToDatabase() throws InvalidUserException {
         DynamoDBMapper mapper = clientToLocalDatabase();
         assertDoesNotThrow(() -> mapper.save(sampleUser));
     }
 
     @Test
-    public void userDbShouldBeReadFromDatabaseWithoutDataLoss() throws InvalidUserException {
+    void userDbShouldBeReadFromDatabaseWithoutDataLoss() throws InvalidUserException {
         UserDb insertedUser = UserDb.newBuilder()
             .withUsername(SOME_USERNAME)
             .withInstitution(SOME_INSTITUTION)
@@ -103,7 +102,7 @@ public class UserDbTest extends DatabaseTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    public void builderShouldThrowExceptionWhenUsernameIsNotValid(String invalidUsername) throws InvalidUserException {
+    void builderShouldThrowExceptionWhenUsernameIsNotValid(String invalidUsername) throws InvalidUserException {
 
         Executable action = () -> UserDb.newBuilder()
             .withUsername(invalidUsername)
@@ -116,7 +115,7 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    public void copyShouldReturnBuilderWithFilledInFields() throws InvalidUserException {
+    void copyShouldReturnBuilderWithFilledInFields() throws InvalidUserException {
         UserDb originalUser = UserDb.newBuilder()
             .withUsername(SOME_USERNAME)
             .withInstitution(SOME_INSTITUTION)
@@ -129,7 +128,7 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    public void setPrimaryHashKeyThrowsExceptionWhenKeyDoesNotStartWithType() {
+    void setPrimaryHashKeyThrowsExceptionWhenKeyDoesNotStartWithType() {
         UserDb userDb = new UserDb();
         Executable action = () -> userDb.setPrimaryHashKey("SomeKey");
         InvalidUserException exception = assertThrows(InvalidUserException.class, action);
@@ -150,6 +149,4 @@ public class UserDbTest extends DatabaseTest {
     private static RoleDb newRole(String str) throws InvalidRoleException {
         return RoleDb.newBuilder().withName(str).build();
     }
-
-
 }

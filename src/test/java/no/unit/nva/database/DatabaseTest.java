@@ -25,6 +25,11 @@ public abstract class DatabaseTest {
 
     protected AmazonDynamoDB localDynamo;
 
+    /**
+     * Initializes a local database.
+     *
+     * @return a client connected to the local database
+     */
     public final AmazonDynamoDB initializeTestDatabase() {
 
         localDynamo = DynamoDBEmbedded.create().amazonDynamoDB();
@@ -44,6 +49,9 @@ public abstract class DatabaseTest {
         return localDynamo;
     }
 
+    /**
+     * Closes db.
+     */
     @AfterEach
     public void closeDB() {
         if (nonNull(localDynamo)) {

@@ -66,6 +66,12 @@ public class RoleDto {
             return this;
         }
 
+        /**
+         * Builds a RoleDto.
+         *
+         * @return a RoleDto
+         * @throws InvalidRoleException when the generated role would be invalid.
+         */
         public RoleDto build() throws InvalidRoleException {
             if (StringUtils.isEmpty(this.name)) {
                 throw new InvalidRoleException(MISSING_ROLE_NAME_ERROR);

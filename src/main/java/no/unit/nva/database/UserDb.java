@@ -124,6 +124,7 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
      * used only by DynamoDb. For any other purpose use the {@link UserDb.Builder}
      *
      * @param primaryKey the primaryKey
+     * @throws InvalidUserException when the primary key is invalid.
      */
     public void setPrimaryHashKey(String primaryKey) throws InvalidUserException {
         if (primaryKeyHasNotBeenSet()) {
@@ -160,10 +161,10 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
             return false;
         }
         UserDb userDb = (UserDb) o;
-        return Objects.equals(getPrimaryHashKey(), userDb.getPrimaryHashKey()) &&
-            Objects.equals(getUsername(), userDb.getUsername()) &&
-            Objects.equals(getInstitution(), userDb.getInstitution()) &&
-            Objects.equals(getRoles(), userDb.getRoles());
+        return Objects.equals(getPrimaryHashKey(), userDb.getPrimaryHashKey())
+            && Objects.equals(getUsername(), userDb.getUsername())
+            && Objects.equals(getInstitution(), userDb.getInstitution())
+            && Objects.equals(getRoles(), userDb.getRoles());
     }
 
     @Override
