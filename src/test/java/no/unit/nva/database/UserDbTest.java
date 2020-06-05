@@ -40,7 +40,7 @@ public class UserDbTest extends DatabaseTest {
     private void init() throws InvalidUserException {
         dynamoFunctionalityTestUser = new UserDb();
         sampleUser = UserDb.newBuilder().withUsername(SOME_USERNAME).build();
-        initializeDatabase();
+        initializeTestDatabase();
     }
 
     @Test

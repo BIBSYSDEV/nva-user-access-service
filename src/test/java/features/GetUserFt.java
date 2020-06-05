@@ -26,7 +26,7 @@ public class GetUserFt extends DatabaseTest {
 
     @BeforeEach
     public void init() {
-        db = new DatabaseServiceImpl(initializeDatabase());
+        db = new DatabaseServiceImpl(initializeTestDatabase());
     }
 
     public GetUserFt() {

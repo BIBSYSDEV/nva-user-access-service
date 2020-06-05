@@ -25,7 +25,7 @@ public abstract class DatabaseTest {
 
     protected AmazonDynamoDB localDynamo;
 
-    public final AmazonDynamoDB initializeDatabase() {
+    public final AmazonDynamoDB initializeTestDatabase() {
 
         localDynamo = DynamoDBEmbedded.create().amazonDynamoDB();
 

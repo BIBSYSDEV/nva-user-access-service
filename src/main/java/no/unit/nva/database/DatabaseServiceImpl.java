@@ -45,19 +45,24 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Optional<UserDto> getUser(String username) throws InvalidUserException {
+        UserDb searchObject = UserDto.newBuilder().withUsername(username).build().toUserDb();
+        DynamoDBQueryExpression<UserDb> query = createGetUserQuery(searchObject);
+        List<UserDb> result = mapper.query(UserDb.class, query);
 
-        UserDb searchObject = UserDto.newBuilder().withUsername(username)
-            .build().toUserDb();
+        UserDto user = result
+            .stream()
+            .map(attempt(UserDto::fromUserDb))
+            .map(effort -> effort.orElseThrow(this::unexpectedException))
+            .collect(SingletonCollector.collectOrElse(null));
+
+        return Optional.ofNullable(user);
+    }
+
+    private DynamoDBQueryExpression<UserDb> createGetUserQuery(UserDb searchObject) {
         Condition comparisonCondition = entityTypeAsRangeKey();
-        DynamoDBQueryExpression<UserDb> query = new DynamoDBQueryExpression<UserDb>()
+        return new DynamoDBQueryExpression<UserDb>()
             .withHashKeyValues(searchObject)
             .withRangeKeyCondition(RANGE_KEY_NAME, comparisonCondition);
-        List<UserDb> result = mapper.query(UserDb.class, query);
-        UserDto user = result.stream()
-            .map(attempt(UserDto::fromUserDb))
-            .map(eff -> eff.orElseThrow(this::unexpectedException))
-            .collect(SingletonCollector.collectOrElse(null));
-        return Optional.ofNullable(user);
     }
 
     private IllegalStateException unexpectedException(Failure<UserDto> failure) {
