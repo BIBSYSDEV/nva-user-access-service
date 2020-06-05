@@ -5,8 +5,10 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.hamcrest.core.IsSame.sameInstance;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.text.IsEmptyString.emptyString;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
@@ -24,20 +26,20 @@ public class RoleDbTest extends DatabaseTest {
     public static final String SOME_ROLE_NAME = "someRoleName";
 
     private DynamoDBMapper mapper;
-    private RoleDb sampleRole = createSampleRole();
+    private final RoleDb sampleRole = createSampleRole();
 
     public RoleDbTest() throws InvalidRoleException {
     }
 
     @BeforeEach
     public void init() {
-        initializeDatabase();
+        initializeTestDatabase();
         mapper = new DynamoDBMapper(localDynamo);
     }
 
     @Test
     public void roleDbHasBuilder() {
-        Builder roleDb = RoleDb.newBuilder();
+        assertDoesNotThrow(RoleDb::newBuilder);
     }
 
     @Test
@@ -60,9 +62,9 @@ public class RoleDbTest extends DatabaseTest {
     }
 
     @Test
-    public void buildWithoutRoleNameShouldThrowException(){
+    public void buildWithoutRoleNameShouldThrowException() {
         Executable action = () -> RoleDb.newBuilder().build();
-        assertThrows(InvalidRoleException.class,action);
+        assertThrows(InvalidRoleException.class, action);
     }
 
     @Test
@@ -93,11 +95,18 @@ public class RoleDbTest extends DatabaseTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings={" ","\t","\n"})
+    @ValueSource(strings = {" ", "\t", "\n"})
     public void setPrimaryHashKeyThrowsExceptionWhenInputIsBlankOrNullString(String blankString) {
-        Executable action = ()->RoleDb.newBuilder().withName(blankString).build();
+        Executable action = () -> RoleDb.newBuilder().withName(blankString).build();
         InvalidRoleException exception = assertThrows(InvalidRoleException.class, action);
-        assertThat(exception.getMessage(),containsString(Builder.EMPTY_ROLE_NAME_ERROR));
+        assertThat(exception.getMessage(), containsString(Builder.EMPTY_ROLE_NAME_ERROR));
+    }
+
+    @Test
+    public void copyReturnsBuilderContainingAllFieldValuesOfOriginalItem() throws InvalidRoleException {
+        RoleDb copyRole = sampleRole.copy().build();
+        assertThat(copyRole, is(equalTo(sampleRole)));
+        assertThat(copyRole, is(not(sameInstance(sampleRole))));
     }
 
     private RoleDb createSampleRole() throws InvalidRoleException {

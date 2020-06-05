@@ -1,7 +1,6 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
@@ -23,7 +22,6 @@ import nva.commons.utils.JacocoGenerated;
 @DynamoDBTyped
 public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
 
-    public static final String ROLE_DELIMITER = ",";
     public static final String TYPE = "USER";
     public static final String INVALID_USER_EMPTY_USERNAME = "Invalid user entry: Empty username is not allowed";
     public static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey of user should start with \"USER\"";
@@ -61,6 +59,7 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
 
     @JacocoGenerated
     @DynamoDBAttribute(attributeName = "type")
+    @Override
     public String getType() {
         return TYPE;
     }
@@ -120,12 +119,11 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
     }
 
     /**
-     * Do not use this function. This function is defined only for internal usage (by DynamoDB).
-     * The function does not reset the primaryKey once it has been set.
-     * It does not throw an Exception because this method is supposed ot be used only by DynamoDb.
-     * For any other purpose use the {@link UserDb.Builder}
-     * @param primaryKey the primaryKey
+     * Do not use this function. This function is defined only for internal usage (by DynamoDB). The function does not
+     * reset the primaryKey once it has been set. It does not throw an Exception because this method is supposed ot be
+     * used only by DynamoDb. For any other purpose use the {@link UserDb.Builder}
      *
+     * @param primaryKey the primaryKey
      */
     public void setPrimaryHashKey(String primaryKey) throws InvalidUserException {
         if (primaryKeyHasNotBeenSet()) {
@@ -180,7 +178,6 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
         private String institution;
         private List<RoleDb> roles;
         private String primaryHashKey;
-        private static final String EMPTY_STRING = "";
 
         private Builder() {
         }

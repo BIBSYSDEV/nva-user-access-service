@@ -1,5 +1,7 @@
 package no.unit.nva.database.intefaces;
 
 public interface DynamoEntry {
-    String FIELD_DELIMITER= "#";
+
+    @SuppressWarnings("PMD.ConstantsInInterface")
+    String FIELD_DELIMITER = "#";
 }

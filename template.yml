@@ -1,7 +1,9 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
-Description: "A small description of the template"
+Description: >
+   The resources for providing a service for listing users and roles.
+   It includes a table containing users and roles and lambda functions for accessing the data.
 
 Resources:
   UserRoleMappings:
@@ -13,10 +15,8 @@ Resources:
           AttributeType: S
         - AttributeName: PK1B
           AttributeType: S
-      BillingMode: PROVISIONED
-      ProvisionedThroughput:
-        ReadCapacityUnits: 2
-        WriteCapacityUnits: 2
+      BillingMode: PAY_PER_REQUEST
+
       KeySchema:
         - AttributeName: PK1A
           KeyType: HASH
