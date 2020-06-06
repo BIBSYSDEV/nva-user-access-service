@@ -16,7 +16,7 @@ import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 
-@SuppressWarnings({"MissingJavadocMethod", "MethodName"})
+@SuppressWarnings({"MissingJavadocMethod","MethodName"})
 public class GetUserFt extends DatabaseTest {
 
     private String username;

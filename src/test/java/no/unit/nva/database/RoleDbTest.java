@@ -15,6 +15,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import no.unit.nva.database.RoleDb.Builder;
 import no.unit.nva.database.exceptions.InvalidRoleException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -94,6 +95,7 @@ public class RoleDbTest extends DatabaseTest {
         assertThat(sampleRole.getPrimaryHashKey(), containsString(RoleDb.TYPE));
     }
 
+    @DisplayName("setPrimaryHashKey throw exception when input is blank or null")
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "\t", "\n"})
