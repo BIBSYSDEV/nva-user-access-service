@@ -2,7 +2,7 @@ package no.unit.nva.database.intefaces;
 
 import static java.util.Objects.isNull;
 
-public abstract class DynamoEntry {
+public abstract class DynamoEntry implements WithType {
 
     @SuppressWarnings("PMD.ConstantsInInterface")
     public static String FIELD_DELIMITER = "#";
@@ -14,6 +14,8 @@ public abstract class DynamoEntry {
     protected boolean primaryKeyHasNotBeenSet() {
         return isNull(getPrimaryHashKey());
     }
+
+    public abstract String getType();
 
     /**
      * Do not use. Intented only for use from DynamoDB. This method has no effect as the type is always ROLE.

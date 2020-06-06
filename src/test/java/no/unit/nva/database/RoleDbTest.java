@@ -97,8 +97,7 @@ public class RoleDbTest extends DatabaseTest {
         assertThat(sampleRole.getPrimaryHashKey(), containsString(RoleDb.TYPE));
     }
 
-    @DisplayName("setPrimaryHashKey throw exception when input is blank or null")
-    @ParameterizedTest
+    @ParameterizedTest(name = "setPrimaryHashKey throws exception when input is:\"{0}\"")
     @NullAndEmptySource
     @ValueSource(strings = {" ", "\t", "\n", "\r"})
     void setPrimaryHashKeyThrowsExceptionWhenInputIsBlankOrNullString(String blankString) {
@@ -108,7 +107,7 @@ public class RoleDbTest extends DatabaseTest {
     }
 
     @Test
-    public void setPrimaryRangeKeyHasNoEffect() throws InvalidRoleException {
+    void setPrimaryRangeKeyHasNoEffect() throws InvalidRoleException {
         RoleDb originalRole = RoleDb.newBuilder().withName(SOME_ROLE_NAME).build();
         RoleDb copy = originalRole.copy().build();
         copy.setPrimaryRangeKey(SOME_OTHER_RANGE_KEY);
@@ -116,7 +115,7 @@ public class RoleDbTest extends DatabaseTest {
     }
 
     @Test
-    public void setTypeHasNoEffect() throws InvalidRoleException {
+    void setTypeHasNoEffect() throws InvalidRoleException {
         RoleDb originalRole = RoleDb.newBuilder().withName(SOME_ROLE_NAME).build();
         RoleDb copy = originalRole.copy().build();
         copy.setType(SOME_TYPE);

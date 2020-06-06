@@ -44,7 +44,7 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    public void userDbHasABuilder() {
+    void userDbHasABuilder() {
         Builder builder = UserDb.newBuilder();
         assertNotNull(builder);
     }
@@ -107,7 +107,7 @@ public class UserDbTest extends DatabaseTest {
         assertThat(savedUser, is(equalTo(insertedUser)));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "builder should throw exception when username is:\"{0}\"")
     @NullAndEmptySource
     void builderShouldThrowExceptionWhenUsernameIsNotValid(String invalidUsername) {
 

@@ -15,12 +15,11 @@ import no.unit.nva.database.UserDb.Builder;
 import no.unit.nva.database.exceptions.InvalidUserException;
 import no.unit.nva.database.intefaces.DynamoEntry;
 import no.unit.nva.database.intefaces.WithCopy;
-import no.unit.nva.database.intefaces.WithType;
 import nva.commons.utils.JacocoGenerated;
 
 @DynamoDBTable(tableName = "UsersRoles")
 @DynamoDBTyped
-public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
+public class UserDb extends DynamoEntry implements WithCopy<Builder> {
 
     public static final String TYPE = "USER";
     public static final String INVALID_USER_EMPTY_USERNAME = "Invalid user entry: Empty username is not allowed";

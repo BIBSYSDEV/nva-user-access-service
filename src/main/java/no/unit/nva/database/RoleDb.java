@@ -10,11 +10,10 @@ import java.util.Objects;
 import no.unit.nva.database.exceptions.InvalidRoleException;
 import no.unit.nva.database.intefaces.DynamoEntry;
 import no.unit.nva.database.intefaces.WithCopy;
-import no.unit.nva.database.intefaces.WithType;
 import nva.commons.utils.JacocoGenerated;
 
 @DynamoDBTable(tableName = "UsersRoles")
-public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder>, WithType {
+public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder> {
 
     private static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey should start with \"ROLE\"";
     public static String TYPE = "ROLE";

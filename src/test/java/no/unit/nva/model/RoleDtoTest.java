@@ -30,7 +30,7 @@ public class RoleDtoTest {
         assertThat(role.getName(), is(equalTo(SOME_ROLE_NAME)));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "builder should throw exception when rolename is:\"{0}\"")
     @NullAndEmptySource
     @ValueSource(strings = {"", " "})
     public void builderShouldNotAllowEmptyRoleName(String rolename) {
