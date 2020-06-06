@@ -14,7 +14,7 @@ import no.unit.nva.database.intefaces.WithType;
 import nva.commons.utils.JacocoGenerated;
 
 @DynamoDBTable(tableName = "UsersRoles")
-public class RoleDb implements WithCopy<RoleDb.Builder>, WithType, DynamoEntry {
+public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder>, WithType {
 
     private static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey should start with \"ROLE\"";
     public static String TYPE = "ROLE";
@@ -23,9 +23,11 @@ public class RoleDb implements WithCopy<RoleDb.Builder>, WithType, DynamoEntry {
     private String name;
 
     public RoleDb() {
+        super();
     }
 
     private RoleDb(Builder builder) throws InvalidRoleException {
+        super();
         setName(builder.name);
         setPrimaryHashKey(builder.primaryHashKey);
     }
@@ -36,11 +38,13 @@ public class RoleDb implements WithCopy<RoleDb.Builder>, WithType, DynamoEntry {
 
     @JacocoGenerated
     @DynamoDBHashKey(attributeName = "PK1A")
+    @Override
     public String getPrimaryHashKey() {
         return this.primaryHashKey;
     }
 
     @DynamoDBRangeKey(attributeName = "PK1B")
+    @Override
     public String getPrimaryRangeKey() {
         return getType();
     }
@@ -72,7 +76,7 @@ public class RoleDb implements WithCopy<RoleDb.Builder>, WithType, DynamoEntry {
      */
     @JacocoGenerated
     public void setPrimaryHashKey(String primaryHashKey) throws InvalidRoleException {
-        if (primaryHashKeyHasNotBeenSet()) {
+        if (primaryKeyHasNotBeenSet()) {
             if (!primaryHashKey.startsWith(TYPE)) {
                 throw new InvalidRoleException(INVALID_PRIMARY_HASH_KEY);
             }
@@ -80,30 +84,9 @@ public class RoleDb implements WithCopy<RoleDb.Builder>, WithType, DynamoEntry {
         }
     }
 
-    private boolean primaryHashKeyHasNotBeenSet() {
-        return isNull(this.primaryHashKey);
-    }
-
-    @JacocoGenerated
-    public void setPrimaryRangeKey(String primaryRangeKey) {
-        // DO NOTHING.
-    }
-
-    /**
-     * Do not use. Intented only for use from DynamoDB. This method has no effect as the type is always ROLE.
-     *
-     * @param type ignored parameter.
-     */
-    @JacocoGenerated
-    public void setType(String type) {
-        // DO NOTHING
-    }
-
     @Override
     public Builder copy() {
-        Builder builder = new Builder()
-            .withName(this.name);
-        return builder;
+        return new Builder().withName(this.name);
     }
 
     @Override

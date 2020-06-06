@@ -9,15 +9,17 @@ import org.junit.jupiter.api.Test;
 
 public class ExceptionsTest {
 
+    public static final String SOME_MESSAGE = "Some message";
+
     @Test
     public void invalidUserExceptionReturnsInternalSeverError() {
-        Integer statusCode = new InvalidUserException("Some message").statusCode();
+        Integer statusCode = new InvalidUserException(SOME_MESSAGE).statusCode();
         assertThat(statusCode, is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
     }
 
     @Test
     public void invalidRoleExceptionReturnsInternalSeverError() {
-        Integer statusCode = new InvalidRoleException("Some message").statusCode();
+        Integer statusCode = new InvalidRoleException(SOME_MESSAGE).statusCode();
         assertThat(statusCode, is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
     }
 }

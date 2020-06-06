@@ -6,10 +6,10 @@ Feature: Role features
     And an authorized client
 
 
-    Scenario:
-      When then authorized client sends a createRole request with following parameters
-         | rolename    |
-         | theRolename |
-      Then a new role is stored in the database
-      And the description of the role is returned to the authorized client
+  Scenario:
+    When then authorized client sends a createRole request with following parameters
+      | rolename    |
+      | theRolename |
+    Then a new role is stored in the database
+    And the description of the role is returned to the authorized client
 

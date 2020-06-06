@@ -25,6 +25,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 public class RoleDbTest extends DatabaseTest {
 
     public static final String SOME_ROLE_NAME = "someRoleName";
+    public static final String SOME_OTHER_RANGE_KEY = "SomeOtherRangeKey";
+    public static final String SOME_TYPE = "SomeType";
 
     private DynamoDBMapper mapper;
     private final RoleDb sampleRole = createSampleRole();
@@ -98,11 +100,27 @@ public class RoleDbTest extends DatabaseTest {
     @DisplayName("setPrimaryHashKey throw exception when input is blank or null")
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = {" ", "\t", "\n"})
+    @ValueSource(strings = {" ", "\t", "\n", "\r"})
     void setPrimaryHashKeyThrowsExceptionWhenInputIsBlankOrNullString(String blankString) {
         Executable action = () -> RoleDb.newBuilder().withName(blankString).build();
         InvalidRoleException exception = assertThrows(InvalidRoleException.class, action);
         assertThat(exception.getMessage(), containsString(Builder.EMPTY_ROLE_NAME_ERROR));
+    }
+
+    @Test
+    public void setPrimaryRangeKeyHasNoEffect() throws InvalidRoleException {
+        RoleDb originalRole = RoleDb.newBuilder().withName(SOME_ROLE_NAME).build();
+        RoleDb copy = originalRole.copy().build();
+        copy.setPrimaryRangeKey(SOME_OTHER_RANGE_KEY);
+        assertThat(originalRole, is(equalTo(copy)));
+    }
+
+    @Test
+    public void setTypeHasNoEffect() throws InvalidRoleException {
+        RoleDb originalRole = RoleDb.newBuilder().withName(SOME_ROLE_NAME).build();
+        RoleDb copy = originalRole.copy().build();
+        copy.setType(SOME_TYPE);
+        assertThat(originalRole, is(equalTo(copy)));
     }
 
     @Test

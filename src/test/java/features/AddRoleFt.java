@@ -25,7 +25,8 @@ public class AddRoleFt extends DatabaseTest {
     }
 
     @When("then authorized client sends a createRole request with following parameters")
-    public void then_authorized_client_sends_a_createRole_request_with_following_parameters(io.cucumber.datatable.DataTable dataTable) {
+    public void then_authorized_client_sends_a_createRole_request_with_following_parameters(
+        io.cucumber.datatable.DataTable dataTable) {
 
     }
 
@@ -40,6 +41,4 @@ public class AddRoleFt extends DatabaseTest {
         // Write code here that turns the phrase above into concrete actions
         throw new io.cucumber.java.PendingException();
     }
-
-
 }

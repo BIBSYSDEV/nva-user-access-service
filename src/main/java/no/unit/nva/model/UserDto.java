@@ -22,7 +22,7 @@ public class UserDto {
 
     public static final String MISSING_FIELD_ERROR = "Invalid User. Missing obligatory field: ";
     public static final String ERROR_DUE_TO_INVALID_ROLE =
-        "Failure while trying to create user with role without rolename";
+        "Failure while trying to create user with role without role-name";
     private String username;
 
     private String institution;
@@ -62,11 +62,11 @@ public class UserDto {
             .stream()
             .flatMap(userDb1 -> userDb1.getRoles().stream())
             .map(attempt(RoleDto::fromRoleDb))
-            .map(eff -> eff.orElseThrow(UserDto::unexpectedException))
+            .map(attempt -> attempt.orElseThrow(UserDto::unexpectedException))
             .collect(Collectors.toList());
     }
 
-    /*This exception should not happen as a RoleDb  should always convert to a RoleDto */
+    /*This exception should not happen as a RoleDb should always convert to a RoleDto */
     private static <T> IllegalStateException unexpectedException(Failure<T> failure) {
         logger.error(ERROR_DUE_TO_INVALID_ROLE);
         throw new IllegalStateException(failure.getException());
@@ -126,7 +126,7 @@ public class UserDto {
                 .stream()
                 .flatMap(Collection::stream)
                 .map(attempt(RoleDto::toRoleDb))
-                .map(eff -> eff.orElseThrow(UserDto::unexpectedException))
+                .map(attempt -> attempt.orElseThrow(UserDto::unexpectedException))
                 .collect(Collectors.toList());
     }
 

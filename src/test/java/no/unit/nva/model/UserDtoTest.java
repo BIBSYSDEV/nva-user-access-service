@@ -63,10 +63,10 @@ public class UserDtoTest {
         assertThat(user.getInstitution(), is(equalTo(SOME_INSTITUTION)));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "build throws exception when username is:\"{0}\"")
     @NullAndEmptySource
     @ValueSource(strings = {" "})
-    void buildThrowsExceptionWhenUsernameisNullOrEmpty(String username) {
+    void buildThrowsExceptionWhenUsernameIsNullOrEmpty(String username) {
         Executable action = () -> UserDto.newBuilder().withUsername(username).build();
         assertThrows(InvalidUserException.class, action);
     }
@@ -78,7 +78,7 @@ public class UserDtoTest {
         assertThat(actualUserOnlyWithName, is(equalTo(userOnlyWithOnlyUsername)));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "fromUserDb throws Exception user contains invalidRole. Rolename:\"{0}\"")
     @NullAndEmptySource
     void fromUserDbThrowsExceptionWhenUserDbContainsInvalidRole(String invalidRoleName)
         throws InvalidUserException {

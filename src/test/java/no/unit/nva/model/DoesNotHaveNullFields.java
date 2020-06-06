@@ -38,7 +38,7 @@ public class DoesNotHaveNullFields<T> extends BaseMatcher<T> {
         Stream<MethodInvocationResult> getterInvocations = Arrays.stream(methods)
             .filter(this::isAGetter)
             .map(attempt(method -> invokeMethod(insertedUser, method)))
-            .map(eff -> eff.orElseThrow(fail -> new RuntimeException(fail.getException())));
+            .map(attempt -> attempt.orElseThrow(fail -> new RuntimeException(fail.getException())));
 
         List<MethodInvocationResult> emptyArgs = getterInvocations.filter(this::isEmpty).collect(
             Collectors.toList());

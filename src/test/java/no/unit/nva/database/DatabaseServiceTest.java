@@ -1,11 +1,14 @@
 package no.unit.nva.database;
 
+import static java.util.Objects.nonNull;
+import static no.unit.nva.model.DoesNotHaveNullFields.doesNotHaveNullFields;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
+import java.util.List;
 import no.unit.nva.database.exceptions.InvalidRoleException;
 import no.unit.nva.database.exceptions.InvalidUserException;
 import no.unit.nva.model.RoleDto;
@@ -39,58 +42,47 @@ public class DatabaseServiceTest extends DatabaseTest {
 
     @Test
     public void databaseServiceShouldInsertValidItemInDatabase() throws InvalidUserException, InvalidRoleException {
-        UserDto insertedUser = createSampleUser();
+        UserDto insertedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
         db.addUser(insertedUser);
-
-        UserDto savedUsr = db.getUser(insertedUser.getUsername()).get();
-        assertThat(savedUsr, is(equalTo(insertedUser)));
+        UserDto savedUser = getUser(insertedUser);
+        assertThat(insertedUser, doesNotHaveNullFields());
+        assertThat(savedUser, is(equalTo(insertedUser)));
     }
 
     @Test
     public void databaseServiceShouldReturnNonEmptyUserWhenUsernameExistsInDatabase()
         throws InvalidUserException, InvalidRoleException {
-        UserDto insertedUser = createSampleUser();
-        db.addUser(insertedUser);
-
-        UserDto savedUsr = db.getUser(insertedUser.getUsername()).get();
-        assertThat(savedUsr, is(equalTo(insertedUser)));
+        UserDto insertedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
+        UserDto savedUser = getUser(insertedUser);
+        assertThat(insertedUser, doesNotHaveNullFields());
+        assertThat(savedUser, is(equalTo(insertedUser)));
     }
 
     @Test
     public void addUserShouldSaveAUserWithoutInstitution() throws InvalidUserException, InvalidRoleException {
-        RoleDto role = RoleDto.newBuilder().withName(SOME_ROLE).build();
-        UserDto expectedUser = UserDto.newBuilder()
-            .withUsername(SOME_USERNAME)
-            .withRoles(Collections.singletonList(role))
-            .build();
-        db.addUser(expectedUser);
-        UserDto actualUser = db.getUser(expectedUser.getUsername()).get();
-
+        UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, null, SOME_ROLE);
+        UserDto actualUser = getUser(expectedUser);
         assertThat(actualUser, is(equalTo(expectedUser)));
         assertThat(actualUser.getInstitution(), is(equalTo(null)));
     }
 
     @Test
-    public void addUserShouldSaveAUserWithoutRoles() throws InvalidUserException {
-        UserDto expectedUser = UserDto.newBuilder()
-            .withUsername(SOME_USERNAME)
-            .withInstitution(SOME_INSTITUTION)
-            .build();
-        db.addUser(expectedUser);
-        UserDto actualUser = db.getUser(expectedUser.getUsername()).get();
+    public void addUserShouldSaveUserWithoutRoles() throws InvalidUserException, InvalidRoleException {
+        UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, null);
+        UserDto actualUser = getUser(expectedUser);
         assertThat(actualUser, is(equalTo(expectedUser)));
     }
 
     @Test
-    public void addUserShouldNotSaveAUserWithoutUsername() {
+    public void addUserShouldNotSaveUserWithoutUsername() {
         Executable illegalAction = () -> db.addUser(userWithoutUsername());
         InvalidUserException exception = assertThrows(InvalidUserException.class, illegalAction);
         assertThat(exception.getClass(), is(equalTo(InvalidUserException.class)));
     }
 
     @Test
-    public void dbServiceShouldHaveAMethodForUpdatingExistingUser() throws InvalidRoleException, InvalidUserException {
-        UserDto user = createSampleUser();
+    public void dbServiceShouldHaveMethodForUpdatingExistingUser() throws InvalidRoleException, InvalidUserException {
+        UserDto user = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
         assertThrows(RuntimeException.class, () -> db.updateUser(user));
     }
 
@@ -100,14 +92,28 @@ public class DatabaseServiceTest extends DatabaseTest {
             .build();
     }
 
-    private UserDto createSampleUser() throws InvalidRoleException, InvalidUserException {
-        RoleDto roleDto = RoleDto.newBuilder()
-            .withName(SOME_ROLE)
+    private UserDto getUser(UserDto insertedUser) throws InvalidUserException {
+        return db.getUser(insertedUser.getUsername())
+            .orElseThrow(() -> new RuntimeException("Expected to find a user"));
+    }
+
+    private UserDto createSampleUserAndAddUserToDb(String username, String institution, String roleName)
+        throws InvalidRoleException, InvalidUserException {
+        UserDto userDto = UserDto.newBuilder()
+            .withRoles(createRoleList(roleName))
+            .withInstitution(institution)
+            .withUsername(username)
             .build();
-        return UserDto.newBuilder()
-            .withUsername(SOME_USERNAME)
-            .withRoles(Collections.singletonList(roleDto))
-            .withInstitution(SOME_INSTITUTION)
-            .build();
+        db.addUser(userDto);
+        return userDto;
+    }
+
+    private List<RoleDto> createRoleList(String rolename) throws InvalidRoleException {
+        if (nonNull(rolename)) {
+            RoleDto roleDto = RoleDto.newBuilder().withName(rolename).build();
+            return Collections.singletonList(roleDto);
+        } else {
+            return Collections.emptyList();
+        }
     }
 }
