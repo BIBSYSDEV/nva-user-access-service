@@ -15,6 +15,7 @@ public abstract class DynamoEntry implements WithType {
         return isNull(getPrimaryHashKey());
     }
 
+    @Override
     public abstract String getType();
 
     /**
