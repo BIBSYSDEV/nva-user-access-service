@@ -3,6 +3,7 @@ package no.unit.nva.model;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import no.unit.nva.database.exceptions.InvalidRoleException;
@@ -20,6 +21,7 @@ public class RoleDtoTest {
     @Test
     public void roleDtoShouldHaveABuilder() {
         Builder builder = RoleDto.newBuilder();
+        assertNotNull(builder);
     }
 
     @Test
@@ -28,10 +30,10 @@ public class RoleDtoTest {
         assertThat(role.getName(), is(equalTo(SOME_ROLE_NAME)));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "builder should throw exception when rolename is:\"{0}\"")
     @NullAndEmptySource
     @ValueSource(strings = {"", " "})
-    public void builderShouldNotAllowEmptyRolename(String rolename) {
+    public void builderShouldNotAllowEmptyRoleName(String rolename) {
         Executable action = () -> RoleDto.newBuilder().withName(rolename).build();
         assertThrows(InvalidRoleException.class, action);
     }

@@ -10,12 +10,14 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import no.unit.nva.database.UserDb.Builder;
 import no.unit.nva.database.exceptions.InvalidRoleException;
 import no.unit.nva.database.exceptions.InvalidUserException;
 import nva.commons.utils.attempt.Try;
@@ -31,8 +33,6 @@ public class UserDbTest extends DatabaseTest {
     public static final String SOME_INSTITUTION = "SomeInstitution";
     public static final List<RoleDb> SAMPLE_ROLES = createSampleRoles();
 
-
-    public static final String BLANK_STRING = " ";
     private UserDb dynamoFunctionalityTestUser;
     private UserDb sampleUser;
 
@@ -44,13 +44,19 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    public void setUsernameShouldAddUsernameToUserObject() throws InvalidUserException {
+    void userDbHasABuilder() {
+        Builder builder = UserDb.newBuilder();
+        assertNotNull(builder);
+    }
+
+    @Test
+    void setUsernameShouldAddUsernameToUserObject() {
         dynamoFunctionalityTestUser.setUsername(SOME_USERNAME);
         assertThat(dynamoFunctionalityTestUser.getUsername(), is(equalTo(SOME_USERNAME)));
     }
 
     @Test
-    public void getUsernameShouldGetTheSetUsernameToUserObject() throws InvalidUserException {
+    void getUsernameShouldGetTheSetUsernameToUserObject() {
         assertThat(dynamoFunctionalityTestUser.getUsername(), is(nullValue()));
 
         dynamoFunctionalityTestUser.setUsername(SOME_USERNAME);
@@ -58,18 +64,18 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    public void getTypeShouldReturnConstantTypeValue() {
+    void getTypeShouldReturnConstantTypeValue() {
         assertThat(dynamoFunctionalityTestUser.getType(), is(equalTo(UserDb.TYPE)));
     }
 
     @Test
-    public void setTypeShouldNotChangeTheReturnedTypeValue() {
+    void setTypeShouldNotChangeTheReturnedTypeValue() {
         dynamoFunctionalityTestUser.setType("NotExpectedType");
         assertThat(dynamoFunctionalityTestUser.getType(), is(equalTo(UserDb.TYPE)));
     }
 
     @Test
-    public void getHashKeyKeyShouldReturnTypeAndUsernameConcatenation() {
+    void getHashKeyKeyShouldReturnTypeAndUsernameConcatenation() {
         String expectedHashKey = String.join(UserDb.FIELD_DELIMITER, UserDb.TYPE, SOME_USERNAME);
         assertThat(sampleUser.getPrimaryHashKey(), is(equalTo(expectedHashKey)));
     }
@@ -82,13 +88,13 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    public void userDbShouldBeWriteableToDatabase() throws InvalidUserException {
+    void userDbShouldBeWriteableToDatabase() {
         DynamoDBMapper mapper = clientToLocalDatabase();
         assertDoesNotThrow(() -> mapper.save(sampleUser));
     }
 
     @Test
-    public void userDbShouldBeReadFromDatabaseWithoutDataLoss() throws InvalidUserException {
+    void userDbShouldBeReadFromDatabaseWithoutDataLoss() throws InvalidUserException {
         UserDb insertedUser = UserDb.newBuilder()
             .withUsername(SOME_USERNAME)
             .withInstitution(SOME_INSTITUTION)
@@ -101,9 +107,9 @@ public class UserDbTest extends DatabaseTest {
         assertThat(savedUser, is(equalTo(insertedUser)));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "builder should throw exception when username is:\"{0}\"")
     @NullAndEmptySource
-    public void builderShouldThrowExceptionWhenUsernameIsNotValid(String invalidUsername) throws InvalidUserException {
+    void builderShouldThrowExceptionWhenUsernameIsNotValid(String invalidUsername) {
 
         Executable action = () -> UserDb.newBuilder()
             .withUsername(invalidUsername)
@@ -116,7 +122,7 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    public void copyShouldReturnBuilderWithFilledInFields() throws InvalidUserException {
+    void copyShouldReturnBuilderWithFilledInFields() throws InvalidUserException {
         UserDb originalUser = UserDb.newBuilder()
             .withUsername(SOME_USERNAME)
             .withInstitution(SOME_INSTITUTION)
@@ -129,7 +135,7 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    public void setPrimaryHashKeyThrowsExceptionWhenKeyDoesNotStartWithType() {
+    void setPrimaryHashKeyThrowsExceptionWhenKeyDoesNotStartWithType() {
         UserDb userDb = new UserDb();
         Executable action = () -> userDb.setPrimaryHashKey("SomeKey");
         InvalidUserException exception = assertThrows(InvalidUserException.class, action);
@@ -150,6 +156,4 @@ public class UserDbTest extends DatabaseTest {
     private static RoleDb newRole(String str) throws InvalidRoleException {
         return RoleDb.newBuilder().withName(str).build();
     }
-
-
 }

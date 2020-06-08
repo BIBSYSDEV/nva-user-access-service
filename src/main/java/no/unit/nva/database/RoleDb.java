@@ -10,11 +10,10 @@ import java.util.Objects;
 import no.unit.nva.database.exceptions.InvalidRoleException;
 import no.unit.nva.database.intefaces.DynamoEntry;
 import no.unit.nva.database.intefaces.WithCopy;
-import no.unit.nva.database.intefaces.WithType;
 import nva.commons.utils.JacocoGenerated;
 
 @DynamoDBTable(tableName = "UsersRoles")
-public class RoleDb implements WithCopy<RoleDb.Builder>, WithType, DynamoEntry {
+public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder> {
 
     private static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey should start with \"ROLE\"";
     public static String TYPE = "ROLE";
@@ -23,9 +22,11 @@ public class RoleDb implements WithCopy<RoleDb.Builder>, WithType, DynamoEntry {
     private String name;
 
     public RoleDb() {
+        super();
     }
 
     private RoleDb(Builder builder) throws InvalidRoleException {
+        super();
         setName(builder.name);
         setPrimaryHashKey(builder.primaryHashKey);
     }
@@ -36,11 +37,13 @@ public class RoleDb implements WithCopy<RoleDb.Builder>, WithType, DynamoEntry {
 
     @JacocoGenerated
     @DynamoDBHashKey(attributeName = "PK1A")
+    @Override
     public String getPrimaryHashKey() {
         return this.primaryHashKey;
     }
 
     @DynamoDBRangeKey(attributeName = "PK1B")
+    @Override
     public String getPrimaryRangeKey() {
         return getType();
     }
@@ -63,9 +66,16 @@ public class RoleDb implements WithCopy<RoleDb.Builder>, WithType, DynamoEntry {
         this.name = name;
     }
 
+    /**
+     * Do not use this method. This is only for usage by the DynamoDbMapper. Sets the hash key value for the database
+     * entry. This is the hashKey for the table and not any secondary index.
+     *
+     * @param primaryHashKey the primary hash key saved in the database
+     * @throws InvalidRoleException when the role is invalid.
+     */
     @JacocoGenerated
     public void setPrimaryHashKey(String primaryHashKey) throws InvalidRoleException {
-        if (primaryHashKeyHasNotBeenSet()) {
+        if (primaryKeyHasNotBeenSet()) {
             if (!primaryHashKey.startsWith(TYPE)) {
                 throw new InvalidRoleException(INVALID_PRIMARY_HASH_KEY);
             }
@@ -73,30 +83,9 @@ public class RoleDb implements WithCopy<RoleDb.Builder>, WithType, DynamoEntry {
         }
     }
 
-    private boolean primaryHashKeyHasNotBeenSet() {
-        return isNull(this.primaryHashKey);
-    }
-
-    @JacocoGenerated
-    public void setPrimaryRangeKey(String primaryRangeKey) {
-        // DO NOTHING.
-    }
-
-    /**
-     * Do not use. Intented only for use from DynamoDB. This method has no effect as the type is always ROLE.
-     *
-     * @param type ignored parameter.
-     */
-    @JacocoGenerated
-    public void setType(String type) {
-        // DO NOTHING
-    }
-
     @Override
     public Builder copy() {
-        Builder builder = new Builder()
-            .withName(this.name);
-        return builder;
+        return new Builder().withName(this.name);
     }
 
     @Override

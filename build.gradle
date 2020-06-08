@@ -3,6 +3,7 @@ plugins {
     id 'jacoco'
     id 'checkstyle'
     id 'pmd'
+    id "nebula.lint" version "16.9.0"
 
 }
 
@@ -14,33 +15,29 @@ repositories {
 
 }
 
-
 def jacksonVersion = "2.10.3"
 def jupiterVersion = "5.6.0"
 def awsSdkVersion = "1.11.791"
 
 dependencies {
-    implementation group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.2.0'
-    implementation group: 'com.amazonaws', name: 'aws-lambda-java-events', version: '2.2.7'
-    implementation group: 'com.amazonaws', name: 'aws-java-sdk-lambda', version: awsSdkVersion
+
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: awsSdkVersion
-
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: jacksonVersion
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
-    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: jacksonVersion
-
-
-    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: '0.3.5'
+    implementation(group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: '0.3.5')
+    implementation(group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4') {
+        because "Because we use the library directly to define loggers in our code"
+    }
 
     testImplementation group: 'com.amazonaws', name: 'DynamoDBLocal', version: '1.12.0'
-    testImplementation group: 'com.almworks.sqlite4java', name: 'sqlite4java', version: '1.0.392'
-
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
     testImplementation group: 'io.cucumber', name: 'cucumber-java', version: '5.6.0'
-    testImplementation group: 'io.cucumber', name: 'cucumber-picocontainer', version: '5.6.0'
-    testImplementation group: 'io.cucumber', name: 'cucumber-junit', version: '5.6.0'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: jupiterVersion
-    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+    testImplementation(group: 'io.cucumber', name: 'datatable', version: '3.3.1'){
+        because("it is transitive dependency and we use it directly")
+    }
 
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: jupiterVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: jupiterVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: jupiterVersion
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
 }
 
 task copyNativeDeps(type: Copy) {
@@ -133,4 +130,8 @@ task cucumber() {
             args = ['--plugin', 'pretty', '--glue', 'features', 'src/test/resources']
         }
     }
+}
+
+gradleLint {
+    rules = ['all-dependency','duplicate-dependency-class','unused-exclude-by-dep']
 }

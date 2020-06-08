@@ -5,7 +5,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.IsSame.sameInstance;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
@@ -32,17 +35,18 @@ public class UserDtoTest {
     public static final String SOME_INSTITUTION = "someInstitution";
 
     @Test
-    public void userDtoHasAConstructorWithoutArgs() {
+    void userDtoHasAConstructorWithoutArgs() {
         new UserDto();
     }
 
     @Test
-    public void userDtoShouldHaveABuilder() {
+    void userDtoShouldHaveABuilder() {
         Builder builder = UserDto.newBuilder();
+        assertNotNull(builder);
     }
 
     @Test
-    public void builderReturnsUserDtoWhenInstitutionIsEmpty() throws InvalidUserException {
+    void builderReturnsUserDtoWhenInstitutionIsEmpty() throws InvalidUserException {
         UserDto user = UserDto.newBuilder().withUsername(SOME_USERNAME)
             .withRoles(sampleRoles).build();
         assertThat(user.getUsername(), is(equalTo(SOME_USERNAME)));
@@ -51,7 +55,7 @@ public class UserDtoTest {
     }
 
     @Test
-    public void builderReturnsUserDtoWhenIRolesIsEmpty() throws InvalidUserException {
+    void builderReturnsUserDtoWhenIRolesIsEmpty() throws InvalidUserException {
         UserDto user = UserDto.newBuilder().withUsername(SOME_USERNAME)
             .withInstitution(SOME_INSTITUTION).build();
         assertThat(user.getUsername(), is(equalTo(SOME_USERNAME)));
@@ -59,29 +63,29 @@ public class UserDtoTest {
         assertThat(user.getInstitution(), is(equalTo(SOME_INSTITUTION)));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "build throws exception when username is:\"{0}\"")
     @NullAndEmptySource
     @ValueSource(strings = {" "})
-    public void buildThrowsExceptionWhenUsernameisNullOrEmpty(String username) {
+    void buildThrowsExceptionWhenUsernameIsNullOrEmpty(String username) {
         Executable action = () -> UserDto.newBuilder().withUsername(username).build();
         assertThrows(InvalidUserException.class, action);
     }
 
     @Test
-    public void toUserDbReturnsValidUserDbWhenUserDtoIsValid() throws InvalidUserException {
+    void toUserDbReturnsValidUserDbWhenUserDtoIsValid() throws InvalidUserException {
         UserDto userOnlyWithOnlyUsername = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
         UserDto actualUserOnlyWithName = convertToUserDbAndBack(userOnlyWithOnlyUsername);
         assertThat(actualUserOnlyWithName, is(equalTo(userOnlyWithOnlyUsername)));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "fromUserDb throws Exception user contains invalidRole. Rolename:\"{0}\"")
     @NullAndEmptySource
-    public void fromUserDbThrowsExceptionWhenUserDbContainsInvalidRole(String invalidRoleName)
+    void fromUserDbThrowsExceptionWhenUserDbContainsInvalidRole(String invalidRoleName)
         throws InvalidUserException {
         RoleDb invalidRole = new RoleDb();
         invalidRole.setName(invalidRoleName);
-        List<RoleDb> invlalidRoles = Collections.singletonList(invalidRole);
-        UserDb userDbWithInvalidRole = UserDb.newBuilder().withUsername(SOME_USERNAME).withRoles(invlalidRoles).build();
+        List<RoleDb> invalidRoles = Collections.singletonList(invalidRole);
+        UserDb userDbWithInvalidRole = UserDb.newBuilder().withUsername(SOME_USERNAME).withRoles(invalidRoles).build();
 
         Executable action = () -> UserDto.fromUserDb(userDbWithInvalidRole);
         RuntimeException exception = assertThrows(RuntimeException.class, action);
@@ -90,20 +94,20 @@ public class UserDtoTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    public void toUserDbThrowsExceptionWhenUserDbContainsInvalidRole(String invalidRoleName)
+    void toUserDbThrowsExceptionWhenUserDbContainsInvalidRole(String invalidRoleName)
         throws InvalidUserException, InvalidRoleException {
         RoleDto invalidRole = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
         invalidRole.setName(invalidRoleName);
-        List<RoleDto> invlalidRoles = Collections.singletonList(invalidRole);
-        UserDto userWithInvalidRole = UserDto.newBuilder().withUsername(SOME_USERNAME).withRoles(invlalidRoles).build();
+        List<RoleDto> invalidRoles = Collections.singletonList(invalidRole);
+        UserDto userWithInvalidRole = UserDto.newBuilder().withUsername(SOME_USERNAME).withRoles(invalidRoles).build();
 
-        Executable action = () -> userWithInvalidRole.toUserDb();
+        Executable action = userWithInvalidRole::toUserDb;
         RuntimeException exception = assertThrows(RuntimeException.class, action);
         assertThat(exception.getCause(), is(instanceOf(InvalidRoleException.class)));
     }
 
     @Test
-    public void roleValidationMethodLogsError()
+    void roleValidationMethodLogsError()
         throws InvalidUserException, InvalidRoleException {
         TestAppender appender = LogUtils.getTestingAppender(UserDto.class);
         RoleDto invalidRole = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
@@ -115,6 +119,16 @@ public class UserDtoTest {
         assertThrows(RuntimeException.class, action);
 
         assertThat(appender.getMessages(), containsString(ERROR_DUE_TO_INVALID_ROLE));
+    }
+
+    @Test
+    void updateShouldUpdateUserInDatabase() throws InvalidUserException {
+        UserDto initialUser = UserDto.newBuilder().withUsername(SOME_USERNAME).withInstitution(SOME_INSTITUTION)
+            .withRoles(sampleRoles).build();
+        UserDto copiedUser = initialUser.copy().build();
+
+        assertThat(copiedUser, is(equalTo(initialUser)));
+        assertThat(copiedUser, is(not(sameInstance(initialUser))));
     }
 
     private UserDto convertToUserDbAndBack(UserDto userDto) throws InvalidUserException {

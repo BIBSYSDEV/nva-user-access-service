@@ -11,7 +11,6 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 import java.util.List;
 import java.util.Optional;
-import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import no.unit.nva.database.exceptions.InvalidUserException;
 import no.unit.nva.model.UserDto;
 import nva.commons.utils.JacocoGenerated;
@@ -47,23 +46,22 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Optional<UserDto> getUser(String username) throws InvalidUserException {
         UserDb searchObject = UserDto.newBuilder().withUsername(username).build().toUserDb();
-        DynamoDBQueryExpression<UserDb> query = createGetUserQuery(searchObject);
-        List<UserDb> result = mapper.query(UserDb.class, query);
+        DynamoDBQueryExpression<UserDb> searchUserByUsername = createGetUserQuery(searchObject);
+        List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserByUsername);
 
-        UserDto user = result
+        UserDto user = userSearchResult
             .stream()
             .map(attempt(UserDto::fromUserDb))
-            .map(effort -> effort.orElseThrow(this::unexpectedException))
+            .map(attempt -> attempt.orElseThrow(this::unexpectedException))
             .collect(SingletonCollector.collectOrElse(null));
 
         return Optional.ofNullable(user);
     }
 
     private DynamoDBQueryExpression<UserDb> createGetUserQuery(UserDb searchObject) {
-        Condition comparisonCondition = entityTypeAsRangeKey();
         return new DynamoDBQueryExpression<UserDb>()
             .withHashKeyValues(searchObject)
-            .withRangeKeyCondition(RANGE_KEY_NAME, comparisonCondition);
+            .withRangeKeyCondition(RANGE_KEY_NAME, entityTypeAsRangeKey());
     }
 
     private IllegalStateException unexpectedException(Failure<UserDto> failure) {

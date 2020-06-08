@@ -15,12 +15,11 @@ import no.unit.nva.database.UserDb.Builder;
 import no.unit.nva.database.exceptions.InvalidUserException;
 import no.unit.nva.database.intefaces.DynamoEntry;
 import no.unit.nva.database.intefaces.WithCopy;
-import no.unit.nva.database.intefaces.WithType;
 import nva.commons.utils.JacocoGenerated;
 
 @DynamoDBTable(tableName = "UsersRoles")
 @DynamoDBTyped
-public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
+public class UserDb extends DynamoEntry implements WithCopy<Builder> {
 
     public static final String TYPE = "USER";
     public static final String INVALID_USER_EMPTY_USERNAME = "Invalid user entry: Empty username is not allowed";
@@ -32,9 +31,11 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
     private List<RoleDb> roles;
 
     public UserDb() {
+        super();
     }
 
     private UserDb(Builder builder) throws InvalidUserException {
+        super();
         setUsername(builder.username);
         setInstitution(builder.institution);
         setRoles(builder.roles);
@@ -47,12 +48,14 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
 
     @JacocoGenerated
     @DynamoDBHashKey(attributeName = "PK1A")
+    @Override
     public String getPrimaryHashKey() {
         return this.primaryHashKey;
     }
 
     @JacocoGenerated
     @DynamoDBRangeKey(attributeName = "PK1B")
+    @Override
     public String getPrimaryRangeKey() {
         return getType();
     }
@@ -80,15 +83,6 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
     @DynamoDBAttribute(attributeName = "institution")
     public String getInstitution() {
         return institution;
-    }
-
-    /**
-     * Method for using only for DynamoDb mapper. Do not use. Use the builder instead.
-     *
-     * @param type the type of the object
-     */
-    public void setType(String type) {
-        //DO NOTHING
     }
 
     /**
@@ -124,6 +118,7 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
      * used only by DynamoDb. For any other purpose use the {@link UserDb.Builder}
      *
      * @param primaryKey the primaryKey
+     * @throws InvalidUserException when the primary key is invalid.
      */
     public void setPrimaryHashKey(String primaryKey) throws InvalidUserException {
         if (primaryKeyHasNotBeenSet()) {
@@ -132,14 +127,6 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
             }
             this.primaryHashKey = primaryKey;
         }
-    }
-
-    private boolean primaryKeyHasNotBeenSet() {
-        return isNull(primaryHashKey);
-    }
-
-    public void setPrimaryRangeKey(String primaryRangeKey) {
-        // DO NOTHING;
     }
 
     @Override
@@ -160,10 +147,10 @@ public class UserDb implements WithCopy<Builder>, WithType, DynamoEntry {
             return false;
         }
         UserDb userDb = (UserDb) o;
-        return Objects.equals(getPrimaryHashKey(), userDb.getPrimaryHashKey()) &&
-            Objects.equals(getUsername(), userDb.getUsername()) &&
-            Objects.equals(getInstitution(), userDb.getInstitution()) &&
-            Objects.equals(getRoles(), userDb.getRoles());
+        return Objects.equals(getPrimaryHashKey(), userDb.getPrimaryHashKey())
+            && Objects.equals(getUsername(), userDb.getUsername())
+            && Objects.equals(getInstitution(), userDb.getInstitution())
+            && Objects.equals(getRoles(), userDb.getRoles());
     }
 
     @Override

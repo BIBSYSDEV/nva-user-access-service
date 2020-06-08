@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -22,6 +22,8 @@ import org.junit.jupiter.api.function.Executable;
 
 public class DatabaseServiceImplTest extends DatabaseTest {
 
+    public static final String SOME_INSTITUTION = "someInstitution";
+    public static final String SOME_USERNAME = "someUsername";
     private DynamoDBMapper mapper;
 
     @BeforeEach
@@ -33,13 +35,13 @@ public class DatabaseServiceImplTest extends DatabaseTest {
     public void getUserThrowsIllegalStateExceptionWhenItReceivesInvalidUserFromDatabase() {
 
         UserDb userWithoutUsername = new UserDb();
-        userWithoutUsername.setInstitution("someInstitution");
+        userWithoutUsername.setInstitution(SOME_INSTITUTION);
 
         PaginatedQueryList<UserDb> response = mockResponseFromDynamoMapper(userWithoutUsername);
         DynamoDBMapper mockMapper = mockDynamoMapperReturningInvalidUser(response);
         DatabaseService service = new DatabaseServiceImpl(mockMapper);
 
-        Executable action = () -> service.getUser("someUsername");
+        Executable action = () -> service.getUser(SOME_USERNAME);
         IllegalStateException exception = assertThrows(IllegalStateException.class, action);
 
         String expectedMessageContent = DatabaseServiceImpl.INVALID_USER_IN_DATABASE;
@@ -49,10 +51,11 @@ public class DatabaseServiceImplTest extends DatabaseTest {
     @Test
     public void getUserReturnsEmptyOptionalWhenUserIsNotFound() throws InvalidUserException {
         DatabaseService service = new DatabaseServiceImpl(mapper);
-        Optional<UserDto> result = service.getUser("someUsername");
+        Optional<UserDto> result = service.getUser(SOME_USERNAME);
         assertThat(result.isEmpty(), is(equalTo(true)));
     }
 
+    @SuppressWarnings("unchecked")
     private DynamoDBMapper mockDynamoMapperReturningInvalidUser(PaginatedQueryList<UserDb> response) {
         DynamoDBMapper mockMapper = mock(DynamoDBMapper.class);
         when(mockMapper.query(any(Class.class), any(DynamoDBQueryExpression.class)))
@@ -60,6 +63,7 @@ public class DatabaseServiceImplTest extends DatabaseTest {
         return mockMapper;
     }
 
+    @SuppressWarnings("unchecked")
     private PaginatedQueryList<UserDb> mockResponseFromDynamoMapper(UserDb userWithoutUsername) {
         PaginatedQueryList<UserDb> response = mock(PaginatedQueryList.class);
         when(response.stream()).thenReturn(Stream.of(userWithoutUsername));
