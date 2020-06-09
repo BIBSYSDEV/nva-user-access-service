@@ -97,7 +97,7 @@ public class UserDtoTest {
     void toUserDbThrowsExceptionWhenUserDbContainsInvalidRole(String invalidRoleName)
         throws InvalidUserException, InvalidRoleException {
         RoleDto invalidRole = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
-        invalidRole.setName(invalidRoleName);
+        invalidRole.setRoleName(invalidRoleName);
         List<RoleDto> invalidRoles = Collections.singletonList(invalidRole);
         UserDto userWithInvalidRole = UserDto.newBuilder().withUsername(SOME_USERNAME).withRoles(invalidRoles).build();
 
@@ -111,7 +111,7 @@ public class UserDtoTest {
         throws InvalidUserException, InvalidRoleException {
         TestAppender appender = LogUtils.getTestingAppender(UserDto.class);
         RoleDto invalidRole = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
-        invalidRole.setName(null);
+        invalidRole.setRoleName(null);
         List<RoleDto> invlalidRoles = Collections.singletonList(invalidRole);
         UserDto userWithInvalidRole = UserDto.newBuilder().withUsername(SOME_USERNAME).withRoles(invlalidRoles).build();
 

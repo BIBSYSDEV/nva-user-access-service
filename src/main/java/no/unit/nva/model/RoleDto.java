@@ -1,18 +1,27 @@
 package no.unit.nva.model;
 
+import static nva.commons.utils.attempt.Try.attempt;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.exceptions.InvalidRoleException;
 import nva.commons.utils.JacocoGenerated;
+import nva.commons.utils.JsonUtils;
 import nva.commons.utils.StringUtils;
+import nva.commons.utils.attempt.Failure;
 
 public class RoleDto {
 
     public static final String MISSING_ROLE_NAME_ERROR = "Role should have a name";
-    public String name;
+    @JsonProperty("rolename")
+    private String roleName;
+
+    public RoleDto() {
+    }
 
     private RoleDto(Builder builder) {
-        setName(builder.name);
+        setRoleName(builder.name);
     }
 
     public static Builder newBuilder() {
@@ -23,12 +32,12 @@ public class RoleDto {
         return newBuilder().withName(roleDb.getName()).build();
     }
 
-    public String getName() {
-        return name;
+    public String getRoleName() {
+        return roleName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
     @Override
@@ -41,17 +50,33 @@ public class RoleDto {
             return false;
         }
         RoleDto roleDto = (RoleDto) o;
-        return getName().equals(roleDto.getName());
+        return getRoleName().equals(roleDto.getRoleName());
     }
 
     @Override
     @JacocoGenerated
     public int hashCode() {
-        return Objects.hash(getName());
+        return Objects.hash(getRoleName());
     }
 
     public RoleDb toRoleDb() throws InvalidRoleException {
-        return RoleDb.newBuilder().withName(this.name).build();
+        return RoleDb.newBuilder().withName(this.roleName).build();
+    }
+
+    /**
+     * a JSON representation of the object.
+     *
+     * @return a JSON representation of the object.
+     */
+    @Override
+    public String toString() {
+        return
+            attempt(() -> JsonUtils.objectMapper.writeValueAsString(this))
+                .orElseThrow(this::newUnexpectedException);
+    }
+
+    private RuntimeException newUnexpectedException(Failure<String> fail) {
+        throw new RuntimeException(fail.getException());
     }
 
     public static final class Builder {
