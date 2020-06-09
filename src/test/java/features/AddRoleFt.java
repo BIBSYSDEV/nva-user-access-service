@@ -33,6 +33,8 @@ import nva.commons.utils.JsonUtils;
 public class AddRoleFt extends DatabaseTest {
 
     public static final int IGNORE_HEADER_ROW = 1;
+    private Context context = mock(Context.class);
+
     private DynamoDBMapper mapper;
     private DatabaseService service;
     private String requestResponse;
@@ -57,14 +59,13 @@ public class AddRoleFt extends DatabaseTest {
     @When("the request contains a JSON body with following key-value pairs")
     public void the_request_contains_a_Json_body_with_following_key_value_pairs(
         io.cucumber.datatable.DataTable dataTable) throws IOException {
-        DataTable inputData = dataTable.rows(IGNORE_HEADER_ROW);
-        requestBody = inputData.asMap(String.class, Object.class);
-        String body = JsonUtils.objectMapper.writeValueAsString(requestBody);
-        InputStream request = new HandlerRequestBuilder<String>(JsonUtils.objectMapper)
-            .withBody(body).build();
+
+        DataTable removedHeaders = dataTable.rows(IGNORE_HEADER_ROW);
+        InputStream request = requestBodyAsInputStream(removedHeaders);
+
         AddRoleHandler addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Context context = mock(Context.class);
+
         addRoleHandler.handleRequest(request, outputStream, context);
         requestResponse = outputStream.toString();
     }
@@ -73,8 +74,8 @@ public class AddRoleFt extends DatabaseTest {
     public void a_new_role_is_stored_in_the_database() throws InvalidRoleException, JsonProcessingException {
         GatewayResponse<RoleDto> response = GatewayResponse.fromString(requestResponse);
         RoleDto resultObject = response.getBodyObject(RoleDto.class);
-        DatabaseService serviceImpl = new DatabaseServiceImpl(mapper);
-        Optional<RoleDto> savedRole = serviceImpl.getRole(resultObject);
+        Optional<RoleDto> savedRole = readRoleDirectlyFromDatabase(resultObject);
+
         assertTrue(savedRole.isPresent());
         assertThat(savedRole.get(), is(equalTo(resultObject)));
         assertThat(savedRole.get(), is(not(sameInstance(resultObject))));
@@ -85,6 +86,19 @@ public class AddRoleFt extends DatabaseTest {
         GatewayResponse<RoleDto> response = GatewayResponse.fromString(requestResponse);
         RoleDto responseObject = response.getBodyObject(RoleDto.class);
         RoleDto requestObject = JsonUtils.objectMapper.convertValue(requestBody, RoleDto.class);
+
         assertThat(requestObject, is(equalTo(responseObject)));
+    }
+
+    private Optional<RoleDto> readRoleDirectlyFromDatabase(RoleDto resultObject) throws InvalidRoleException {
+        DatabaseService serviceImpl = new DatabaseServiceImpl(mapper);
+        return serviceImpl.getRole(resultObject);
+    }
+
+    private InputStream requestBodyAsInputStream(DataTable removedHeaders) throws JsonProcessingException {
+        requestBody = removedHeaders.asMap(String.class, Object.class);
+        String body = JsonUtils.objectMapper.writeValueAsString(requestBody);
+        return new HandlerRequestBuilder<String>(JsonUtils.objectMapper)
+            .withBody(body).build();
     }
 }
