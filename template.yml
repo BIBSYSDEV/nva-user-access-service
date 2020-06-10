@@ -2,23 +2,16 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
 Description: >
-   The resources for providing a service for listing users and roles.
-   It includes a table containing users and roles and lambda functions for accessing the data.
-
-
-Parameters:
-  CognitoAuthorizerArn:
-    Type: String
-
+  The resources for providing a service for listing users and roles.
+  It includes a table containing users and roles and lambda functions for accessing the data.
 
 
 Resources:
-  Api:
+  RestApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       EndpointConfiguration: REGIONAL
-      DefinitionUri
 
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
@@ -30,9 +23,65 @@ Resources:
         - AttributeName: PK1B
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
-
       KeySchema:
         - AttributeName: PK1A
           KeyType: HASH
         - AttributeName: PK1B
           KeyType: RANGE
+
+  LambdaRole:
+    DependsOn: UserRoleMappings
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: LambdaAccessPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "dynamodb:BatchGetItem"
+                  - "dynamodb:BatchWriteItem"
+                  - "dynamodb:GetItem"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:Query"
+                  - "dynamodb:UpdateItem"
+                Resource: !GetAtt UserRoleMappings.Arn
+
+  AddRoleHandler:
+    DependsOn: [ LambdaRole, UserRoleMappings]
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.AddRoleHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: post
+            RestApiId: !Ref RestApi
+            RequestParameters:
+              - method.request.header.Authorization
