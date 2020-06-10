@@ -5,7 +5,21 @@ Description: >
    The resources for providing a service for listing users and roles.
    It includes a table containing users and roles and lambda functions for accessing the data.
 
+
+Parameters:
+  CognitoAuthorizerArn:
+    Type: String
+
+
+
 Resources:
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      EndpointConfiguration: REGIONAL
+      DefinitionUri
+
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
     Properties:
