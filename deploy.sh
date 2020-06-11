@@ -3,8 +3,8 @@
 
 sam build -b .aws-sam
 
-sam deploy --profile default  --template-file ./.aws-sam/template.yaml \
---s3-bucket orestis-b1 \
+sam deploy --profile nva-dev  --template-file ./.aws-sam/template.yaml \
+--s3-bucket orestis-b2 \
 --stack-name test-lambda \
 --capabilities CAPABILITY_IAM \
 --region eu-west-1

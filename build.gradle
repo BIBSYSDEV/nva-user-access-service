@@ -159,7 +159,7 @@ task cucumber() {
 }
 
 
-task debug() {
+task debugCucumber() {
     dependsOn assemble, compileTestJava
     doLast {
         javaexec {

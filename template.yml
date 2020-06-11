@@ -12,6 +12,7 @@ Resources:
     Properties:
       StageName: Prod
       EndpointConfiguration: REGIONAL
+      DefinitionUri: ./swagger.yml
 
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
@@ -83,5 +84,3 @@ Resources:
             Path: /users
             Method: post
             RestApiId: !Ref RestApi
-            RequestParameters:
-              - method.request.header.Authorization
