@@ -12,7 +12,37 @@ Resources:
     Properties:
       StageName: Prod
       EndpointConfiguration: REGIONAL
-      DefinitionUri: swagger.yml
+      DefinitionBody:
+        swagger: 2.0
+        info:
+          title: institutions proxy api
+          description: api description for institutions proxy
+          version: 1.0.0
+        paths:
+          /roles:
+            post:
+              summary: Adds new Role
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/Role'
+              responses:
+                '200':
+                  description: Successfull creation of role. Returns the generated role
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
+                responses: {}
+                httpMethod: GET
+                type: AWS_PROXY
+        components:
+          schemas:
+            Role:
+              properties:
+                rolename:
+                  type: string
 
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
