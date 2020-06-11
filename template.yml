@@ -15,8 +15,8 @@ Resources:
       DefinitionBody:
         swagger: 2.0
         info:
-          title: institutions proxy api
-          description: api description for institutions proxy
+          title: roles and users access
+          description: Api for updating users and roles
           version: 1.0.0
         paths:
           /roles:
