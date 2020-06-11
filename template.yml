@@ -35,7 +35,7 @@ Resources:
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
                 responses: {}
-                httpMethod: GET
+                httpMethod: POST
                 type: AWS_PROXY
         components:
           schemas:
@@ -112,5 +112,5 @@ Resources:
           Type: Api
           Properties:
             Path: /roles
-            Method: get
+            Method: post
             RestApiId: !Ref RestApi
