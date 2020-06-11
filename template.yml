@@ -28,8 +28,6 @@ Resources:
                   application/json:
                     schema:
                       $ref: '#/components/schemas/Role'
-                example:
-                  rolename: "Creator"
               responses:
                 '200':
                   description: Successfull creation of role. Returns the generated role
@@ -46,6 +44,8 @@ Resources:
                 rolename:
                   required: true
                   type: string
+              example:
+                rolename: "Creator"
 
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
