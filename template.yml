@@ -112,5 +112,5 @@ Resources:
           Type: Api
           Properties:
             Path: /roles
-            Method: post
+            Method: get
             RestApiId: !Ref RestApi
