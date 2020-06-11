@@ -42,6 +42,7 @@ Resources:
             Role:
               properties:
                 rolename:
+                  required: true
                   type: string
 
   UserRoleMappings:
