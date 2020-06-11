@@ -12,7 +12,7 @@ Resources:
     Properties:
       StageName: Prod
       EndpointConfiguration: REGIONAL
-      #DefinitionUri: swagger.yml
+      DefinitionUri: swagger.yml
 
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
