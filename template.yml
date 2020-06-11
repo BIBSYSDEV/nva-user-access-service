@@ -81,6 +81,6 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /users
+            Path: /roles
             Method: post
             RestApiId: !Ref RestApi
