@@ -28,6 +28,8 @@ Resources:
                   application/json:
                     schema:
                       $ref: '#/components/schemas/Role'
+                example:
+                  rolename: "Creator"
               responses:
                 '200':
                   description: Successfull creation of role. Returns the generated role
