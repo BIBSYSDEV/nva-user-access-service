@@ -13,7 +13,7 @@ Resources:
       StageName: Prod
       EndpointConfiguration: REGIONAL
       DefinitionBody:
-        openapi: '3.0'
+        openapi: 3.0
         info:
           title: roles and users access
           description: Api for updating users and roles
@@ -23,7 +23,7 @@ Resources:
             post:
               summary: Adds new Role
               security:
-                - bearerAuth: []
+                - httpAuth: []
               requestBody:
                 required: true
                 content:
@@ -33,28 +33,24 @@ Resources:
               responses:
                 '200':
                   description: Successfull creation of role. Returns the generated role
-              x-amazon-apigateway-integration:
-                uri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
-                responses: {}
-                httpMethod: POST
-                type: AWS_PROXY
+            x-amazon-apigateway-integration:
+              uri:
+                Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
+              responses: {}
+              httpMethod: POST
+              type: AWS_PROXY
         components:
           schemas:
             Role:
               properties:
                 rolename:
-                  required: true
                   type: string
-              required:
-                - rolename
-              example:
-                rolename: "Creator"
           securitySchemes:
-            bearerAuth:
+            httpAuth:
               type: http
               scheme: bearer
               bearerFormat: JWT
+
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
     Properties:
