@@ -22,6 +22,8 @@ Resources:
           /roles:
             post:
               summary: Adds new Role
+              security:
+                - bearerAuth: []
               requestBody:
                 required: true
                 content:
@@ -48,7 +50,11 @@ Resources:
                 - rolename
               example:
                 rolename: "Creator"
-
+          securitySchemes:
+            bearerAuth:
+              type: http
+              scheme: bearer
+              bearerFormat: JWT
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
     Properties:
