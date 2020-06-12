@@ -33,12 +33,12 @@ Resources:
               responses:
                 '200':
                   description: Successfull creation of role. Returns the generated role
-            x-amazon-apigateway-integration:
-              uri:
-                Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
-              responses: {}
-              httpMethod: POST
-              type: AWS_PROXY
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
+                responses: {}
+                httpMethod: POST
+                type: AWS_PROXY
         components:
           schemas:
             Role:
