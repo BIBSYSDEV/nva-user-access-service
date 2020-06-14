@@ -79,7 +79,7 @@ test {
     useJUnitPlatform()
     failFast = true
     testLogging {
-        events 'skipped', 'passed', 'failed'
+        events ('skipped', 'passed', 'failed')
     }
     Map<String, String> envVariables = new HashMap<>()
     envVariables.put("ALLOWED_ORIGIN", "*")
