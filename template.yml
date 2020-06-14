@@ -43,9 +43,9 @@ Resources:
               x-amazon-apigateway-integration:
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
-                  responses: {}
-                  httpMethod: POST
-                  type: AWS_PROXY
+                responses: {}
+                httpMethod: POST
+                type: AWS_PROXY
         components:
           schemas:
             Role:
