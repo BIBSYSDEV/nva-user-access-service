@@ -107,12 +107,12 @@ public class AddRoleHandlerTest extends DatabaseTest {
             private int counter = 0;
 
             @Override
-            public Optional<RoleDto> getRole(RoleDto role) throws InvalidRoleException {
+            public Optional<RoleDto> getRole(RoleDto queryObject) throws InvalidRoleException {
                 if (counter == 0) {
                     counter++;
                     return Optional.empty();
                 }
-                return super.getRole(role);
+                return super.getRole(queryObject);
             }
         };
     }
@@ -120,7 +120,7 @@ public class AddRoleHandlerTest extends DatabaseTest {
     private DatabaseServiceImpl databaseServiceReturningEmpty() {
         return new DatabaseServiceImpl(localDynamo) {
             @Override
-            public Optional<RoleDto> getRole(RoleDto role) {
+            public Optional<RoleDto> getRole(RoleDto queryObject) {
                 return Optional.empty();
             }
         };

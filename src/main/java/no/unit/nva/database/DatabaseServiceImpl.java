@@ -84,8 +84,8 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Optional<RoleDto> getRole(RoleDto input) throws InvalidRoleException {
-        RoleDb searchObject = input.toRoleDb();
+    public Optional<RoleDto> getRole(RoleDto queryObject) throws InvalidRoleException {
+        RoleDb searchObject = queryObject.toRoleDb();
         DynamoDBQueryExpression<RoleDb> searchRoleByName = createGetQuery(searchObject);
 
         PaginatedQueryList<RoleDb> searchRoleByNameResult = mapper.query(RoleDb.class, searchRoleByName);
