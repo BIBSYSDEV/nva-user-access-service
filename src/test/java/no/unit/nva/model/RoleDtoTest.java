@@ -55,7 +55,7 @@ public class RoleDtoTest {
         Method method = role.getClass().getDeclaredMethod("newUnexpectedException", Failure.class);
         method.setAccessible(true);
         Exception exceptionDuringSerialization = new Exception(SOME_MESSAGE);
-        Failure failure = new Failure<>(exceptionDuringSerialization);
+        Failure failure = new Failure<Object>(exceptionDuringSerialization);
         Executable action = () -> method.invoke(role, failure);
         InvocationTargetException thrown = assertThrows(InvocationTargetException.class, action);
         assertThat(thrown.getCause().getClass(), is(equalTo(RuntimeException.class)));

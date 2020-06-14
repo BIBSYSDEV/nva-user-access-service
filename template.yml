@@ -39,7 +39,7 @@ Resources:
                       $ref: '#/components/schemas/Role'
               responses:
                 '200':
-                  description: Successfull creation of role. Returns the generated role
+                  description: Successful creation of role. Returns the generated role
                   x-amazon-apigateway-integration:
                     uri:
                       Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations

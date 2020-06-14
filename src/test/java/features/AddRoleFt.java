@@ -51,12 +51,12 @@ public class AddRoleFt extends DatabaseTest {
 
     @When("then authorized client sends a POST request")
     public void then_authorized_client_sends_a_Post_request() {
-        ;
+        // cannot imitate generating a post request with currently no parameters when running internally.
     }
 
     @When("the request contains a JSON body with following key-value pairs")
-    public void the_request_contains_a_Json_body_with_following_key_value_pairs(
-        io.cucumber.datatable.DataTable dataTable) throws IOException {
+    public void the_request_contains_a_Json_body_with_following_key_value_pairs(DataTable dataTable)
+        throws IOException {
         DataTable inputData = dataTable.rows(IGNORE_HEADER_ROW);
         requestBody = inputData.asMap(String.class, Object.class);
         String body = JsonUtils.objectMapper.writeValueAsString(requestBody);

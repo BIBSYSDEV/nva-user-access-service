@@ -18,10 +18,10 @@ import org.slf4j.LoggerFactory;
 
 public class AddRoleHandler extends ApiGatewayHandler<RoleDto, RoleDto> {
 
-    private static final int EFFORTS_RETRIEVING_SAVED_ROLE = 2;
+    private static final int MAX_EFFORTS_FOR_FETCHING_ROLE = 2;
     private static final long WAITING_TIME = 100;
     public static final String INTERRPTION_ERROR = "Interuption while waiting to get role.";
-    public static final String ERROR_RETRIEVING_SAVED_ROLE = "Could not retrieve role with name: ";
+    public static final String ERROR_FETCHING_SAVED_ROLE = "Could not fetch role with name: ";
     private final DatabaseService databaseService;
 
     /**
@@ -47,15 +47,17 @@ public class AddRoleHandler extends ApiGatewayHandler<RoleDto, RoleDto> {
         throws DataHandlingError, UnexpectedException, InvalidInputRoleException, InvalidRoleException {
         databaseService.addRole(input);
         return getEventuallyConsistentRole(input)
-            .orElseThrow(() -> new DataHandlingError(ERROR_RETRIEVING_SAVED_ROLE + input.getRoleName()));
+            .orElseThrow(() -> new DataHandlingError(ERROR_FETCHING_SAVED_ROLE + input.getRoleName()));
     }
 
     private Optional<RoleDto> getEventuallyConsistentRole(RoleDto input)
         throws InvalidRoleException, UnexpectedException {
         Optional<RoleDto> role = databaseService.getRole(input);
-        for (int i = 0; keepQuerying(i, role); i++) {
+        int counter = 0;
+        while (role.isEmpty() && counter < MAX_EFFORTS_FOR_FETCHING_ROLE) {
             waitForEventualConsistency();
             role = databaseService.getRole(input);
+            counter++;
         }
         return role;
     }
@@ -67,10 +69,6 @@ public class AddRoleHandler extends ApiGatewayHandler<RoleDto, RoleDto> {
             logger.error(INTERRPTION_ERROR, e);
             throw new UnexpectedException(INTERRPTION_ERROR, e);
         }
-    }
-
-    private boolean keepQuerying(int i, Optional<RoleDto> role) {
-        return role.isEmpty() && i < EFFORTS_RETRIEVING_SAVED_ROLE;
     }
 
     @Override

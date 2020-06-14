@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
@@ -15,16 +16,15 @@ import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.DatabaseTest;
-import no.unit.nva.database.exceptions.DataHandlingError;
-import no.unit.nva.database.exceptions.InvalidInputRoleException;
 import no.unit.nva.database.exceptions.InvalidRoleException;
-import no.unit.nva.database.exceptions.UnexpectedException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.handlers.GatewayResponse;
+import nva.commons.handlers.RequestInfo;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.zalando.problem.Problem;
 
 public class AddRoleHandlerTest extends DatabaseTest {
@@ -46,9 +46,11 @@ public class AddRoleHandlerTest extends DatabaseTest {
 
     @Test
     public void addRoleHandlerHasProcessInputMethod()
-        throws DataHandlingError, UnexpectedException, InvalidRoleException, InvalidInputRoleException {
+        throws InvalidRoleException {
         RoleDto roleDto = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
-        addRoleHandler.processInput(roleDto, null, null);
+        Executable action = () -> roleDto.getClass()
+            .getDeclaredMethod("processInput", RequestInfo.class, Context.class);
+        assertDoesNotThrow(action);
     }
 
     @Test
@@ -99,7 +101,7 @@ public class AddRoleHandlerTest extends DatabaseTest {
         GatewayResponse<Problem> response = sendRequest(actualRole);
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
         Problem problem = response.getBodyObject(Problem.class);
-        assertThat(problem.getDetail(), containsString(AddRoleHandler.ERROR_RETRIEVING_SAVED_ROLE));
+        assertThat(problem.getDetail(), containsString(AddRoleHandler.ERROR_FETCHING_SAVED_ROLE));
     }
 
     private DatabaseServiceImpl databaseServiceWithSyncDelay() {
