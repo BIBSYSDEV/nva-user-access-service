@@ -46,22 +46,22 @@ Resources:
         #                responses: {}
         #                httpMethod: POST
         #                type: AWS_PROXY
-        components:
-          schemas:
-            Role:
-              properties:
-                rolename:
-                  type: string
-          securitySchemes:
-            CognitoUserPool:
-              type: apiKey
-              name: Authorization
-              in: header
-              x-amazon-apigateway-authtype: cognito_user_pools
-              x-amazon-apigateway-authorizer:
-                type: cognito_user_pools
-                providerARNs:
-                  - !Ref CognitoAuthorizerArn
+  #        components:
+  #          schemas:
+  #            Role:
+  #              properties:
+  #                rolename:
+  #                  type: string
+  #          securitySchemes:
+  #            CognitoUserPool:
+  #              type: apiKey
+  #              name: Authorization
+  #              in: header
+  #              x-amazon-apigateway-authtype: cognito_user_pools
+  #              x-amazon-apigateway-authorizer:
+  #                type: cognito_user_pools
+  #                providerARNs:
+  #                  - !Ref CognitoAuthorizerArn
 
 
   UserRoleMappings:
