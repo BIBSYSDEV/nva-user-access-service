@@ -40,12 +40,12 @@ Resources:
               responses:
                 '200':
                   description: Successfull creation of role. Returns the generated role
-              x-amazon-apigateway-integration:
-                uri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
-                responses: {}
-                httpMethod: POST
-                type: AWS_PROXY
+        #              x-amazon-apigateway-integration:
+        #                uri:
+        #                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
+        #                responses: {}
+        #                httpMethod: POST
+        #                type: AWS_PROXY
         components:
           schemas:
             Role:
@@ -57,11 +57,7 @@ Resources:
               type: "apiKey"
               name: "Authorization"
               in: "header"
-  #              x-amazon-apigateway-authtype: "COGNITO_USER_POOLS"
-  #              x-amazon-apigateway-authorizer:
-  #                providerARNs:
-  #                  - "arn:aws:cognito-idp:eu-west-1:884807050265:userpool/eu-west-1_XUZ0npK9d"
-  #                type: "COGNITO_USER_POOLS"
+
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
     Properties:
