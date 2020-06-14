@@ -18,49 +18,50 @@ Resources:
         Authorizers:
           CognitoAuthentication:
             UserPoolArn: 'arn:aws:cognito-idp:eu-west-1:884807050265:userpool/eu-west-1_XUZ0npK9d'
-        DefinitionBody:
-          openapi: 3.0
-          info:
-            title: roles and users access
-            description: Api for updating users and roles
-            version: 1.0.0
-          paths:
-            /roles:
-              post:
-                summary: Adds new Role
-                security:
-                  - httpAuth: []
-                requestBody:
-                  required: true
-                  content:
-                    application/json:
-                      schema:
-                        $ref: '#/components/schemas/Role'
-                responses:
-                  '200':
-                    description: Successfull creation of role. Returns the generated role
-                x-amazon-apigateway-integration:
-                  uri:
-                    Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
-                  responses: {}
-                  httpMethod: POST
-                  type: AWS_PROXY
-          components:
-            schemas:
-              Role:
-                properties:
-                  rolename:
-                    type: string
-            securitySchemes:
-              CognitoUserPool:
-                type: apiKey
-                name: Authorization
-                in: header
-                x-amazon-apigateway-authtype: cognito_user_pools
-                x-amazon-apigateway-authorizer:
-                  type: cognito_user_pools
-                  providerARNs:
-                    - !Ref CognitoAuthorizerArn
+            AuthType: "COGNITO_USER_POOLS"
+      DefinitionBody:
+        openapi: 3.0
+        info:
+          title: roles and users access
+          description: Api for updating users and roles
+          version: 1.0.0
+        paths:
+          /roles:
+            post:
+              summary: Adds new Role
+              security:
+                - httpAuth: []
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/Role'
+              responses:
+                '200':
+                  description: Successfull creation of role. Returns the generated role
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
+                responses: {}
+                httpMethod: POST
+                type: AWS_PROXY
+        components:
+          schemas:
+            Role:
+              properties:
+                rolename:
+                  type: string
+          securitySchemes:
+            CognitoUserPool:
+              type: apiKey
+              name: Authorization
+              in: header
+              x-amazon-apigateway-authtype: cognito_user_pools
+              x-amazon-apigateway-authorizer:
+                type: cognito_user_pools
+                providerARNs:
+                  - !Ref CognitoAuthorizerArn
 
 
   UserRoleMappings:
