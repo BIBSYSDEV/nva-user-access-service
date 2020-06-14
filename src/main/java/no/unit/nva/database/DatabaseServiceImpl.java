@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import no.unit.nva.database.exceptions.InvalidInputRoleException;
 import no.unit.nva.database.exceptions.InvalidRoleException;
-import no.unit.nva.database.exceptions.InvalidUserException;
+import no.unit.nva.database.exceptions.InvalidUserInternalException;
 import no.unit.nva.database.intefaces.WithType;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
@@ -52,7 +52,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Optional<UserDto> getUser(String username) throws InvalidUserException {
+    public Optional<UserDto> getUser(String username) throws InvalidUserInternalException {
         UserDb searchObject = UserDto.newBuilder().withUsername(username).build().toUserDb();
         DynamoDBQueryExpression<UserDb> searchUserByUsername = createGetQuery(searchObject);
         List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserByUsername);
@@ -67,7 +67,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public void addUser(UserDto user) throws InvalidUserException {
+    public void addUser(UserDto user) throws InvalidUserInternalException {
         mapper.save(user.toUserDb());
     }
 

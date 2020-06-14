@@ -14,7 +14,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 import java.util.Optional;
 import java.util.stream.Stream;
-import no.unit.nva.database.exceptions.InvalidUserException;
+import no.unit.nva.database.exceptions.InvalidUserInternalException;
 import no.unit.nva.model.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,7 @@ public class DatabaseServiceImplTest extends DatabaseTest {
     }
 
     @Test
-    public void getUserReturnsEmptyOptionalWhenUserIsNotFound() throws InvalidUserException {
+    public void getUserReturnsEmptyOptionalWhenUserIsNotFound() throws InvalidUserInternalException {
         DatabaseService service = new DatabaseServiceImpl(mapper);
         Optional<UserDto> result = service.getUser(SOME_USERNAME);
         assertThat(result.isEmpty(), is(equalTo(true)));

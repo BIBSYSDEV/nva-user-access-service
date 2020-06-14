@@ -17,7 +17,7 @@ import java.util.List;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.UserDb;
 import no.unit.nva.database.exceptions.InvalidRoleException;
-import no.unit.nva.database.exceptions.InvalidUserException;
+import no.unit.nva.database.exceptions.InvalidUserInternalException;
 import no.unit.nva.model.UserDto.Builder;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
@@ -46,7 +46,7 @@ public class UserDtoTest {
     }
 
     @Test
-    void builderReturnsUserDtoWhenInstitutionIsEmpty() throws InvalidUserException {
+    void builderReturnsUserDtoWhenInstitutionIsEmpty() throws InvalidUserInternalException {
         UserDto user = UserDto.newBuilder().withUsername(SOME_USERNAME)
             .withRoles(sampleRoles).build();
         assertThat(user.getUsername(), is(equalTo(SOME_USERNAME)));
@@ -55,7 +55,7 @@ public class UserDtoTest {
     }
 
     @Test
-    void builderReturnsUserDtoWhenIRolesIsEmpty() throws InvalidUserException {
+    void builderReturnsUserDtoWhenIRolesIsEmpty() throws InvalidUserInternalException {
         UserDto user = UserDto.newBuilder().withUsername(SOME_USERNAME)
             .withInstitution(SOME_INSTITUTION).build();
         assertThat(user.getUsername(), is(equalTo(SOME_USERNAME)));
@@ -68,11 +68,11 @@ public class UserDtoTest {
     @ValueSource(strings = {" "})
     void buildThrowsExceptionWhenUsernameIsNullOrEmpty(String username) {
         Executable action = () -> UserDto.newBuilder().withUsername(username).build();
-        assertThrows(InvalidUserException.class, action);
+        assertThrows(InvalidUserInternalException.class, action);
     }
 
     @Test
-    void toUserDbReturnsValidUserDbWhenUserDtoIsValid() throws InvalidUserException {
+    void toUserDbReturnsValidUserDbWhenUserDtoIsValid() throws InvalidUserInternalException {
         UserDto userOnlyWithOnlyUsername = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
         UserDto actualUserOnlyWithName = convertToUserDbAndBack(userOnlyWithOnlyUsername);
         assertThat(actualUserOnlyWithName, is(equalTo(userOnlyWithOnlyUsername)));
@@ -81,7 +81,7 @@ public class UserDtoTest {
     @ParameterizedTest(name = "fromUserDb throws Exception user contains invalidRole. Rolename:\"{0}\"")
     @NullAndEmptySource
     void fromUserDbThrowsExceptionWhenUserDbContainsInvalidRole(String invalidRoleName)
-        throws InvalidUserException {
+        throws InvalidUserInternalException {
         RoleDb invalidRole = new RoleDb();
         invalidRole.setName(invalidRoleName);
         List<RoleDb> invalidRoles = Collections.singletonList(invalidRole);
@@ -95,7 +95,7 @@ public class UserDtoTest {
     @ParameterizedTest
     @NullAndEmptySource
     void toUserDbThrowsExceptionWhenUserDbContainsInvalidRole(String invalidRoleName)
-        throws InvalidUserException, InvalidRoleException {
+        throws InvalidUserInternalException, InvalidRoleException {
         RoleDto invalidRole = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
         invalidRole.setRoleName(invalidRoleName);
         List<RoleDto> invalidRoles = Collections.singletonList(invalidRole);
@@ -108,7 +108,7 @@ public class UserDtoTest {
 
     @Test
     void roleValidationMethodLogsError()
-        throws InvalidUserException, InvalidRoleException {
+        throws InvalidUserInternalException, InvalidRoleException {
         TestAppender appender = LogUtils.getTestingAppender(UserDto.class);
         RoleDto invalidRole = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
         invalidRole.setRoleName(null);
@@ -122,7 +122,7 @@ public class UserDtoTest {
     }
 
     @Test
-    void updateShouldUpdateUserInDatabase() throws InvalidUserException {
+    void updateShouldUpdateUserInDatabase() throws InvalidUserInternalException {
         UserDto initialUser = UserDto.newBuilder().withUsername(SOME_USERNAME).withInstitution(SOME_INSTITUTION)
             .withRoles(sampleRoles).build();
         UserDto copiedUser = initialUser.copy().build();
@@ -131,7 +131,7 @@ public class UserDtoTest {
         assertThat(copiedUser, is(not(sameInstance(initialUser))));
     }
 
-    private UserDto convertToUserDbAndBack(UserDto userDto) throws InvalidUserException {
+    private UserDto convertToUserDbAndBack(UserDto userDto) throws InvalidUserInternalException {
         UserDb userDb = userDto.toUserDb();
         return UserDto.fromUserDb(userDb);
     }

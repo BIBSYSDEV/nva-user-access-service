@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.UserDb;
-import no.unit.nva.database.exceptions.InvalidUserException;
+import no.unit.nva.database.exceptions.InvalidUserInternalException;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.StringUtils;
 import nva.commons.utils.attempt.Failure;
@@ -45,9 +45,9 @@ public class UserDto {
      *
      * @param userDb a database object {@link UserDb}
      * @return a data transfer object {@link UserDto}
-     * @throws InvalidUserException when database object is invalid (should never happen).
+     * @throws InvalidUserInternalException when database object is invalid (should never happen).
      */
-    public static UserDto fromUserDb(UserDb userDb) throws InvalidUserException {
+    public static UserDto fromUserDb(UserDb userDb) throws InvalidUserInternalException {
 
         UserDto.Builder userDto = new UserDto.Builder();
         userDto
@@ -85,9 +85,9 @@ public class UserDto {
      * Trasnforms the DTO to a database object.
      *
      * @return a {@link UserDb}.
-     * @throws InvalidUserException when the DTO contains an invalid user.
+     * @throws InvalidUserInternalException when the DTO contains an invalid user.
      */
-    public UserDb toUserDb() throws InvalidUserException {
+    public UserDb toUserDb() throws InvalidUserInternalException {
         UserDb.Builder userDb = UserDb.newBuilder()
             .withUsername(username)
             .withInstitution(institution)
@@ -192,11 +192,11 @@ public class UserDto {
          * creates a UserDto instance.
          *
          * @return a {@link UserDto}
-         * @throws InvalidUserException when the used to be built is invalid.
+         * @throws InvalidUserInternalException when the used to be built is invalid.
          */
-        public UserDto build() throws InvalidUserException {
+        public UserDto build() throws InvalidUserInternalException {
             if (StringUtils.isEmpty(username)) {
-                throw new InvalidUserException(MISSING_FIELD_ERROR + "username");
+                throw new InvalidUserInternalException(MISSING_FIELD_ERROR + "username");
             }
             return new UserDto(this);
         }
