@@ -13,6 +13,7 @@ Resources:
       StageName: Prod
       EndpointConfiguration: REGIONAL
       Auth:
+        ApiKeyRequired: false
         Authorizers:
           CognitoAuthentication:
             UserPoolArn: 'arn:aws:cognito-idp:eu-west-1:884807050265:userpool/eu-west-1_XUZ0npK9d'
