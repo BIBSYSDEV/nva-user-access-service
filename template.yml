@@ -12,13 +12,12 @@ Resources:
     Properties:
       StageName: Prod
       EndpointConfiguration: REGIONAL
-        #      Auth:
-        #        ApiKeyRequired: false
-        #        DefaultAuthorizer: CognitoAuthentication
-        #        Authorizers:
-        #          CognitoAuthentication:
-        #            UserPoolArn: 'arn:aws:cognito-idp:eu-west-1:884807050265:userpool/eu-west-1_XUZ0npK9d'
-
+      Auth:
+        ApiKeyRequired: false
+        DefaultAuthorizer: CognitoAuthentication
+        Authorizers:
+          CognitoAuthentication:
+            UserPoolArn: 'arn:aws:cognito-idp:eu-west-1:884807050265:userpool/eu-west-1_XUZ0npK9d'
         DefinitionBody:
           openapi: 3.0
           info:
