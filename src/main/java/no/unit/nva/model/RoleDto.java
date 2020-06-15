@@ -5,7 +5,7 @@ import static nva.commons.utils.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 import no.unit.nva.database.RoleDb;
-import no.unit.nva.database.exceptions.InvalidRoleException;
+import no.unit.nva.database.exceptions.InvalidRoleInternalException;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.JsonUtils;
 import nva.commons.utils.StringUtils;
@@ -28,7 +28,7 @@ public class RoleDto {
         return new Builder();
     }
 
-    public static RoleDto fromRoleDb(RoleDb roleDb) throws InvalidRoleException {
+    public static RoleDto fromRoleDb(RoleDb roleDb) throws InvalidRoleInternalException {
         return newBuilder().withName(roleDb.getName()).build();
     }
 
@@ -59,7 +59,7 @@ public class RoleDto {
         return Objects.hash(getRoleName());
     }
 
-    public RoleDb toRoleDb() throws InvalidRoleException {
+    public RoleDb toRoleDb() throws InvalidRoleInternalException {
         return RoleDb.newBuilder().withName(this.roleName).build();
     }
 
@@ -95,11 +95,11 @@ public class RoleDto {
          * Builds a RoleDto.
          *
          * @return a RoleDto
-         * @throws InvalidRoleException when the generated role would be invalid.
+         * @throws InvalidRoleInternalException when the generated role would be invalid.
          */
-        public RoleDto build() throws InvalidRoleException {
+        public RoleDto build() throws InvalidRoleInternalException {
             if (StringUtils.isEmpty(this.name)) {
-                throw new InvalidRoleException(MISSING_ROLE_NAME_ERROR);
+                throw new InvalidRoleInternalException(MISSING_ROLE_NAME_ERROR);
             }
             return new RoleDto(this);
         }

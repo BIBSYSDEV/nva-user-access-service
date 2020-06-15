@@ -1,5 +1,6 @@
 package no.unit.nva.database.exceptions;
 
+import static no.unit.nva.database.exceptions.UnexpectedExceptionTest.SOME_MESSAGE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -10,12 +11,10 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-public class InvalidInputRoleExceptionTest {
-
-    public static final String SOME_MESSAGE = "Some message";
+public class InvalidRoleInternalExceptionTest {
 
     @Test
-    public void invalidInputRoleExceptionHasConstructorWithMessage() {
+    public void invalidRoleInternalExceptionHasConstructorWithMessage() {
         Executable action = () -> {
             throw new InvalidRoleInternalException(SOME_MESSAGE);
         };
@@ -24,8 +23,8 @@ public class InvalidInputRoleExceptionTest {
     }
 
     @Test
-    public void invalidInputRoleExceptionrReturnsBadRequest() {
-        InvalidInputRoleException error = new InvalidInputRoleException(SOME_MESSAGE);
-        assertThat(error.statusCode(), is(equalTo(HttpStatus.SC_BAD_REQUEST)));
+    public void invalidRoleInternalExceptionReturnsBadRequest() {
+        InvalidRoleInternalException error = new InvalidRoleInternalException(SOME_MESSAGE);
+        assertThat(error.statusCode(), is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
     }
 }

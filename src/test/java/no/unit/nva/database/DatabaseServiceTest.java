@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 import java.util.List;
-import no.unit.nva.database.exceptions.InvalidRoleException;
+import no.unit.nva.database.exceptions.InvalidRoleInternalException;
 import no.unit.nva.database.exceptions.InvalidUserInternalException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
@@ -42,7 +42,7 @@ public class DatabaseServiceTest extends DatabaseTest {
 
     @Test
     public void databaseServiceShouldInsertValidItemInDatabase()
-        throws InvalidUserInternalException, InvalidRoleException {
+        throws InvalidUserInternalException, InvalidRoleInternalException {
         UserDto insertedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
         db.addUser(insertedUser);
         UserDto savedUser = getUser(insertedUser);
@@ -52,7 +52,7 @@ public class DatabaseServiceTest extends DatabaseTest {
 
     @Test
     public void databaseServiceShouldReturnNonEmptyUserWhenUsernameExistsInDatabase()
-        throws InvalidUserInternalException, InvalidRoleException {
+        throws InvalidUserInternalException, InvalidRoleInternalException {
         UserDto insertedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
         UserDto savedUser = getUser(insertedUser);
         assertThat(insertedUser, doesNotHaveNullFields());
@@ -60,7 +60,8 @@ public class DatabaseServiceTest extends DatabaseTest {
     }
 
     @Test
-    public void addUserShouldSaveAUserWithoutInstitution() throws InvalidUserInternalException, InvalidRoleException {
+    public void addUserShouldSaveAUserWithoutInstitution() throws InvalidUserInternalException,
+                                                                  InvalidRoleInternalException {
         UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, null, SOME_ROLE);
         UserDto actualUser = getUser(expectedUser);
         assertThat(actualUser, is(equalTo(expectedUser)));
@@ -68,7 +69,7 @@ public class DatabaseServiceTest extends DatabaseTest {
     }
 
     @Test
-    public void addUserShouldSaveUserWithoutRoles() throws InvalidUserInternalException, InvalidRoleException {
+    public void addUserShouldSaveUserWithoutRoles() throws InvalidUserInternalException, InvalidRoleInternalException {
         UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, null);
         UserDto actualUser = getUser(expectedUser);
         assertThat(actualUser, is(equalTo(expectedUser)));
@@ -82,7 +83,7 @@ public class DatabaseServiceTest extends DatabaseTest {
     }
 
     @Test
-    public void dbServiceShouldHaveMethodForUpdatingExistingUser() throws InvalidRoleException,
+    public void dbServiceShouldHaveMethodForUpdatingExistingUser() throws InvalidRoleInternalException,
                                                                           InvalidUserInternalException {
         UserDto user = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
         assertThrows(RuntimeException.class, () -> db.updateUser(user));
@@ -100,7 +101,7 @@ public class DatabaseServiceTest extends DatabaseTest {
     }
 
     private UserDto createSampleUserAndAddUserToDb(String username, String institution, String roleName)
-        throws InvalidRoleException, InvalidUserInternalException {
+        throws InvalidRoleInternalException, InvalidUserInternalException {
         UserDto userDto = UserDto.newBuilder()
             .withRoles(createRoleList(roleName))
             .withInstitution(institution)
@@ -110,7 +111,7 @@ public class DatabaseServiceTest extends DatabaseTest {
         return userDto;
     }
 
-    private List<RoleDto> createRoleList(String rolename) throws InvalidRoleException {
+    private List<RoleDto> createRoleList(String rolename) throws InvalidRoleInternalException {
         if (nonNull(rolename)) {
             RoleDto roleDto = RoleDto.newBuilder().withName(rolename).build();
             return Collections.singletonList(roleDto);

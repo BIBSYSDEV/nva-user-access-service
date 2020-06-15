@@ -23,7 +23,7 @@ import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.DatabaseTest;
-import no.unit.nva.database.exceptions.InvalidRoleException;
+import no.unit.nva.database.exceptions.InvalidRoleInternalException;
 import no.unit.nva.handlers.AddRoleHandler;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -70,7 +70,7 @@ public class AddRoleFt extends DatabaseTest {
     }
 
     @Then("a new role is stored in the database")
-    public void a_new_role_is_stored_in_the_database() throws InvalidRoleException, JsonProcessingException {
+    public void a_new_role_is_stored_in_the_database() throws InvalidRoleInternalException, JsonProcessingException {
         GatewayResponse<RoleDto> response = GatewayResponse.fromString(requestResponse);
         RoleDto resultObject = response.getBodyObject(RoleDto.class);
         DatabaseService serviceImpl = new DatabaseServiceImpl(mapper);

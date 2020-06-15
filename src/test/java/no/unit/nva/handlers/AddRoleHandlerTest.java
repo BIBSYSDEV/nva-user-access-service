@@ -16,7 +16,7 @@ import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.DatabaseTest;
-import no.unit.nva.database.exceptions.InvalidRoleException;
+import no.unit.nva.database.exceptions.InvalidRoleInternalException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.handlers.GatewayResponse;
@@ -44,14 +44,6 @@ public class AddRoleHandlerTest extends DatabaseTest {
         addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
     }
 
-    @Test
-    public void addRoleHandlerHasProcessInputMethod()
-        throws InvalidRoleException {
-        RoleDto roleDto = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
-        Executable action = () -> roleDto.getClass()
-            .getDeclaredMethod("processInput", RequestInfo.class, Context.class);
-        assertDoesNotThrow(action);
-    }
 
     @Test
     public void handleRequestReturnsBadRequestWhenRequestBodyIsEmpty() throws IOException {
@@ -66,13 +58,14 @@ public class AddRoleHandlerTest extends DatabaseTest {
     }
 
     @Test
-    public void handlerRequestReturnsOkWheRequestBodyIsValid() throws InvalidRoleException, IOException {
+    public void handlerRequestReturnsOkWheRequestBodyIsValid() throws InvalidRoleInternalException, IOException {
         GatewayResponse<RoleDto> response = sendRequest(RoleDto.newBuilder().withName(SOME_ROLE_NAME).build());
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_OK)));
     }
 
     @Test
-    public void handlerRequestReturnsTheGeneratedObjectWhenInputIsValid() throws InvalidRoleException, IOException {
+    public void handlerRequestReturnsTheGeneratedObjectWhenInputIsValid()
+        throws InvalidRoleInternalException, IOException {
         RoleDto actualRole = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
         GatewayResponse<RoleDto> response = sendRequest(actualRole);
         RoleDto savedRole = response.getBodyObject(RoleDto.class);
@@ -81,7 +74,7 @@ public class AddRoleHandlerTest extends DatabaseTest {
 
     @Test
     public void handlerRequestReturnsTheGeneratedObjectAfterWaitingForSyncingToComplete()
-        throws InvalidRoleException, IOException {
+        throws InvalidRoleInternalException, IOException {
         RoleDto actualRole = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
         DatabaseService service = databaseServiceWithSyncDelay();
         addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
@@ -93,7 +86,7 @@ public class AddRoleHandlerTest extends DatabaseTest {
 
     @Test
     public void handleRequestReturnsInternalServerErrorWhenDatabaseFailsToSaveTheData()
-        throws InvalidRoleException, IOException {
+        throws InvalidRoleInternalException, IOException {
         RoleDto actualRole = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
         DatabaseService service = databaseServiceReturningEmpty();
         addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
@@ -109,7 +102,7 @@ public class AddRoleHandlerTest extends DatabaseTest {
             private int counter = 0;
 
             @Override
-            public Optional<RoleDto> getRole(RoleDto queryObject) throws InvalidRoleException {
+            public Optional<RoleDto> getRole(RoleDto queryObject) throws InvalidRoleInternalException {
                 if (counter == 0) {
                     counter++;
                     return Optional.empty();

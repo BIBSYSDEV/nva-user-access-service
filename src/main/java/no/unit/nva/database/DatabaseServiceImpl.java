@@ -13,7 +13,7 @@ import com.amazonaws.services.dynamodbv2.model.Condition;
 import java.util.List;
 import java.util.Optional;
 import no.unit.nva.database.exceptions.InvalidInputRoleException;
-import no.unit.nva.database.exceptions.InvalidRoleException;
+import no.unit.nva.database.exceptions.InvalidRoleInternalException;
 import no.unit.nva.database.exceptions.InvalidUserInternalException;
 import no.unit.nva.database.intefaces.WithType;
 import no.unit.nva.model.RoleDto;
@@ -84,7 +84,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Optional<RoleDto> getRole(RoleDto queryObject) throws InvalidRoleException {
+    public Optional<RoleDto> getRole(RoleDto queryObject) throws InvalidRoleInternalException {
         RoleDb searchObject = queryObject.toRoleDb();
         DynamoDBQueryExpression<RoleDb> searchRoleByName = createGetQuery(searchObject);
 

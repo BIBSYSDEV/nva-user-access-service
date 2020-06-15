@@ -6,7 +6,7 @@ import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.exceptions.DataHandlingError;
 import no.unit.nva.database.exceptions.InvalidInputRoleException;
-import no.unit.nva.database.exceptions.InvalidRoleException;
+import no.unit.nva.database.exceptions.InvalidRoleInternalException;
 import no.unit.nva.database.exceptions.UnexpectedException;
 import no.unit.nva.model.RoleDto;
 import nva.commons.handlers.ApiGatewayHandler;
@@ -44,14 +44,14 @@ public class AddRoleHandler extends ApiGatewayHandler<RoleDto, RoleDto> {
 
     @Override
     protected RoleDto processInput(RoleDto input, RequestInfo requestInfo, Context context)
-        throws DataHandlingError, UnexpectedException, InvalidInputRoleException, InvalidRoleException {
+        throws DataHandlingError, UnexpectedException, InvalidInputRoleException, InvalidRoleInternalException {
         databaseService.addRole(input);
         return getEventuallyConsistentRole(input)
             .orElseThrow(() -> new DataHandlingError(ERROR_FETCHING_SAVED_ROLE + input.getRoleName()));
     }
 
     private Optional<RoleDto> getEventuallyConsistentRole(RoleDto input)
-        throws InvalidRoleException, UnexpectedException {
+        throws InvalidRoleInternalException, UnexpectedException {
         Optional<RoleDto> role = databaseService.getRole(input);
         int counter = 0;
         while (role.isEmpty() && counter < MAX_EFFORTS_FOR_FETCHING_ROLE) {

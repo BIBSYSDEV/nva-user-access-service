@@ -3,9 +3,9 @@ package no.unit.nva.database.exceptions;
 import nva.commons.exceptions.ApiGatewayException;
 import org.apache.http.HttpStatus;
 
-public class InvalidRoleException extends ApiGatewayException {
+public class InvalidRoleInternalException extends ApiGatewayException {
 
-    public InvalidRoleException(String message) {
+    public InvalidRoleInternalException(String message) {
         super(message);
     }
 

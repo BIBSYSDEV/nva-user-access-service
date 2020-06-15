@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.unit.nva.database.UserDb.Builder;
-import no.unit.nva.database.exceptions.InvalidRoleException;
+import no.unit.nva.database.exceptions.InvalidRoleInternalException;
 import no.unit.nva.database.exceptions.InvalidUserInternalException;
 import nva.commons.utils.attempt.Try;
 import org.junit.jupiter.api.BeforeEach;
@@ -153,7 +153,7 @@ public class UserDbTest extends DatabaseTest {
             .collect(Collectors.toList());
     }
 
-    private static RoleDb newRole(String str) throws InvalidRoleException {
+    private static RoleDb newRole(String str) throws InvalidRoleInternalException {
         return RoleDb.newBuilder().withName(str).build();
     }
 }

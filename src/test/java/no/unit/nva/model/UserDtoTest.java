@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.UserDb;
-import no.unit.nva.database.exceptions.InvalidRoleException;
+import no.unit.nva.database.exceptions.InvalidRoleInternalException;
 import no.unit.nva.database.exceptions.InvalidUserInternalException;
 import no.unit.nva.model.UserDto.Builder;
 import nva.commons.utils.log.LogUtils;
@@ -89,13 +89,13 @@ public class UserDtoTest {
 
         Executable action = () -> UserDto.fromUserDb(userDbWithInvalidRole);
         RuntimeException exception = assertThrows(RuntimeException.class, action);
-        assertThat(exception.getCause(), is(instanceOf(InvalidRoleException.class)));
+        assertThat(exception.getCause(), is(instanceOf(InvalidRoleInternalException.class)));
     }
 
     @ParameterizedTest
     @NullAndEmptySource
     void toUserDbThrowsExceptionWhenUserDbContainsInvalidRole(String invalidRoleName)
-        throws InvalidUserInternalException, InvalidRoleException {
+        throws InvalidUserInternalException, InvalidRoleInternalException {
         RoleDto invalidRole = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
         invalidRole.setRoleName(invalidRoleName);
         List<RoleDto> invalidRoles = Collections.singletonList(invalidRole);
@@ -103,12 +103,12 @@ public class UserDtoTest {
 
         Executable action = userWithInvalidRole::toUserDb;
         RuntimeException exception = assertThrows(RuntimeException.class, action);
-        assertThat(exception.getCause(), is(instanceOf(InvalidRoleException.class)));
+        assertThat(exception.getCause(), is(instanceOf(InvalidRoleInternalException.class)));
     }
 
     @Test
     void roleValidationMethodLogsError()
-        throws InvalidUserInternalException, InvalidRoleException {
+        throws InvalidUserInternalException, InvalidRoleInternalException {
         TestAppender appender = LogUtils.getTestingAppender(UserDto.class);
         RoleDto invalidRole = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
         invalidRole.setRoleName(null);
@@ -139,7 +139,7 @@ public class UserDtoTest {
     private static List<RoleDto> createSampleRoles() {
         try {
             return Arrays.asList(RoleDto.newBuilder().withName(SOME_ROLENAME).build());
-        } catch (InvalidRoleException e) {
+        } catch (InvalidRoleInternalException e) {
             throw new RuntimeException(e);
         }
     }
