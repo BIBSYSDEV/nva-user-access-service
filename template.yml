@@ -2,10 +2,62 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
 Description: >
-   The resources for providing a service for listing users and roles.
-   It includes a table containing users and roles and lambda functions for accessing the data.
+  The resources for providing a service for listing users and roles.
+  It includes a table containing users and roles and lambda functions for accessing the data.
+
 
 Resources:
+  RestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      EndpointConfiguration: REGIONAL
+      Auth:
+        ApiKeyRequired: false
+        DefaultAuthorizer: CognitoAuthentication
+        Authorizers:
+          CognitoAuthentication:
+            UserPoolArn: 'arn:aws:cognito-idp:eu-west-1:884807050265:userpool/eu-west-1_XUZ0npK9d'
+            AuthType: "COGNITO_USER_POOLS"
+      DefinitionBody:
+        openapi: 3.0
+        info:
+          title: roles and users access
+          description: Api for updating users and roles
+          version: 1.0.0
+        paths:
+          /roles:
+            post:
+              summary: Adds new Role
+              security:
+                - CognitoAuthentication: []
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/Role'
+              responses:
+                '200':
+                  description: Successful creation of role. Returns the generated role
+                  x-amazon-apigateway-integration:
+                    uri:
+                      Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
+                    responses: {}
+                    httpMethod: POST
+                    type: aws_proxy
+        components:
+          schemas:
+            Role:
+              properties:
+                rolename:
+                  type: string
+          securitySchemes:
+            CognitoAuthentication:
+              type: "apiKey"
+              name: "Authorization"
+              in: "header"
+
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -16,9 +68,63 @@ Resources:
         - AttributeName: PK1B
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
-
       KeySchema:
         - AttributeName: PK1A
           KeyType: HASH
         - AttributeName: PK1B
           KeyType: RANGE
+
+  LambdaRole:
+    DependsOn: UserRoleMappings
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: LambdaAccessPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "dynamodb:BatchGetItem"
+                  - "dynamodb:BatchWriteItem"
+                  - "dynamodb:GetItem"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:Query"
+                  - "dynamodb:UpdateItem"
+                Resource: !GetAtt UserRoleMappings.Arn
+
+  AddRoleHandler:
+    DependsOn: [ LambdaRole, UserRoleMappings]
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.AddRoleHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /roles
+            Method: post
+            RestApiId: !Ref RestApi

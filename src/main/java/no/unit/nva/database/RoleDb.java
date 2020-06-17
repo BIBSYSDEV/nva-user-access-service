@@ -7,7 +7,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import java.util.Objects;
-import no.unit.nva.database.exceptions.InvalidRoleException;
+import no.unit.nva.database.exceptions.InvalidRoleInternalException;
 import no.unit.nva.database.intefaces.DynamoEntry;
 import no.unit.nva.database.intefaces.WithCopy;
 import nva.commons.utils.JacocoGenerated;
@@ -25,7 +25,7 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder> {
         super();
     }
 
-    private RoleDb(Builder builder) throws InvalidRoleException {
+    private RoleDb(Builder builder) throws InvalidRoleInternalException {
         super();
         setName(builder.name);
         setPrimaryHashKey(builder.primaryHashKey);
@@ -71,13 +71,13 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder> {
      * entry. This is the hashKey for the table and not any secondary index.
      *
      * @param primaryHashKey the primary hash key saved in the database
-     * @throws InvalidRoleException when the role is invalid.
+     * @throws InvalidRoleInternalException when the role is invalid.
      */
     @JacocoGenerated
-    public void setPrimaryHashKey(String primaryHashKey) throws InvalidRoleException {
+    public void setPrimaryHashKey(String primaryHashKey) throws InvalidRoleInternalException {
         if (primaryKeyHasNotBeenSet()) {
             if (!primaryHashKey.startsWith(TYPE)) {
-                throw new InvalidRoleException(INVALID_PRIMARY_HASH_KEY);
+                throw new InvalidRoleInternalException(INVALID_PRIMARY_HASH_KEY);
             }
             this.primaryHashKey = primaryHashKey;
         }
@@ -121,15 +121,15 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder> {
             return this;
         }
 
-        private String formatPrimaryHashKey() throws InvalidRoleException {
+        private String formatPrimaryHashKey() throws InvalidRoleInternalException {
             if (isNull(name) || name.isBlank()) {
-                throw new InvalidRoleException(EMPTY_ROLE_NAME_ERROR);
+                throw new InvalidRoleInternalException(EMPTY_ROLE_NAME_ERROR);
             } else {
                 return String.join(FIELD_DELIMITER, TYPE, name);
             }
         }
 
-        public RoleDb build() throws InvalidRoleException {
+        public RoleDb build() throws InvalidRoleInternalException {
             this.primaryHashKey = formatPrimaryHashKey();
             return new RoleDb(this);
         }

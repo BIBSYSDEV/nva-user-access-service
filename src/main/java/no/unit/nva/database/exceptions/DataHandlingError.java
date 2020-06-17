@@ -3,9 +3,9 @@ package no.unit.nva.database.exceptions;
 import nva.commons.exceptions.ApiGatewayException;
 import org.apache.http.HttpStatus;
 
-public class InvalidUserException extends ApiGatewayException {
+public class DataHandlingError extends ApiGatewayException {
 
-    public InvalidUserException(String message) {
+    public DataHandlingError(String message) {
         super(message);
     }
 

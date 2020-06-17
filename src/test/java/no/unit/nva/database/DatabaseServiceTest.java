@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 import java.util.List;
-import no.unit.nva.database.exceptions.InvalidRoleException;
-import no.unit.nva.database.exceptions.InvalidUserException;
+import no.unit.nva.database.exceptions.InvalidRoleInternalException;
+import no.unit.nva.database.exceptions.InvalidUserInternalException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,18 +30,19 @@ public class DatabaseServiceTest extends DatabaseTest {
     }
 
     @Test
-    public void databaseServiceShouldHaveAMethodForGettingAUserByUsername() throws InvalidUserException {
+    public void databaseServiceShouldHaveAMethodForGettingAUserByUsername() throws InvalidUserInternalException {
         db.getUser(SOME_USERNAME);
     }
 
     @Test
-    public void databaseServiceShouldHaveAMethodForInsertingAUser() throws InvalidUserException {
+    public void databaseServiceShouldHaveAMethodForInsertingAUser() throws InvalidUserInternalException {
         UserDto user = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
         db.addUser(user);
     }
 
     @Test
-    public void databaseServiceShouldInsertValidItemInDatabase() throws InvalidUserException, InvalidRoleException {
+    public void databaseServiceShouldInsertValidItemInDatabase()
+        throws InvalidUserInternalException, InvalidRoleInternalException {
         UserDto insertedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
         db.addUser(insertedUser);
         UserDto savedUser = getUser(insertedUser);
@@ -51,7 +52,7 @@ public class DatabaseServiceTest extends DatabaseTest {
 
     @Test
     public void databaseServiceShouldReturnNonEmptyUserWhenUsernameExistsInDatabase()
-        throws InvalidUserException, InvalidRoleException {
+        throws InvalidUserInternalException, InvalidRoleInternalException {
         UserDto insertedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
         UserDto savedUser = getUser(insertedUser);
         assertThat(insertedUser, doesNotHaveNullFields());
@@ -59,7 +60,8 @@ public class DatabaseServiceTest extends DatabaseTest {
     }
 
     @Test
-    public void addUserShouldSaveAUserWithoutInstitution() throws InvalidUserException, InvalidRoleException {
+    public void addUserShouldSaveAUserWithoutInstitution() throws InvalidUserInternalException,
+                                                                  InvalidRoleInternalException {
         UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, null, SOME_ROLE);
         UserDto actualUser = getUser(expectedUser);
         assertThat(actualUser, is(equalTo(expectedUser)));
@@ -67,7 +69,7 @@ public class DatabaseServiceTest extends DatabaseTest {
     }
 
     @Test
-    public void addUserShouldSaveUserWithoutRoles() throws InvalidUserException, InvalidRoleException {
+    public void addUserShouldSaveUserWithoutRoles() throws InvalidUserInternalException, InvalidRoleInternalException {
         UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, null);
         UserDto actualUser = getUser(expectedUser);
         assertThat(actualUser, is(equalTo(expectedUser)));
@@ -76,29 +78,30 @@ public class DatabaseServiceTest extends DatabaseTest {
     @Test
     public void addUserShouldNotSaveUserWithoutUsername() {
         Executable illegalAction = () -> db.addUser(userWithoutUsername());
-        InvalidUserException exception = assertThrows(InvalidUserException.class, illegalAction);
-        assertThat(exception.getClass(), is(equalTo(InvalidUserException.class)));
+        InvalidUserInternalException exception = assertThrows(InvalidUserInternalException.class, illegalAction);
+        assertThat(exception.getClass(), is(equalTo(InvalidUserInternalException.class)));
     }
 
     @Test
-    public void dbServiceShouldHaveMethodForUpdatingExistingUser() throws InvalidRoleException, InvalidUserException {
+    public void dbServiceShouldHaveMethodForUpdatingExistingUser() throws InvalidRoleInternalException,
+                                                                          InvalidUserInternalException {
         UserDto user = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
         assertThrows(RuntimeException.class, () -> db.updateUser(user));
     }
 
-    private UserDto userWithoutUsername() throws InvalidUserException {
+    private UserDto userWithoutUsername() throws InvalidUserInternalException {
         return UserDto.newBuilder()
             .withInstitution(SOME_INSTITUTION)
             .build();
     }
 
-    private UserDto getUser(UserDto insertedUser) throws InvalidUserException {
+    private UserDto getUser(UserDto insertedUser) throws InvalidUserInternalException {
         return db.getUser(insertedUser.getUsername())
             .orElseThrow(() -> new RuntimeException("Expected to find a user"));
     }
 
     private UserDto createSampleUserAndAddUserToDb(String username, String institution, String roleName)
-        throws InvalidRoleException, InvalidUserException {
+        throws InvalidRoleInternalException, InvalidUserInternalException {
         UserDto userDto = UserDto.newBuilder()
             .withRoles(createRoleList(roleName))
             .withInstitution(institution)
@@ -108,7 +111,7 @@ public class DatabaseServiceTest extends DatabaseTest {
         return userDto;
     }
 
-    private List<RoleDto> createRoleList(String rolename) throws InvalidRoleException {
+    private List<RoleDto> createRoleList(String rolename) throws InvalidRoleInternalException {
         if (nonNull(rolename)) {
             RoleDto roleDto = RoleDto.newBuilder().withName(rolename).build();
             return Collections.singletonList(roleDto);

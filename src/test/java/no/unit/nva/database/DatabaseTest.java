@@ -19,9 +19,10 @@ import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import java.util.ArrayList;
 import java.util.List;
+import no.unit.nva.database.intefaces.WithEnvironment;
 import org.junit.jupiter.api.AfterEach;
 
-public abstract class DatabaseTest {
+public abstract class DatabaseTest implements WithEnvironment {
 
     protected AmazonDynamoDB localDynamo;
 

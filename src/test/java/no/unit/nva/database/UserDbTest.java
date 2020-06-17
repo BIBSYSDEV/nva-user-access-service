@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.unit.nva.database.UserDb.Builder;
-import no.unit.nva.database.exceptions.InvalidRoleException;
-import no.unit.nva.database.exceptions.InvalidUserException;
+import no.unit.nva.database.exceptions.InvalidRoleInternalException;
+import no.unit.nva.database.exceptions.InvalidUserInternalException;
 import nva.commons.utils.attempt.Try;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ public class UserDbTest extends DatabaseTest {
     private UserDb sampleUser;
 
     @BeforeEach
-    private void init() throws InvalidUserException {
+    private void init() throws InvalidUserInternalException {
         dynamoFunctionalityTestUser = new UserDb();
         sampleUser = UserDb.newBuilder().withUsername(SOME_USERNAME).build();
         initializeTestDatabase();
@@ -81,7 +81,7 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    public void builderShouldSetTheHashKeyBasedOnusername() throws InvalidUserException {
+    public void builderShouldSetTheHashKeyBasedOnusername() throws InvalidUserInternalException {
         sampleUser.setPrimaryHashKey("SomeOtherHashKey");
         String expectedHashKey = String.join(UserDb.FIELD_DELIMITER, UserDb.TYPE, SOME_USERNAME);
         assertThat(sampleUser.getPrimaryHashKey(), is(equalTo(expectedHashKey)));
@@ -94,7 +94,7 @@ public class UserDbTest extends DatabaseTest {
     }
 
     @Test
-    void userDbShouldBeReadFromDatabaseWithoutDataLoss() throws InvalidUserException {
+    void userDbShouldBeReadFromDatabaseWithoutDataLoss() throws InvalidUserInternalException {
         UserDb insertedUser = UserDb.newBuilder()
             .withUsername(SOME_USERNAME)
             .withInstitution(SOME_INSTITUTION)
@@ -117,12 +117,12 @@ public class UserDbTest extends DatabaseTest {
             .withRoles(SAMPLE_ROLES)
             .build();
 
-        InvalidUserException exception = assertThrows(InvalidUserException.class, action);
+        InvalidUserInternalException exception = assertThrows(InvalidUserInternalException.class, action);
         assertThat(exception.getMessage(), containsString(UserDb.INVALID_USER_EMPTY_USERNAME));
     }
 
     @Test
-    void copyShouldReturnBuilderWithFilledInFields() throws InvalidUserException {
+    void copyShouldReturnBuilderWithFilledInFields() throws InvalidUserInternalException {
         UserDb originalUser = UserDb.newBuilder()
             .withUsername(SOME_USERNAME)
             .withInstitution(SOME_INSTITUTION)
@@ -138,7 +138,7 @@ public class UserDbTest extends DatabaseTest {
     void setPrimaryHashKeyThrowsExceptionWhenKeyDoesNotStartWithType() {
         UserDb userDb = new UserDb();
         Executable action = () -> userDb.setPrimaryHashKey("SomeKey");
-        InvalidUserException exception = assertThrows(InvalidUserException.class, action);
+        InvalidUserInternalException exception = assertThrows(InvalidUserInternalException.class, action);
         assertThat(exception.getMessage(), containsString(UserDb.INVALID_PRIMARY_HASH_KEY));
     }
 
@@ -153,7 +153,7 @@ public class UserDbTest extends DatabaseTest {
             .collect(Collectors.toList());
     }
 
-    private static RoleDb newRole(String str) throws InvalidRoleException {
+    private static RoleDb newRole(String str) throws InvalidRoleInternalException {
         return RoleDb.newBuilder().withName(str).build();
     }
 }
