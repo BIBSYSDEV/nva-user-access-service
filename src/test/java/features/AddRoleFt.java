@@ -56,7 +56,7 @@ public class AddRoleFt extends DatabaseTest {
     }
 
     @When("the authorized client sends a {string} request")
-    public void the_authorized_client_sends_a_Post_request(String httpMethod) {
+    public void the_authorized_client_sends_a_request(String httpMethod) {
         this.scenarioContext.setRequestBody(new ConcurrentHashMap<>());
         scenarioContext.getRequestBody().put(HTTP_METHOD, httpMethod.toUpperCase());
     }
