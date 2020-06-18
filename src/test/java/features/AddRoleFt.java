@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.DatabaseTest;
@@ -33,10 +34,15 @@ import nva.commons.utils.JsonUtils;
 public class AddRoleFt extends DatabaseTest {
 
     public static final int IGNORE_HEADER_ROW = 1;
+    public static final String HTTP_METHOD = "httpMethod";
+    private final ScenarioContext scenarioContext;
     private DynamoDBMapper mapper;
     private DatabaseService service;
     private String requestResponse;
-    private Map<String, Object> requestBody;
+
+    public AddRoleFt(ScenarioContext scenarioContext) {
+        this.scenarioContext = scenarioContext;
+    }
 
     @Given("a database for users and roles")
     public void a_database_for_users_and_roles() {
@@ -49,17 +55,18 @@ public class AddRoleFt extends DatabaseTest {
         // do nothing
     }
 
-    @When("then authorized client sends a POST request")
-    public void then_authorized_client_sends_a_Post_request() {
-        // cannot imitate generating a post request with currently no parameters when running internally.
+    @When("the authorized client sends a {string} request")
+    public void the_authorized_client_sends_a_request(String httpMethod) {
+        this.scenarioContext.setRequestBody(new ConcurrentHashMap<>());
+        scenarioContext.getRequestBody().put(HTTP_METHOD, httpMethod.toUpperCase());
     }
 
     @When("the request contains a JSON body with following key-value pairs")
     public void the_request_contains_a_Json_body_with_following_key_value_pairs(DataTable dataTable)
         throws IOException {
         DataTable inputData = dataTable.rows(IGNORE_HEADER_ROW);
-        requestBody = inputData.asMap(String.class, Object.class);
-        String body = JsonUtils.objectMapper.writeValueAsString(requestBody);
+        scenarioContext.getRequestBody().putAll(inputData.asMap(String.class, Object.class));
+        String body = JsonUtils.objectMapper.writeValueAsString(scenarioContext.getRequestBody());
         InputStream request = new HandlerRequestBuilder<String>(JsonUtils.objectMapper)
             .withBody(body).build();
         AddRoleHandler addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
@@ -84,7 +91,7 @@ public class AddRoleFt extends DatabaseTest {
     public void the_description_of_the_role_is_returned_to_the_authorized_client() throws JsonProcessingException {
         GatewayResponse<RoleDto> response = GatewayResponse.fromString(requestResponse);
         RoleDto responseObject = response.getBodyObject(RoleDto.class);
-        RoleDto requestObject = JsonUtils.objectMapper.convertValue(requestBody, RoleDto.class);
+        RoleDto requestObject = JsonUtils.objectMapper.convertValue(scenarioContext.getRequestBody(), RoleDto.class);
         assertThat(requestObject, is(equalTo(responseObject)));
     }
 }
