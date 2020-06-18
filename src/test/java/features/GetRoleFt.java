@@ -1,7 +1,5 @@
 package features;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
@@ -19,6 +17,11 @@ public class GetRoleFt extends ScenarioTest {
     private RoleDto expectedRoleDto;
     private RoleDto actualRoleDto;
 
+    /**
+     * Default Constructor.
+     *
+     * @param scenarioContext the injected scenario context.
+     */
     public GetRoleFt(ScenarioContext scenarioContext) {
         this.scenarioContext = scenarioContext;
     }

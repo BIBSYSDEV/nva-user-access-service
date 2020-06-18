@@ -38,7 +38,6 @@ public class AddRoleFt extends ScenarioTest {
     }
 
 
-
     @Given("an authorized client")
     public void an_authorized_client() {
         // do nothing
