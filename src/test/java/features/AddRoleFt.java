@@ -8,7 +8,6 @@ import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.datatable.DataTable;
@@ -21,9 +20,6 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import no.unit.nva.database.DatabaseService;
-import no.unit.nva.database.DatabaseServiceImpl;
-import no.unit.nva.database.DatabaseTest;
 import no.unit.nva.database.exceptions.InvalidRoleInternalException;
 import no.unit.nva.handlers.AddRoleHandler;
 import no.unit.nva.model.RoleDto;
@@ -31,24 +27,17 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.utils.JsonUtils;
 
-public class AddRoleFt extends DatabaseTest {
+public class AddRoleFt extends ScenarioTest {
 
-    public static final int IGNORE_HEADER_ROW = 1;
     public static final String HTTP_METHOD = "httpMethod";
     private final ScenarioContext scenarioContext;
-    private DynamoDBMapper mapper;
-    private DatabaseService service;
     private String requestResponse;
 
     public AddRoleFt(ScenarioContext scenarioContext) {
         this.scenarioContext = scenarioContext;
     }
 
-    @Given("a database for users and roles")
-    public void a_database_for_users_and_roles() {
-        mapper = new DynamoDBMapper(initializeTestDatabase());
-        service = new DatabaseServiceImpl(mapper);
-    }
+
 
     @Given("an authorized client")
     public void an_authorized_client() {
@@ -65,11 +54,12 @@ public class AddRoleFt extends DatabaseTest {
     public void the_request_contains_a_Json_body_with_following_key_value_pairs(DataTable dataTable)
         throws IOException {
         DataTable inputData = dataTable.rows(IGNORE_HEADER_ROW);
-        scenarioContext.getRequestBody().putAll(inputData.asMap(String.class, Object.class));
+        Map<String, Object> bodyFields = inputData.asMap(String.class, Object.class);
+        scenarioContext.getRequestBody().putAll(bodyFields);
         String body = JsonUtils.objectMapper.writeValueAsString(scenarioContext.getRequestBody());
         InputStream request = new HandlerRequestBuilder<String>(JsonUtils.objectMapper)
             .withBody(body).build();
-        AddRoleHandler addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
+        AddRoleHandler addRoleHandler = new AddRoleHandler(mockEnvironment(), scenarioContext.getDatabaseService());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Context context = mock(Context.class);
         addRoleHandler.handleRequest(request, outputStream, context);
@@ -80,8 +70,7 @@ public class AddRoleFt extends DatabaseTest {
     public void a_new_role_is_stored_in_the_database() throws InvalidRoleInternalException, JsonProcessingException {
         GatewayResponse<RoleDto> response = GatewayResponse.fromString(requestResponse);
         RoleDto resultObject = response.getBodyObject(RoleDto.class);
-        DatabaseService serviceImpl = new DatabaseServiceImpl(mapper);
-        Optional<RoleDto> savedRole = serviceImpl.getRole(resultObject);
+        Optional<RoleDto> savedRole = scenarioContext.getDatabaseService().getRole(resultObject);
         assertTrue(savedRole.isPresent());
         assertThat(savedRole.get(), is(equalTo(resultObject)));
         assertThat(savedRole.get(), is(not(sameInstance(resultObject))));
