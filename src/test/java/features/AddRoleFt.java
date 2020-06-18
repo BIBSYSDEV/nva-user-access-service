@@ -37,7 +37,6 @@ public class AddRoleFt extends ScenarioTest {
         this.scenarioContext = scenarioContext;
     }
 
-
     @Given("an authorized client")
     public void an_authorized_client() {
         // do nothing
@@ -53,15 +52,12 @@ public class AddRoleFt extends ScenarioTest {
     public void the_request_contains_a_Json_body_with_following_key_value_pairs(DataTable dataTable)
         throws IOException {
         DataTable inputData = dataTable.rows(IGNORE_HEADER_ROW);
-        Map<String, Object> bodyFields = inputData.asMap(String.class, Object.class);
-        scenarioContext.getRequestBody().putAll(bodyFields);
-        String body = JsonUtils.objectMapper.writeValueAsString(scenarioContext.getRequestBody());
-        InputStream request = new HandlerRequestBuilder<String>(JsonUtils.objectMapper)
-            .withBody(body).build();
-        AddRoleHandler addRoleHandler = new AddRoleHandler(mockEnvironment(), scenarioContext.getDatabaseService());
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Context context = mock(Context.class);
-        addRoleHandler.handleRequest(request, outputStream, context);
+        addFieldsToRequestBody(inputData);
+
+        InputStream request = buildRequestInputStream();
+
+        ByteArrayOutputStream outputStream = invokeAddRoleHandler(request);
+
         requestResponse = outputStream.toString();
     }
 
@@ -81,5 +77,24 @@ public class AddRoleFt extends ScenarioTest {
         RoleDto responseObject = response.getBodyObject(RoleDto.class);
         RoleDto requestObject = JsonUtils.objectMapper.convertValue(scenarioContext.getRequestBody(), RoleDto.class);
         assertThat(requestObject, is(equalTo(responseObject)));
+    }
+
+    private ByteArrayOutputStream invokeAddRoleHandler(InputStream request) throws IOException {
+        AddRoleHandler addRoleHandler = new AddRoleHandler(mockEnvironment(), scenarioContext.getDatabaseService());
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Context context = mock(Context.class);
+        addRoleHandler.handleRequest(request, outputStream, context);
+        return outputStream;
+    }
+
+    private InputStream buildRequestInputStream() throws JsonProcessingException {
+        String body = JsonUtils.objectMapper.writeValueAsString(scenarioContext.getRequestBody());
+        return new HandlerRequestBuilder<String>(JsonUtils.objectMapper)
+            .withBody(body).build();
+    }
+
+    private void addFieldsToRequestBody(DataTable inputData) {
+        Map<String, Object> bodyFields = inputData.asMap(String.class, Object.class);
+        scenarioContext.getRequestBody().putAll(bodyFields);
     }
 }
