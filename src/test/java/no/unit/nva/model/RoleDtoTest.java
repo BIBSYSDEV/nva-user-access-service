@@ -1,9 +1,12 @@
 package no.unit.nva.model;
 
+import static no.unit.nva.hamcrest.DoesNotHaveNullOrEmptyFields.doesNotHaveNullOrEmptyFields;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -55,9 +58,18 @@ public class RoleDtoTest {
         Method method = role.getClass().getDeclaredMethod("newUnexpectedException", Failure.class);
         method.setAccessible(true);
         Exception exceptionDuringSerialization = new Exception(SOME_MESSAGE);
-        Failure failure = new Failure<Object>(exceptionDuringSerialization);
+        Failure<Object> failure = new Failure<Object>(exceptionDuringSerialization);
         Executable action = () -> method.invoke(role, failure);
         InvocationTargetException thrown = assertThrows(InvocationTargetException.class, action);
         assertThat(thrown.getCause().getClass(), is(equalTo(RuntimeException.class)));
+    }
+
+    @Test
+    public void copyReturnsABuilderWithAllFieldsOfOriginalObjectPreserved() throws InvalidRoleInternalException {
+        RoleDto original = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
+        RoleDto copy = original.copy().build();
+        assertThat(original, doesNotHaveNullOrEmptyFields());
+        assertThat(copy, is(not(sameInstance(original))));
+        assertThat(copy, is(equalTo(original)));
     }
 }
