@@ -1,4 +1,4 @@
-package no.unit.nva.database.exceptions;
+package no.unit.nva.exceptions;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

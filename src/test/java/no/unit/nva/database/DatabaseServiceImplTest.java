@@ -14,7 +14,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 import java.util.Optional;
 import java.util.stream.Stream;
-import no.unit.nva.database.exceptions.InvalidUserInternalException;
+import no.unit.nva.exceptions.InvalidUserInternalException;
 import no.unit.nva.model.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -16,15 +16,13 @@ import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.DatabaseTest;
-import no.unit.nva.database.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.handlers.GatewayResponse;
-import nva.commons.handlers.RequestInfo;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.zalando.problem.Problem;
 
 public class AddRoleHandlerTest extends DatabaseTest {

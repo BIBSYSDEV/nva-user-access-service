@@ -5,7 +5,7 @@ import static nva.commons.utils.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 import no.unit.nva.database.RoleDb;
-import no.unit.nva.database.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.database.intefaces.WithCopy;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.JsonUtils;

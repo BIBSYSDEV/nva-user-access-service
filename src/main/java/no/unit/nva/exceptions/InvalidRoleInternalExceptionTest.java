@@ -1,6 +1,6 @@
-package no.unit.nva.database.exceptions;
+package no.unit.nva.exceptions;
 
-import static no.unit.nva.database.exceptions.UnexpectedExceptionTest.SOME_MESSAGE;
+import static no.unit.nva.exceptions.UnexpectedExceptionTest.SOME_MESSAGE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -11,20 +11,20 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-public class InvalidUserInternalExceptionTest {
+public class InvalidRoleInternalExceptionTest {
 
     @Test
-    public void invalidUserInternalExceptionHasConstructorWithMessage() {
+    public void invalidRoleInternalExceptionHasConstructorWithMessage() {
         Executable action = () -> {
-            throw new InvalidUserInternalException(SOME_MESSAGE);
+            throw new InvalidRoleInternalException(SOME_MESSAGE);
         };
-        InvalidUserInternalException exception = assertThrows(InvalidUserInternalException.class, action);
+        InvalidRoleInternalException exception = assertThrows(InvalidRoleInternalException.class, action);
         assertThat(exception.getMessage(), containsString(SOME_MESSAGE));
     }
 
     @Test
-    public void invalidUserInternalExceptionReturnsBadRequest() {
-        InvalidUserInternalException error = new InvalidUserInternalException(SOME_MESSAGE);
+    public void invalidRoleInternalExceptionReturnsBadRequest() {
+        InvalidRoleInternalException error = new InvalidRoleInternalException(SOME_MESSAGE);
         assertThat(error.statusCode(), is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
     }
 }

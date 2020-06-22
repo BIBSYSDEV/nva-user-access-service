@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.UserDb;
-import no.unit.nva.database.exceptions.InvalidUserInternalException;
+import no.unit.nva.exceptions.InvalidUserInternalException;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.StringUtils;
 import nva.commons.utils.attempt.Failure;

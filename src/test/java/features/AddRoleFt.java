@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import no.unit.nva.database.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.handlers.AddRoleHandler;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -29,7 +29,6 @@ import nva.commons.utils.JsonUtils;
 
 public class AddRoleFt extends ScenarioTest {
 
-    public static final String HTTP_METHOD = "httpMethod";
     private final ScenarioContext scenarioContext;
     private String requestResponse;
 
