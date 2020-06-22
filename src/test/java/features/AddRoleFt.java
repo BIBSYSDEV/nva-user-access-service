@@ -44,7 +44,7 @@ public class AddRoleFt extends ScenarioTest {
     @When("the authorized client sends a {string} request")
     public void the_authorized_client_sends_a_request(String httpMethod) {
         this.scenarioContext.setRequestBody(new ConcurrentHashMap<>());
-        scenarioContext.getRequestBody().put(HTTP_METHOD, httpMethod.toUpperCase());
+        scenarioContext.getRequestBody().put(HTTP_REQUEST_FIELD_FOR_HTTP_METHOD, httpMethod.toUpperCase());
     }
 
     @When("the request contains a JSON body with following key-value pairs")

@@ -6,8 +6,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.util.Map;
-import no.unit.nva.database.exceptions.InvalidInputRoleException;
-import no.unit.nva.database.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.InvalidInputRoleException;
+import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.model.RoleDto;
 import nva.commons.utils.JsonUtils;
 
