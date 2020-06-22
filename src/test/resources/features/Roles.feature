@@ -16,7 +16,9 @@ Feature: Role features
 
   Scenario: Authorized client reads Role
     Given that there is a role with role-name "TheRole"
-    When the authorized client sends a GET request to the path "/role/TheRole"
+    When the authorized client sends a "GET" request with the following path parameters:
+      | parameter | value   |
+      | role      | TheRole |
     Then a role description is returned
     And the role description contains the following fields and respective values:
       | field    | fieldValue |
