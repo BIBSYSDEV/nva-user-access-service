@@ -36,6 +36,9 @@ public class DatabaseServiceImpl implements DatabaseService {
     private AmazonDynamoDB client;
     private final DynamoDBMapper mapper;
 
+    /**
+     * Default constructor.
+     */
     @JacocoGenerated
     public DatabaseServiceImpl() {
         client = AmazonDynamoDBClientBuilder.defaultClient();

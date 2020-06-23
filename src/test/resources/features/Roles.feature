@@ -12,3 +12,14 @@ Feature: Role features
       | rolename | theRole |
     Then a new role is stored in the database
     And the description of the role is returned to the authorized client
+
+
+  Scenario: Authorized client reads Role
+    Given that there is a role with role-name "TheRole"
+    When the authorized client sends a GET request to the path "/role/TheRole"
+    Then a role description is returned
+    And the role description contains the following fields and respective values:
+      | field    | fieldValue |
+      | rolename | TheRole    |
+
+
