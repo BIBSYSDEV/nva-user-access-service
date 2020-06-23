@@ -9,17 +9,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import io.cucumber.java.Before;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.DatabaseTest;
 import no.unit.nva.database.intefaces.WithEnvironment;
 import no.unit.nva.exceptions.BadRequestException;
+import no.unit.nva.exceptions.ResourceNotFoundException;
 import no.unit.nva.model.RoleDto;
 import nva.commons.exceptions.ApiGatewayException;
-import nva.commons.exceptions.ResourceNotFoundException;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
+import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -33,7 +34,7 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
     /**
      * init.
      */
-    @Before
+    @BeforeEach
     public void init() {
         databaseService = new DatabaseServiceImpl(initializeTestDatabase());
         getRoleHandler = new GetRoleHandler(mockEnvironment(), databaseService);
@@ -71,7 +72,13 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
         RequestInfo requestInfoWithoutRoleName = new RequestInfo();
         Executable action = () -> getRoleHandler.processInput(null, requestInfoWithoutRoleName, null);
         BadRequestException exception = assertThrows(BadRequestException.class, action);
-        assertThat(exception.getMessage(), containsString("Role-name cannot be null"));
+        assertThat(exception.getMessage(), containsString(GetRoleHandler.EMPTY_ROLE_NAME));
+    }
+
+    @Test
+    public void statusCodeReturnsOkWhenRequestIsSuccessful() {
+        Integer successCode = getRoleHandler.getSuccessStatusCode(null, null);
+        assertThat(successCode, is(equalTo(HttpStatus.SC_OK)));
     }
 
     private RequestInfo queryWithRoleName() {

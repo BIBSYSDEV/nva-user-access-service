@@ -12,6 +12,7 @@ import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.handlers.ApiGatewayHandler;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.Environment;
+import nva.commons.utils.JacocoGenerated;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,10 @@ public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
     private final DatabaseService databaseService;
     private static final Logger logger = LoggerFactory.getLogger(GetRoleHandler.class);
 
+    /**
+     * Default constructor used by AWS Lambda.
+     */
+    @JacocoGenerated
     public GetRoleHandler() {
         this(new Environment(), new DatabaseServiceImpl());
     }
@@ -37,7 +42,8 @@ public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
 
     @Override
     protected RoleDto processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-        String rolename = Optional.ofNullable(requestInfo.getPathParameters().get(ROLE_PATH_PARAMETER))
+        String rolename = Optional.ofNullable(requestInfo.getPathParameters())
+            .map(pathParams -> pathParams.get(ROLE_PATH_PARAMETER))
             .orElseThrow(() -> new BadRequestException(EMPTY_ROLE_NAME));
 
         Optional<RoleDto> searchResult = databaseService.getRole(RoleDto.newBuilder().withName(rolename).build());
