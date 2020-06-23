@@ -7,9 +7,9 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import java.util.Objects;
-import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.database.intefaces.DynamoEntry;
 import no.unit.nva.database.intefaces.WithCopy;
+import no.unit.nva.exceptions.InvalidRoleInternalException;
 import nva.commons.utils.JacocoGenerated;
 
 @DynamoDBTable(tableName = "UsersRoles")
@@ -42,30 +42,6 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder> {
         return this.primaryHashKey;
     }
 
-    @DynamoDBRangeKey(attributeName = "PK1B")
-    @Override
-    public String getPrimaryRangeKey() {
-        return getType();
-    }
-
-    @JacocoGenerated
-    @DynamoDBAttribute(attributeName = "name")
-    public String getName() {
-        return name;
-    }
-
-    @JacocoGenerated
-    @DynamoDBAttribute(attributeName = "type")
-    @Override
-    public String getType() {
-        return TYPE;
-    }
-
-    @JacocoGenerated
-    public void setName(String name) {
-        this.name = name;
-    }
-
     /**
      * Do not use this method. This is only for usage by the DynamoDbMapper. Sets the hash key value for the database
      * entry. This is the hashKey for the table and not any secondary index.
@@ -81,6 +57,30 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder> {
             }
             this.primaryHashKey = primaryHashKey;
         }
+    }
+
+    @DynamoDBRangeKey(attributeName = "PK1B")
+    @Override
+    public String getPrimaryRangeKey() {
+        return getType();
+    }
+
+    @JacocoGenerated
+    @DynamoDBAttribute(attributeName = "name")
+    public String getName() {
+        return name;
+    }
+
+    @JacocoGenerated
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @JacocoGenerated
+    @DynamoDBAttribute(attributeName = "type")
+    @Override
+    public String getType() {
+        return TYPE;
     }
 
     @Override
@@ -121,17 +121,17 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder> {
             return this;
         }
 
+        public RoleDb build() throws InvalidRoleInternalException {
+            this.primaryHashKey = formatPrimaryHashKey();
+            return new RoleDb(this);
+        }
+
         private String formatPrimaryHashKey() throws InvalidRoleInternalException {
             if (isNull(name) || name.isBlank()) {
                 throw new InvalidRoleInternalException(EMPTY_ROLE_NAME_ERROR);
             } else {
                 return String.join(FIELD_DELIMITER, TYPE, name);
             }
-        }
-
-        public RoleDb build() throws InvalidRoleInternalException {
-            this.primaryHashKey = formatPrimaryHashKey();
-            return new RoleDb(this);
         }
     }
 }

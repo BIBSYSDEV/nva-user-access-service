@@ -11,8 +11,9 @@ public abstract class DynamoEntry implements WithType {
 
     public abstract String getPrimaryRangeKey();
 
-    protected boolean primaryKeyHasNotBeenSet() {
-        return isNull(getPrimaryHashKey());
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
+    public final void setPrimaryRangeKey(String primaryRangeKey) {
+        // DO NOTHING.
     }
 
     @Override
@@ -28,8 +29,7 @@ public abstract class DynamoEntry implements WithType {
         // DO NOTHING
     }
 
-    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
-    public final void setPrimaryRangeKey(String primaryRangeKey) {
-        // DO NOTHING.
+    protected boolean primaryKeyHasNotBeenSet() {
+        return isNull(getPrimaryHashKey());
     }
 }

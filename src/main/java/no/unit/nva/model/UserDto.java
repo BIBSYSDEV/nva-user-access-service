@@ -23,13 +23,10 @@ public class UserDto {
     public static final String MISSING_FIELD_ERROR = "Invalid User. Missing obligatory field: ";
     public static final String ERROR_DUE_TO_INVALID_ROLE =
         "Failure while trying to create user with role without role-name";
-    private String username;
-
-    private String institution;
-
-    public List<RoleDto> roles;
-
     private static final Logger logger = LoggerFactory.getLogger(UserDto.class);
+    public List<RoleDto> roles;
+    private String username;
+    private String institution;
 
     public UserDto() {
     }
@@ -55,21 +52,6 @@ public class UserDto {
             .withRoles(extractRoles(userDb))
             .withInstitution(userDb.getInstitution());
         return userDto.build();
-    }
-
-    private static List<RoleDto> extractRoles(UserDb userDb) {
-        return Optional.ofNullable(userDb)
-            .stream()
-            .flatMap(userDb1 -> userDb1.getRoles().stream())
-            .map(attempt(RoleDto::fromRoleDb))
-            .map(attempt -> attempt.orElseThrow(UserDto::unexpectedException))
-            .collect(Collectors.toList());
-    }
-
-    /*This exception should not happen as a RoleDb should always convert to a RoleDto */
-    private static <T> IllegalStateException unexpectedException(Failure<T> failure) {
-        logger.error(ERROR_DUE_TO_INVALID_ROLE);
-        throw new IllegalStateException(failure.getException());
     }
 
     /**
@@ -120,16 +102,6 @@ public class UserDto {
         this.roles = roles;
     }
 
-    private List<RoleDb> createRoleDb() {
-        return
-            Optional.ofNullable(this.roles)
-                .stream()
-                .flatMap(Collection::stream)
-                .map(attempt(RoleDto::toRoleDb))
-                .map(attempt -> attempt.orElseThrow(UserDto::unexpectedException))
-                .collect(Collectors.toList());
-    }
-
     /**
      * Creates a copy of the object.
      *
@@ -161,6 +133,31 @@ public class UserDto {
     @JacocoGenerated
     public int hashCode() {
         return Objects.hash(getUsername(), getInstitution(), getRoles());
+    }
+
+    private static List<RoleDto> extractRoles(UserDb userDb) {
+        return Optional.ofNullable(userDb)
+            .stream()
+            .flatMap(userDb1 -> userDb1.getRoles().stream())
+            .map(attempt(RoleDto::fromRoleDb))
+            .map(attempt -> attempt.orElseThrow(UserDto::unexpectedException))
+            .collect(Collectors.toList());
+    }
+
+    /*This exception should not happen as a RoleDb should always convert to a RoleDto */
+    private static <T> IllegalStateException unexpectedException(Failure<T> failure) {
+        logger.error(ERROR_DUE_TO_INVALID_ROLE);
+        throw new IllegalStateException(failure.getException());
+    }
+
+    private List<RoleDb> createRoleDb() {
+        return
+            Optional.ofNullable(this.roles)
+                .stream()
+                .flatMap(Collection::stream)
+                .map(attempt(RoleDto::toRoleDb))
+                .map(attempt -> attempt.orElseThrow(UserDto::unexpectedException))
+                .collect(Collectors.toList());
     }
 
     public static final class Builder {
