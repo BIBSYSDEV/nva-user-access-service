@@ -21,10 +21,10 @@ public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
 
     public static final String LOG_ROLE_NOT_FOUND = "Could not find role:";
     public static final String EMPTY_ROLE_NAME = "Role-name cannot be empty";
-    public static String ROLE_NOT_FOUND_ERROR_MESSAGE = "Could not find role:";
     public static final String ROLE_PATH_PARAMETER = "role";
-    private final DatabaseService databaseService;
     private static final Logger logger = LoggerFactory.getLogger(GetRoleHandler.class);
+    public static String ROLE_NOT_FOUND_ERROR_MESSAGE = "Could not find role:";
+    private final DatabaseService databaseService;
 
     /**
      * Default constructor used by AWS Lambda.
@@ -50,13 +50,13 @@ public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
         return searchResult.orElseThrow(roleNotFound(rolename));
     }
 
-    private Supplier<ResourceNotFoundException> roleNotFound(String rolename) {
-        logger.warn(LOG_ROLE_NOT_FOUND + rolename);
-        return () -> new ResourceNotFoundException(ROLE_NOT_FOUND_ERROR_MESSAGE + rolename);
-    }
-
     @Override
     protected Integer getSuccessStatusCode(Void input, RoleDto output) {
         return HttpStatus.SC_OK;
+    }
+
+    private Supplier<ResourceNotFoundException> roleNotFound(String rolename) {
+        logger.warn(LOG_ROLE_NOT_FOUND + rolename);
+        return () -> new ResourceNotFoundException(ROLE_NOT_FOUND_ERROR_MESSAGE + rolename);
     }
 }

@@ -12,10 +12,10 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 import java.util.List;
 import java.util.Optional;
+import no.unit.nva.database.intefaces.WithType;
 import no.unit.nva.exceptions.InvalidInputRoleException;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.exceptions.InvalidUserInternalException;
-import no.unit.nva.database.intefaces.WithType;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 import nva.commons.utils.JacocoGenerated;
@@ -27,14 +27,13 @@ import org.slf4j.LoggerFactory;
 
 public class DatabaseServiceImpl implements DatabaseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
     public static final String RANGE_KEY_NAME = "PK1B";
     public static final String INVALID_USER_IN_DATABASE = "Invalid user stored in the database:";
     public static final String MISSING_USERNAME = "missing username";
     public static final String INVALID_ROLE_ERROR = "InvalidRole, null object or missing data.";
-
-    private AmazonDynamoDB client;
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
     private final DynamoDBMapper mapper;
+    private AmazonDynamoDB client;
 
     /**
      * Default constructor.
@@ -107,15 +106,15 @@ public class DatabaseServiceImpl implements DatabaseService {
             .withRangeKeyCondition(RANGE_KEY_NAME, entityTypeAsRangeKey(searchObject));
     }
 
-    private <I> IllegalStateException unexpectedException(Failure<I> failure) {
-        logger.error(INVALID_USER_IN_DATABASE + MISSING_USERNAME);
-        throw new IllegalStateException(INVALID_USER_IN_DATABASE, failure.getException());
-    }
-
     private static <I extends WithType> Condition entityTypeAsRangeKey(I searchObject) {
         Condition comparisonCondition = new Condition();
         comparisonCondition.setComparisonOperator(ComparisonOperator.EQ);
         comparisonCondition.setAttributeValueList(List.of(new AttributeValue(searchObject.getType())));
         return comparisonCondition;
+    }
+
+    private <I> IllegalStateException unexpectedException(Failure<I> failure) {
+        logger.error(INVALID_USER_IN_DATABASE + MISSING_USERNAME);
+        throw new IllegalStateException(INVALID_USER_IN_DATABASE, failure.getException());
     }
 }

@@ -26,9 +26,8 @@ public class RoleDbTest extends DatabaseTest {
     public static final String SOME_ROLE_NAME = "someRoleName";
     public static final String SOME_OTHER_RANGE_KEY = "SomeOtherRangeKey";
     public static final String SOME_TYPE = "SomeType";
-
-    private DynamoDBMapper mapper;
     private final RoleDb sampleRole = createSampleRole();
+    private DynamoDBMapper mapper;
 
     public RoleDbTest() throws InvalidRoleInternalException {
     }
@@ -37,6 +36,11 @@ public class RoleDbTest extends DatabaseTest {
     void init() {
         initializeTestDatabase();
         mapper = new DynamoDBMapper(localDynamo);
+    }
+
+    @Test
+    void getPrimaryHashKeyReturnsStringContainingTypeRole() {
+        assertThat(sampleRole.getPrimaryHashKey(), containsString(RoleDb.TYPE));
     }
 
     @Test
@@ -80,11 +84,6 @@ public class RoleDbTest extends DatabaseTest {
     @Test
     void getPrimaryHashKeyReturnsStringContainingRoleName() {
         assertThat(sampleRole.getPrimaryHashKey(), containsString(sampleRole.getName()));
-    }
-
-    @Test
-    public void getPrimaryHashKeyReturnsStringContainingTypeRole() {
-        assertThat(sampleRole.getPrimaryHashKey(), containsString(RoleDb.TYPE));
     }
 
     @Test

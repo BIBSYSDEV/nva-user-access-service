@@ -29,10 +29,10 @@ import nva.commons.handlers.GatewayResponse;
 public class GetRoleFt extends ScenarioTest {
 
     private final ScenarioContext scenarioContext;
+    private final Context context = mock(Context.class);
     private RoleDto expectedRoleDto;
     private RoleDto actualRoleDto;
     private HandlerRequestBuilder<Void> requestBuilder;
-    private final Context context = mock(Context.class);
 
     /**
      * Default Constructor.

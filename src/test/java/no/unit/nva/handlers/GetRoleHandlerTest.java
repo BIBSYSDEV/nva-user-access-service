@@ -42,6 +42,12 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
     }
 
     @Test
+    void statusCodeReturnsOkWhenRequestIsSuccessful() {
+        Integer successCode = getRoleHandler.getSuccessStatusCode(null, null);
+        assertThat(successCode, is(equalTo(HttpStatus.SC_OK)));
+    }
+
+    @Test
     void processInputReturnsARoleDtoWhenARoleWithTheInputRoleNameExists()
         throws ApiGatewayException {
         RoleDto existingRole = RoleDto.newBuilder().withName(THE_ROLE).build();
@@ -73,12 +79,6 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
         Executable action = () -> getRoleHandler.processInput(null, requestInfoWithoutRoleName, null);
         BadRequestException exception = assertThrows(BadRequestException.class, action);
         assertThat(exception.getMessage(), containsString(GetRoleHandler.EMPTY_ROLE_NAME));
-    }
-
-    @Test
-    public void statusCodeReturnsOkWhenRequestIsSuccessful() {
-        Integer successCode = getRoleHandler.getSuccessStatusCode(null, null);
-        assertThat(successCode, is(equalTo(HttpStatus.SC_OK)));
     }
 
     private RequestInfo queryWithRoleName() {
