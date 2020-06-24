@@ -54,10 +54,10 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Optional<UserDto> getUser(String username) throws InvalidUserInternalException {
-        UserDb searchObject = UserDto.newBuilder().withUsername(username).build().toUserDb();
-        DynamoDBQueryExpression<UserDb> searchUserByUsername = createGetQuery(searchObject);
-        List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserByUsername);
+    public Optional<UserDto> getUser(UserDto queryObject) throws InvalidUserInternalException {
+
+        DynamoDBQueryExpression<UserDb> searchUserRequest = createGetQuery(queryObject.toUserDb());
+        List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserRequest);
 
         UserDto user = userSearchResult
             .stream()

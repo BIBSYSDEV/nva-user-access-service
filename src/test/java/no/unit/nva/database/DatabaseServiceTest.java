@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.exceptions.InvalidUserInternalException;
 import no.unit.nva.model.RoleDto;
@@ -23,15 +24,17 @@ public class DatabaseServiceTest extends DatabaseTest {
     public static final String SOME_ROLE = "SomeRole";
     public static final String SOME_INSTITUTION = "SomeInstitution";
     private DatabaseService db;
+    private UserDto sampleUser;
 
     @BeforeEach
-    public void init() {
+    public void init() throws InvalidUserInternalException {
         db = new DatabaseServiceImpl(initializeTestDatabase());
+        sampleUser = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
     }
 
     @Test
     public void databaseServiceShouldHaveAMethodForGettingAUserByUsername() throws InvalidUserInternalException {
-        db.getUser(SOME_USERNAME);
+        db.getUser(sampleUser);
     }
 
     @Test
@@ -45,34 +48,42 @@ public class DatabaseServiceTest extends DatabaseTest {
         throws InvalidUserInternalException, InvalidRoleInternalException {
         UserDto insertedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
         db.addUser(insertedUser);
-        UserDto savedUser = getUser(insertedUser);
+        Optional<UserDto> savedUser = db.getUser(insertedUser);
+
+        assertThat(savedUser.isPresent(), is(true));
         assertThat(insertedUser, doesNotHaveNullFields());
-        assertThat(savedUser, is(equalTo(insertedUser)));
+        assertThat(savedUser.get(), is(equalTo(insertedUser)));
     }
 
     @Test
     public void databaseServiceShouldReturnNonEmptyUserWhenUsernameExistsInDatabase()
         throws InvalidUserInternalException, InvalidRoleInternalException {
         UserDto insertedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
-        UserDto savedUser = getUser(insertedUser);
+        Optional<UserDto> savedUser = db.getUser(insertedUser);
+
+        assertThat(savedUser.isPresent(), is(true));
         assertThat(insertedUser, doesNotHaveNullFields());
-        assertThat(savedUser, is(equalTo(insertedUser)));
+        assertThat(savedUser.get(), is(equalTo(insertedUser)));
     }
 
     @Test
     public void addUserShouldSaveAUserWithoutInstitution() throws InvalidUserInternalException,
                                                                   InvalidRoleInternalException {
         UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, null, SOME_ROLE);
-        UserDto actualUser = getUser(expectedUser);
-        assertThat(actualUser, is(equalTo(expectedUser)));
-        assertThat(actualUser.getInstitution(), is(equalTo(null)));
+        Optional<UserDto> actualUser = db.getUser(expectedUser);
+        assertThat(actualUser.isPresent(), is(true));
+        assertThat(actualUser.get(), is(equalTo(expectedUser)));
+
+        assertThat(actualUser.get().getInstitution(), is(equalTo(null)));
     }
 
     @Test
     public void addUserShouldSaveUserWithoutRoles() throws InvalidUserInternalException, InvalidRoleInternalException {
         UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, null);
-        UserDto actualUser = getUser(expectedUser);
-        assertThat(actualUser, is(equalTo(expectedUser)));
+        Optional<UserDto> actualUser = db.getUser(expectedUser);
+
+        assertThat(actualUser.isPresent(), is(true));
+        assertThat(actualUser.get(), is(equalTo(expectedUser)));
     }
 
     @Test
@@ -93,11 +104,6 @@ public class DatabaseServiceTest extends DatabaseTest {
         return UserDto.newBuilder()
             .withInstitution(SOME_INSTITUTION)
             .build();
-    }
-
-    private UserDto getUser(UserDto insertedUser) throws InvalidUserInternalException {
-        return db.getUser(insertedUser.getUsername())
-            .orElseThrow(() -> new RuntimeException("Expected to find a user"));
     }
 
     private UserDto createSampleUserAndAddUserToDb(String username, String institution, String roleName)

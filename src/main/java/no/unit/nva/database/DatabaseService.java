@@ -11,7 +11,7 @@ public interface DatabaseService {
 
     String TABLE_NAME = "UsersRoles";
 
-    Optional<UserDto> getUser(String username) throws InvalidUserInternalException;
+    Optional<UserDto> getUser(UserDto queryObject) throws InvalidUserInternalException;
 
     void addUser(UserDto user) throws InvalidUserInternalException;
 

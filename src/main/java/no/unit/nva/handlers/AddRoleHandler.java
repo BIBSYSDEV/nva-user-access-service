@@ -1,5 +1,7 @@
 package no.unit.nva.handlers;
 
+import static nva.commons.utils.attempt.Try.attempt;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
@@ -9,19 +11,16 @@ import no.unit.nva.exceptions.InvalidInputRoleException;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.exceptions.UnexpectedException;
 import no.unit.nva.model.RoleDto;
-import nva.commons.handlers.ApiGatewayHandler;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.Environment;
 import nva.commons.utils.JacocoGenerated;
 import org.apache.http.HttpStatus;
 import org.slf4j.LoggerFactory;
 
-public class AddRoleHandler extends ApiGatewayHandler<RoleDto, RoleDto> {
+public class AddRoleHandler extends HandlerWithEventualConsistency<RoleDto, RoleDto> {
 
-    public static final String INTERRUPTION_ERROR = "Interuption while waiting to get role.";
     public static final String ERROR_FETCHING_SAVED_ROLE = "Could not fetch role with name: ";
-    private static final int MAX_EFFORTS_FOR_FETCHING_ROLE = 2;
-    private static final long WAITING_TIME = 100;
+    public static final String UNEXPECTED_ERROR_MESSAGE = "Unexpected error while trying to access role";
     private final DatabaseService databaseService;
 
     /**
@@ -46,33 +45,17 @@ public class AddRoleHandler extends ApiGatewayHandler<RoleDto, RoleDto> {
     protected RoleDto processInput(RoleDto input, RequestInfo requestInfo, Context context)
         throws DataHandlingError, UnexpectedException, InvalidInputRoleException, InvalidRoleInternalException {
         databaseService.addRole(input);
-        return getEventuallyConsistentRole(input)
+        return getEventuallyConsistent(() -> getRole(input))
             .orElseThrow(() -> new DataHandlingError(ERROR_FETCHING_SAVED_ROLE + input.getRoleName()));
+    }
+
+    private Optional<RoleDto> getRole(RoleDto input) {
+        return attempt(() -> databaseService.getRole(input))
+            .orElseThrow(fail -> unexpectedFailure(UNEXPECTED_ERROR_MESSAGE, fail.getException()));
     }
 
     @Override
     protected Integer getSuccessStatusCode(RoleDto input, RoleDto output) {
         return HttpStatus.SC_OK;
-    }
-
-    private Optional<RoleDto> getEventuallyConsistentRole(RoleDto input)
-        throws InvalidRoleInternalException, UnexpectedException {
-        Optional<RoleDto> role = databaseService.getRole(input);
-        int counter = 0;
-        while (role.isEmpty() && counter < MAX_EFFORTS_FOR_FETCHING_ROLE) {
-            waitForEventualConsistency();
-            role = databaseService.getRole(input);
-            counter++;
-        }
-        return role;
-    }
-
-    private void waitForEventualConsistency() throws UnexpectedException {
-        try {
-            Thread.sleep(WAITING_TIME);
-        } catch (InterruptedException e) {
-            logger.error(INTERRUPTION_ERROR, e);
-            throw new UnexpectedException(INTERRUPTION_ERROR, e);
-        }
     }
 }

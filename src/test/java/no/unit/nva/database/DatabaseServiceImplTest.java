@@ -26,9 +26,12 @@ public class DatabaseServiceImplTest extends DatabaseTest {
     public static final String SOME_USERNAME = "someUsername";
     private DynamoDBMapper mapper;
 
+    private UserDto someUser;
+
     @BeforeEach
-    public void init() {
+    public void init() throws InvalidUserInternalException {
         mapper = new DynamoDBMapper(initializeTestDatabase());
+        someUser = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
     }
 
     @Test
@@ -41,7 +44,7 @@ public class DatabaseServiceImplTest extends DatabaseTest {
         DynamoDBMapper mockMapper = mockDynamoMapperReturningInvalidUser(response);
         DatabaseService service = new DatabaseServiceImpl(mockMapper);
 
-        Executable action = () -> service.getUser(SOME_USERNAME);
+        Executable action = () -> service.getUser(someUser);
         IllegalStateException exception = assertThrows(IllegalStateException.class, action);
 
         String expectedMessageContent = DatabaseServiceImpl.INVALID_USER_IN_DATABASE;
@@ -51,7 +54,7 @@ public class DatabaseServiceImplTest extends DatabaseTest {
     @Test
     public void getUserReturnsEmptyOptionalWhenUserIsNotFound() throws InvalidUserInternalException {
         DatabaseService service = new DatabaseServiceImpl(mapper);
-        Optional<UserDto> result = service.getUser(SOME_USERNAME);
+        Optional<UserDto> result = service.getUser(someUser);
         assertThat(result.isEmpty(), is(equalTo(true)));
     }
 

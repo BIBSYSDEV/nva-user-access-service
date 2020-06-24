@@ -23,4 +23,5 @@ public class NotAuthorizedExceptionTest {
         NotAuthorizedException exception = new NotAuthorizedException(SOME_MESAGE);
         assertThat(exception.getMessage(), containsString(SOME_MESAGE));
     }
+
 }
