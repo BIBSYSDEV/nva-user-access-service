@@ -49,14 +49,14 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
         throws ApiGatewayException {
         addRoleToDatabase(THE_ROLE);
         RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
-        RoleDto roleDto = getRoleHandler.processInput(null, requestInfo, null);
+        RoleDto roleDto = getRoleHandler.processInput(null, requestInfo, context);
         assertThat(roleDto.getRoleName(), is(equalTo(THE_ROLE)));
     }
 
     @Test
     void processInputThrowsNotFoundExceptionWhenThereIsNoRoleInTheDatabaseWithTheSpecifiedRolename() {
         RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
-        Executable action = () -> getRoleHandler.processInput(null, requestInfo, null);
+        Executable action = () -> getRoleHandler.processInput(null, requestInfo, context);
         NotFoundException exception = assertThrows(NotFoundException.class, action);
         assertThat(exception.getMessage(), containsString(THE_ROLE));
     }
@@ -65,14 +65,14 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
     void processInputLogsWarningWhenNotFoundExceptionIsThrown() {
         TestAppender testAppender = LogUtils.getTestingAppender(GetRoleHandler.class);
         RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
-        attempt(() -> getRoleHandler.processInput(null, requestInfo, null));
+        attempt(() -> getRoleHandler.processInput(null, requestInfo, context));
         assertThat(testAppender.getMessages(), containsString(GetRoleHandler.LOG_ROLE_NOT_FOUND));
     }
 
     @Test
     void processInputThrowsBadRequestExceptionWhenNoRoleNameIsProvided() {
         RequestInfo requestInfoWithoutRoleName = new RequestInfo();
-        Executable action = () -> getRoleHandler.processInput(null, requestInfoWithoutRoleName, null);
+        Executable action = () -> getRoleHandler.processInput(null, requestInfoWithoutRoleName, context);
         BadRequestException exception = assertThrows(BadRequestException.class, action);
         assertThat(exception.getMessage(), containsString(GetRoleHandler.EMPTY_ROLE_NAME));
     }
@@ -80,7 +80,7 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
     @Test
     void processInputThrowsBadRequestExceptionWhenBlankRoleNameIsProvided() {
         RequestInfo requestInfoWithBlankRoleName = queryWithRoleName(BLANK_STR);
-        Executable action = () -> getRoleHandler.processInput(null, requestInfoWithBlankRoleName, null);
+        Executable action = () -> getRoleHandler.processInput(null, requestInfoWithBlankRoleName, context);
         BadRequestException exception = assertThrows(BadRequestException.class, action);
         assertThat(exception.getMessage(), containsString(GetRoleHandler.EMPTY_ROLE_NAME));
     }
