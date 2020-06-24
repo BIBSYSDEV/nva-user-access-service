@@ -42,14 +42,18 @@ public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
 
     @Override
     protected RoleDto processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-        String roleName = Optional.ofNullable(requestInfo.getPathParameters())
-            .map(pathParams -> pathParams.get(ROLE_PATH_PARAMETER))
-            .filter(String::isBlank)
-            .orElseThrow(() -> new BadRequestException(EMPTY_ROLE_NAME));
+        String roleName = roleNameThatIsNotNullOrBlank(requestInfo);
 
         RoleDto searchObject = RoleDto.newBuilder().withName(roleName).build();
         Optional<RoleDto> searchResult = databaseService.getRole(searchObject);
         return searchResult.orElseThrow(roleNotFound(roleName));
+    }
+
+    private String roleNameThatIsNotNullOrBlank(RequestInfo requestInfo) throws BadRequestException {
+        return Optional.ofNullable(requestInfo.getPathParameters())
+            .map(pathParams -> pathParams.get(ROLE_PATH_PARAMETER))
+            .filter(String::isBlank)
+            .orElseThrow(() -> new BadRequestException(EMPTY_ROLE_NAME));
     }
 
     private Supplier<NotFoundException> roleNotFound(String roleName) {
