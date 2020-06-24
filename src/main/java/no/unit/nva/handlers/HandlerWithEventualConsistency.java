@@ -43,7 +43,7 @@ public abstract class HandlerWithEventualConsistency<I,O> extends ApiGatewayHand
 
     protected RuntimeException unexpectedFailure(String message,Exception exception) {
         logger.error(message);
-        throw new RuntimeException(exception);
+        return new RuntimeException(message, exception);
     }
 
 
