@@ -27,6 +27,7 @@ import org.junit.jupiter.api.function.Executable;
 public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment {
 
     public static final String THE_ROLE = "theRole";
+    public static final String BLANK_STR = " ";
     private DatabaseServiceImpl databaseService;
     private GetRoleHandler getRoleHandler;
     private Context context;
@@ -46,14 +47,14 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
         throws ApiGatewayException {
         RoleDto existingRole = RoleDto.newBuilder().withName(THE_ROLE).build();
         databaseService.addRole(existingRole);
-        RequestInfo requestInfo = queryWithRoleName();
+        RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
         RoleDto roleDto = getRoleHandler.processInput(null, requestInfo, null);
         assertThat(roleDto.getRoleName(), is(equalTo(THE_ROLE)));
     }
 
     @Test
     void processInputThrowsNotFoundExceptionWhenThereIsNoRoleInTheDatabaseWithTheSpecifiedRolename() {
-        RequestInfo requestInfo = queryWithRoleName();
+        RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
         Executable action = () -> getRoleHandler.processInput(null, requestInfo, null);
         NotFoundException exception = assertThrows(NotFoundException.class, action);
         assertThat(exception.getMessage(), containsString(THE_ROLE));
@@ -62,7 +63,7 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
     @Test
     void processInputLogsWarningWhenResourceNotFoundExceptionIsThrown() {
         TestAppender testAppender = LogUtils.getTestingAppender(GetRoleHandler.class);
-        RequestInfo requestInfo = queryWithRoleName();
+        RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
         attempt(() -> getRoleHandler.processInput(null, requestInfo, null));
         assertThat(testAppender.getMessages(), containsString(GetRoleHandler.LOG_ROLE_NOT_FOUND));
     }
@@ -76,14 +77,22 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
     }
 
     @Test
+    void processInputThrowsBadRequestExceptionWhenBlankRolenameIsProvided() {
+        RequestInfo requestInfoWithBlankRoleName = queryWithRoleName(BLANK_STR);
+        Executable action = () -> getRoleHandler.processInput(null, requestInfoWithBlankRoleName, null);
+        BadRequestException exception = assertThrows(BadRequestException.class, action);
+        assertThat(exception.getMessage(), containsString(GetRoleHandler.EMPTY_ROLE_NAME));
+    }
+
+    @Test
     public void statusCodeReturnsOkWhenRequestIsSuccessful() {
         Integer successCode = getRoleHandler.getSuccessStatusCode(null, null);
         assertThat(successCode, is(equalTo(HttpStatus.SC_OK)));
     }
 
-    private RequestInfo queryWithRoleName() {
+    private RequestInfo queryWithRoleName(String roleName) {
         RequestInfo requestInfo = new RequestInfo();
-        requestInfo.getPathParameters().put(GetRoleHandler.ROLE_PATH_PARAMETER, THE_ROLE);
+        requestInfo.getPathParameters().put(GetRoleHandler.ROLE_PATH_PARAMETER, roleName);
         return requestInfo;
     }
 }

@@ -19,9 +19,9 @@ import org.slf4j.LoggerFactory;
 
 public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
 
-    public static final String LOG_ROLE_NOT_FOUND = "Could not find role:";
+    public static final String LOG_ROLE_NOT_FOUND = "Could not find role: ";
     public static final String EMPTY_ROLE_NAME = "Role-name cannot be empty";
-    public static String ROLE_NOT_FOUND_ERROR_MESSAGE = "Could not find role:";
+    public static String ROLE_NOT_FOUND_ERROR_MESSAGE = "Could not find role: ";
     public static final String ROLE_PATH_PARAMETER = "role";
     private final DatabaseService databaseService;
     private static final Logger logger = LoggerFactory.getLogger(GetRoleHandler.class);
@@ -42,17 +42,19 @@ public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
 
     @Override
     protected RoleDto processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-        String rolename = Optional.ofNullable(requestInfo.getPathParameters())
+        String roleName = Optional.ofNullable(requestInfo.getPathParameters())
             .map(pathParams -> pathParams.get(ROLE_PATH_PARAMETER))
+            .filter(String::isBlank)
             .orElseThrow(() -> new BadRequestException(EMPTY_ROLE_NAME));
 
-        Optional<RoleDto> searchResult = databaseService.getRole(RoleDto.newBuilder().withName(rolename).build());
-        return searchResult.orElseThrow(roleNotFound(rolename));
+        RoleDto searchObject = RoleDto.newBuilder().withName(roleName).build();
+        Optional<RoleDto> searchResult = databaseService.getRole(searchObject);
+        return searchResult.orElseThrow(roleNotFound(roleName));
     }
 
-    private Supplier<NotFoundException> roleNotFound(String rolename) {
-        logger.warn(LOG_ROLE_NOT_FOUND + rolename);
-        return () -> new NotFoundException(ROLE_NOT_FOUND_ERROR_MESSAGE + rolename);
+    private Supplier<NotFoundException> roleNotFound(String roleName) {
+        logger.warn(LOG_ROLE_NOT_FOUND + roleName);
+        return () -> new NotFoundException(ROLE_NOT_FOUND_ERROR_MESSAGE + roleName);
     }
 
     @Override
