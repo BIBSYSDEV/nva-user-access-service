@@ -13,6 +13,8 @@ import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.DatabaseTest;
 import no.unit.nva.database.intefaces.WithEnvironment;
 import no.unit.nva.exceptions.BadRequestException;
+import no.unit.nva.exceptions.InvalidInputRoleException;
+import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import nva.commons.exceptions.ApiGatewayException;
@@ -43,10 +45,9 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
     }
 
     @Test
-    void processInputReturnsARoleDtoWhenARoleWithTheInputRoleNameExists()
+    void processInputReturnsRoleDtoWhenARoleWithTheInputRoleNameExists()
         throws ApiGatewayException {
-        RoleDto existingRole = RoleDto.newBuilder().withName(THE_ROLE).build();
-        databaseService.addRole(existingRole);
+        addRoleToDatabase(THE_ROLE);
         RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
         RoleDto roleDto = getRoleHandler.processInput(null, requestInfo, null);
         assertThat(roleDto.getRoleName(), is(equalTo(THE_ROLE)));
@@ -61,7 +62,7 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
     }
 
     @Test
-    void processInputLogsWarningWhenResourceNotFoundExceptionIsThrown() {
+    void processInputLogsWarningWhenNotFoundExceptionIsThrown() {
         TestAppender testAppender = LogUtils.getTestingAppender(GetRoleHandler.class);
         RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
         attempt(() -> getRoleHandler.processInput(null, requestInfo, null));
@@ -69,7 +70,7 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
     }
 
     @Test
-    void processInputThrowsBadRequestExceptionWhenNoRolenameIsProvided() {
+    void processInputThrowsBadRequestExceptionWhenNoRoleNameIsProvided() {
         RequestInfo requestInfoWithoutRoleName = new RequestInfo();
         Executable action = () -> getRoleHandler.processInput(null, requestInfoWithoutRoleName, null);
         BadRequestException exception = assertThrows(BadRequestException.class, action);
@@ -77,7 +78,7 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
     }
 
     @Test
-    void processInputThrowsBadRequestExceptionWhenBlankRolenameIsProvided() {
+    void processInputThrowsBadRequestExceptionWhenBlankRoleNameIsProvided() {
         RequestInfo requestInfoWithBlankRoleName = queryWithRoleName(BLANK_STR);
         Executable action = () -> getRoleHandler.processInput(null, requestInfoWithBlankRoleName, null);
         BadRequestException exception = assertThrows(BadRequestException.class, action);
@@ -94,5 +95,10 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
         RequestInfo requestInfo = new RequestInfo();
         requestInfo.getPathParameters().put(GetRoleHandler.ROLE_PATH_PARAMETER, roleName);
         return requestInfo;
+    }
+
+    private void addRoleToDatabase(String roleName) throws InvalidRoleInternalException, InvalidInputRoleException {
+        RoleDto existingRole = RoleDto.newBuilder().withName(roleName).build();
+        databaseService.addRole(existingRole);
     }
 }

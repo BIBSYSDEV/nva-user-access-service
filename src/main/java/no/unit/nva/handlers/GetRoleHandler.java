@@ -1,5 +1,7 @@
 package no.unit.nva.handlers;
 
+import static java.util.function.Predicate.not;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -52,7 +54,7 @@ public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
     private String roleNameThatIsNotNullOrBlank(RequestInfo requestInfo) throws BadRequestException {
         return Optional.ofNullable(requestInfo.getPathParameters())
             .map(pathParams -> pathParams.get(ROLE_PATH_PARAMETER))
-            .filter(String::isBlank)
+            .filter(not(String::isBlank))
             .orElseThrow(() -> new BadRequestException(EMPTY_ROLE_NAME));
     }
 
