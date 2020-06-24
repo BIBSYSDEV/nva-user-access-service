@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import no.unit.nva.database.RoleDb.Builder;
-import no.unit.nva.database.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.InvalidRoleInternalException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;

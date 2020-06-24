@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 import java.util.List;
-import no.unit.nva.database.exceptions.InvalidRoleInternalException;
-import no.unit.nva.database.exceptions.InvalidUserInternalException;
+import no.unit.nva.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.InvalidUserInternalException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 import org.junit.jupiter.api.BeforeEach;

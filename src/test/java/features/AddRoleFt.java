@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import no.unit.nva.database.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.handlers.AddRoleHandler;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -29,7 +29,6 @@ import nva.commons.utils.JsonUtils;
 
 public class AddRoleFt extends ScenarioTest {
 
-    public static final String HTTP_METHOD = "httpMethod";
     private final ScenarioContext scenarioContext;
     private String requestResponse;
 
@@ -45,7 +44,7 @@ public class AddRoleFt extends ScenarioTest {
     @When("the authorized client sends a {string} request")
     public void the_authorized_client_sends_a_request(String httpMethod) {
         this.scenarioContext.setRequestBody(new ConcurrentHashMap<>());
-        scenarioContext.getRequestBody().put(HTTP_METHOD, httpMethod.toUpperCase());
+        scenarioContext.getRequestBody().put(HTTP_REQUEST_FIELD_FOR_HTTP_METHOD, httpMethod.toUpperCase());
     }
 
     @When("the request contains a JSON body with following key-value pairs")

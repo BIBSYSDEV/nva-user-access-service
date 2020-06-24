@@ -5,7 +5,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 import no.unit.nva.database.RoleDb;
-import no.unit.nva.database.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.InvalidRoleInternalException;
 import org.junit.jupiter.api.Test;
 
 class DynamoEntryTest {

@@ -1,11 +1,11 @@
-package no.unit.nva.database.exceptions;
+package no.unit.nva.exceptions;
 
 import nva.commons.exceptions.ApiGatewayException;
 import org.apache.http.HttpStatus;
 
-public class DataHandlingError extends ApiGatewayException {
+public class InvalidRoleInternalException extends ApiGatewayException {
 
-    public DataHandlingError(String message) {
+    public InvalidRoleInternalException(String message) {
         super(message);
     }
 

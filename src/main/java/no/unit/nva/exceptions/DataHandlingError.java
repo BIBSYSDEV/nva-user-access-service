@@ -1,12 +1,12 @@
-package no.unit.nva.database.exceptions;
+package no.unit.nva.exceptions;
 
 import nva.commons.exceptions.ApiGatewayException;
 import org.apache.http.HttpStatus;
 
-public class UnexpectedException extends ApiGatewayException {
+public class DataHandlingError extends ApiGatewayException {
 
-    public UnexpectedException(String message, Exception e) {
-        super(e, message);
+    public DataHandlingError(String message) {
+        super(message);
     }
 
     @Override

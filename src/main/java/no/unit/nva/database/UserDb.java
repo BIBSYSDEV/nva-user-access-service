@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import no.unit.nva.database.UserDb.Builder;
-import no.unit.nva.database.exceptions.InvalidUserInternalException;
+import no.unit.nva.exceptions.InvalidUserInternalException;
 import no.unit.nva.database.intefaces.DynamoEntry;
 import no.unit.nva.database.intefaces.WithCopy;
 import nva.commons.utils.JacocoGenerated;

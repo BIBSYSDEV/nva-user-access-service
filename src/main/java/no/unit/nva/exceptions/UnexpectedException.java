@@ -1,12 +1,12 @@
-package no.unit.nva.database.exceptions;
+package no.unit.nva.exceptions;
 
 import nva.commons.exceptions.ApiGatewayException;
 import org.apache.http.HttpStatus;
 
-public class InvalidRoleInternalException extends ApiGatewayException {
+public class UnexpectedException extends ApiGatewayException {
 
-    public InvalidRoleInternalException(String message) {
-        super(message);
+    public UnexpectedException(String message, Exception e) {
+        super(e, message);
     }
 
     @Override
