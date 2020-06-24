@@ -13,7 +13,7 @@ import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.DatabaseTest;
 import no.unit.nva.database.intefaces.WithEnvironment;
 import no.unit.nva.exceptions.BadRequestException;
-import no.unit.nva.exceptions.ResourceNotFoundException;
+import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.handlers.RequestInfo;
@@ -55,7 +55,7 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
     void processInputThrowsNotFoundExceptionWhenThereIsNoRoleInTheDatabaseWithTheSpecifiedRolename() {
         RequestInfo requestInfo = queryWithRoleName();
         Executable action = () -> getRoleHandler.processInput(null, requestInfo, null);
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, action);
+        NotFoundException exception = assertThrows(NotFoundException.class, action);
         assertThat(exception.getMessage(), containsString(THE_ROLE));
     }
 

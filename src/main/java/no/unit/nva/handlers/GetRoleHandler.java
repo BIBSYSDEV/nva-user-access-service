@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.exceptions.BadRequestException;
-import no.unit.nva.exceptions.ResourceNotFoundException;
+import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.handlers.ApiGatewayHandler;
@@ -50,9 +50,9 @@ public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
         return searchResult.orElseThrow(roleNotFound(rolename));
     }
 
-    private Supplier<ResourceNotFoundException> roleNotFound(String rolename) {
+    private Supplier<NotFoundException> roleNotFound(String rolename) {
         logger.warn(LOG_ROLE_NOT_FOUND + rolename);
-        return () -> new ResourceNotFoundException(ROLE_NOT_FOUND_ERROR_MESSAGE + rolename);
+        return () -> new NotFoundException(ROLE_NOT_FOUND_ERROR_MESSAGE + rolename);
     }
 
     @Override
