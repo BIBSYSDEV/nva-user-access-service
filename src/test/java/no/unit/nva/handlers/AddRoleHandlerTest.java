@@ -5,7 +5,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
@@ -41,7 +40,6 @@ public class AddRoleHandlerTest extends DatabaseTest {
         DatabaseService service = new DatabaseServiceImpl(localDynamo);
         addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
     }
-
 
     @Test
     public void handleRequestReturnsBadRequestWhenRequestBodyIsEmpty() throws IOException {
@@ -93,6 +91,12 @@ public class AddRoleHandlerTest extends DatabaseTest {
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
         Problem problem = response.getBodyObject(Problem.class);
         assertThat(problem.getDetail(), containsString(AddRoleHandler.ERROR_FETCHING_SAVED_ROLE));
+    }
+
+    @Test
+    public void statusCodeReturnsOkWhenRequestIsSuccessful() {
+        Integer successCode = addRoleHandler.getSuccessStatusCode(null, null);
+        assertThat(successCode, is(equalTo(HttpStatus.SC_OK)));
     }
 
     private DatabaseServiceImpl databaseServiceWithSyncDelay() {
