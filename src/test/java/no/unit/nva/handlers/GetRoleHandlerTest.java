@@ -13,7 +13,9 @@ import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.DatabaseTest;
 import no.unit.nva.database.intefaces.WithEnvironment;
 import no.unit.nva.exceptions.BadRequestException;
-import no.unit.nva.exceptions.ResourceNotFoundException;
+import no.unit.nva.exceptions.InvalidInputRoleException;
+import no.unit.nva.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.handlers.RequestInfo;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.function.Executable;
 public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment {
 
     public static final String THE_ROLE = "theRole";
+    public static final String BLANK_STR = " ";
     private DatabaseServiceImpl databaseService;
     private GetRoleHandler getRoleHandler;
     private Context context;
@@ -42,48 +45,61 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
     }
 
     @Test
-    void statusCodeReturnsOkWhenRequestIsSuccessful() {
-        Integer successCode = getRoleHandler.getSuccessStatusCode(null, null);
-        assertThat(successCode, is(equalTo(HttpStatus.SC_OK)));
-    }
-
-    @Test
-    void processInputReturnsARoleDtoWhenARoleWithTheInputRoleNameExists()
+    void processInputReturnsRoleDtoWhenARoleWithTheInputRoleNameExists()
         throws ApiGatewayException {
-        RoleDto existingRole = RoleDto.newBuilder().withName(THE_ROLE).build();
-        databaseService.addRole(existingRole);
-        RequestInfo requestInfo = queryWithRoleName();
-        RoleDto roleDto = getRoleHandler.processInput(null, requestInfo, null);
+        addRoleToDatabase(THE_ROLE);
+        RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
+        RoleDto roleDto = getRoleHandler.processInput(null, requestInfo, context);
         assertThat(roleDto.getRoleName(), is(equalTo(THE_ROLE)));
     }
 
     @Test
     void processInputThrowsNotFoundExceptionWhenThereIsNoRoleInTheDatabaseWithTheSpecifiedRolename() {
-        RequestInfo requestInfo = queryWithRoleName();
-        Executable action = () -> getRoleHandler.processInput(null, requestInfo, null);
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, action);
+        RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
+        Executable action = () -> getRoleHandler.processInput(null, requestInfo, context);
+        NotFoundException exception = assertThrows(NotFoundException.class, action);
         assertThat(exception.getMessage(), containsString(THE_ROLE));
     }
 
     @Test
-    void processInputLogsWarningWhenResourceNotFoundExceptionIsThrown() {
+    void processInputLogsWarningWhenNotFoundExceptionIsThrown() {
         TestAppender testAppender = LogUtils.getTestingAppender(GetRoleHandler.class);
-        RequestInfo requestInfo = queryWithRoleName();
-        attempt(() -> getRoleHandler.processInput(null, requestInfo, null));
+        RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
+        attempt(() -> getRoleHandler.processInput(null, requestInfo, context));
         assertThat(testAppender.getMessages(), containsString(GetRoleHandler.LOG_ROLE_NOT_FOUND));
     }
 
     @Test
-    void processInputThrowsBadRequestExceptionWhenNoRolenameIsProvided() {
+    void processInputThrowsBadRequestExceptionWhenNoRoleNameIsProvided() {
         RequestInfo requestInfoWithoutRoleName = new RequestInfo();
-        Executable action = () -> getRoleHandler.processInput(null, requestInfoWithoutRoleName, null);
+        Executable action = () -> getRoleHandler.processInput(null, requestInfoWithoutRoleName, context);
         BadRequestException exception = assertThrows(BadRequestException.class, action);
         assertThat(exception.getMessage(), containsString(GetRoleHandler.EMPTY_ROLE_NAME));
     }
 
-    private RequestInfo queryWithRoleName() {
+    @Test
+    void processInputThrowsBadRequestExceptionWhenBlankRoleNameIsProvided() {
+        RequestInfo requestInfoWithBlankRoleName = queryWithRoleName(BLANK_STR);
+        Executable action = () -> getRoleHandler.processInput(null, requestInfoWithBlankRoleName, context);
+        BadRequestException exception = assertThrows(BadRequestException.class, action);
+        assertThat(exception.getMessage(), containsString(GetRoleHandler.EMPTY_ROLE_NAME));
+    }
+
+
+    @Test
+    public void statusCodeReturnsOkWhenRequestIsSuccessful() {
+        Integer successCode = getRoleHandler.getSuccessStatusCode(null, null);
+        assertThat(successCode, is(equalTo(HttpStatus.SC_OK)));
+    }
+
+    private RequestInfo queryWithRoleName(String roleName) {
         RequestInfo requestInfo = new RequestInfo();
-        requestInfo.getPathParameters().put(GetRoleHandler.ROLE_PATH_PARAMETER, THE_ROLE);
+        requestInfo.getPathParameters().put(GetRoleHandler.ROLE_PATH_PARAMETER, roleName);
         return requestInfo;
+    }
+
+    private void addRoleToDatabase(String roleName) throws InvalidRoleInternalException, InvalidInputRoleException {
+        RoleDto existingRole = RoleDto.newBuilder().withName(roleName).build();
+        databaseService.addRole(existingRole);
     }
 }

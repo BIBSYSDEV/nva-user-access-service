@@ -29,6 +29,7 @@ import nva.commons.handlers.GatewayResponse;
 public class GetRoleFt extends ScenarioTest {
 
     private final ScenarioContext scenarioContext;
+
     private final Context context = mock(Context.class);
     private RoleDto expectedRoleDto;
     private RoleDto actualRoleDto;
@@ -48,7 +49,6 @@ public class GetRoleFt extends ScenarioTest {
         throws InvalidInputRoleException, InvalidRoleInternalException {
 
         RoleDto newRole = RoleDto.newBuilder().withName(roleName).build();
-        expectedRoleDto = newRole;
         scenarioContext.getDatabaseService().addRole(newRole);
     }
 

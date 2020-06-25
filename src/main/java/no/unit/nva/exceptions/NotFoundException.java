@@ -3,9 +3,9 @@ package no.unit.nva.exceptions;
 import nva.commons.exceptions.ApiGatewayException;
 import org.apache.http.HttpStatus;
 
-public class ResourceNotFoundException extends ApiGatewayException {
+public class NotFoundException extends ApiGatewayException {
 
-    public ResourceNotFoundException(String message) {
+    public NotFoundException(String message) {
         super(message);
     }
 

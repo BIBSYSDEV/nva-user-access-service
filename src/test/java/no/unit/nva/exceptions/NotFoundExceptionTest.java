@@ -7,13 +7,13 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 
-public class ResourceNotFoundExceptionTest {
+public class NotFoundExceptionTest {
 
     public static final String SOME_MESSAGE = "Some message";
 
     @Test
     public void exceptionReturnsNotFoundStatusCode() {
-        ResourceNotFoundException exception = new ResourceNotFoundException(SOME_MESSAGE);
+        NotFoundException exception = new NotFoundException(SOME_MESSAGE);
         assertThat(exception.getStatusCode(), is(equalTo(HttpStatus.SC_NOT_FOUND)));
     }
 }
