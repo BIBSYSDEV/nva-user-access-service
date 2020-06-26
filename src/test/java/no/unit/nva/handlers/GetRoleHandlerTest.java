@@ -54,7 +54,7 @@ public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment 
     }
 
     @Test
-    void processInputThrowsNotFoundExceptionWhenThereIsNoRoleInTheDatabaseWithTheSpecifiedRolename() {
+    void processInputThrowsNotFoundExceptionWhenThereIsNoRoleInTheDatabaseWithTheSpecifiedRoleName() {
         RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
         Executable action = () -> getRoleHandler.processInput(null, requestInfo, context);
         NotFoundException exception = assertThrows(NotFoundException.class, action);
