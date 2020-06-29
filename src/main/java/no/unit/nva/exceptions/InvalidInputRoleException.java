@@ -9,10 +9,6 @@ public class InvalidInputRoleException extends ApiGatewayException {
         super(message);
     }
 
-    public InvalidInputRoleException(Exception exception) {
-        super(exception);
-    }
-
     @Override
     protected Integer statusCode() {
         return HttpStatus.SC_BAD_REQUEST;
