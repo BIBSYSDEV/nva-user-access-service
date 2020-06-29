@@ -7,17 +7,17 @@ import nva.commons.handlers.ApiGatewayHandler;
 import nva.commons.utils.Environment;
 import org.slf4j.Logger;
 
-public abstract class HandlerWithEventualConsistency<I,O> extends ApiGatewayHandler<I,O> {
+public abstract class HandlerWithEventualConsistency<I, O> extends ApiGatewayHandler<I, O> {
 
     protected static final int MAX_EFFORTS_FOR_FETCHING_OBJECT = 2;
     protected static final String INTERRUPTION_ERROR = "Interuption while waiting to get role.";
     protected static final long WAITING_TIME = 100;
 
-    public HandlerWithEventualConsistency(Class<I> iclass, Logger logger) {
+    protected HandlerWithEventualConsistency(Class<I> iclass, Logger logger) {
         super(iclass, logger);
     }
 
-    public HandlerWithEventualConsistency(Class<I> iclass, Environment environment, Logger logger) {
+    protected HandlerWithEventualConsistency(Class<I> iclass, Environment environment, Logger logger) {
         super(iclass, environment, logger);
     }
 

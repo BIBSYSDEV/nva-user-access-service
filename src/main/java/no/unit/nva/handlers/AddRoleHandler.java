@@ -22,11 +22,6 @@ public class AddRoleHandler extends HandlerWithEventualConsistency<RoleDto, Role
     public static final String ERROR_FETCHING_SAVED_ROLE = "Could not fetch role with name: ";
     public static final String UNEXPECTED_ERROR_MESSAGE = "Unexpected error while trying to access role";
 
-    public static final String INTERRUPTION_ERROR = "Interuption while waiting to get role.";
-
-    private static final int MAX_EFFORTS_FOR_FETCHING_ROLE = 2;
-    private static final long WAITING_TIME = 100;
-
     private final DatabaseService databaseService;
 
     /**
