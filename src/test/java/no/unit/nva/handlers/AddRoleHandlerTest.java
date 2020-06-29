@@ -12,7 +12,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +41,8 @@ public class AddRoleHandlerTest extends DatabaseTest {
 
     /**
      * init.
+     *
+     * @throws InvalidRoleInternalException when an invalid role is created
      */
     @BeforeEach
     public void init() throws InvalidRoleInternalException {
@@ -139,8 +140,8 @@ public class AddRoleHandlerTest extends DatabaseTest {
         assertThat(appender.getMessages(), containsString(AddRoleHandler.UNEXPECTED_ERROR_MESSAGE));
     }
 
-    private AddRoleHandler addRoleHandlerThrowsUnexpectedException
-        (Class<InvalidRoleInternalException> expectedExceptionClass) throws InvalidRoleInternalException {
+    private AddRoleHandler addRoleHandlerThrowsUnexpectedException(
+        Class<InvalidRoleInternalException> expectedExceptionClass) throws InvalidRoleInternalException {
         DatabaseService databaseServiceThrowingException = mock(DatabaseService.class);
         when(databaseServiceThrowingException.getRole(any(RoleDto.class))).thenThrow(expectedExceptionClass);
         return new AddRoleHandler(mockEnvironment(), databaseServiceThrowingException);

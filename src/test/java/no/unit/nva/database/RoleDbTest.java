@@ -32,15 +32,15 @@ public class RoleDbTest extends DatabaseTest {
     public RoleDbTest() throws InvalidRoleInternalException {
     }
 
+    @Test
+    public void getPrimaryHashKeyReturnsStringContainingTypeRole() {
+        assertThat(sampleRole.getPrimaryHashKey(), containsString(RoleDb.TYPE));
+    }
+
     @BeforeEach
     void init() {
         initializeTestDatabase();
         mapper = new DynamoDBMapper(localDynamo);
-    }
-
-    @Test
-    void getPrimaryHashKeyReturnsStringContainingTypeRole() {
-        assertThat(sampleRole.getPrimaryHashKey(), containsString(RoleDb.TYPE));
     }
 
     @Test
