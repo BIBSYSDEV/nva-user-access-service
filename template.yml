@@ -58,6 +58,12 @@ Resources:
           /roles/{role}:
             get:
               summary: Gets an existing Role
+              parameters:
+                - in: path
+                  name: role
+                  schema:
+                    type: string
+                  required: true
               security:
                 - CognitoAuthentication: []
               responses:
