@@ -40,12 +40,40 @@ Resources:
               responses:
                 '200':
                   description: Successful creation of role. Returns the generated role
-                  x-amazon-apigateway-integration:
-                    uri:
-                      Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
-                    responses: {}
-                    httpMethod: POST
-                    type: aws_proxy
+                  content:
+                    "application/json":
+                      schema:
+                        $ref: '#/components/schemas/Role'
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
+                responses: {}
+                httpMethod: POST
+                type: aws_proxy
+          /roles/{role}:
+            get:
+              summary: Gets an existing Role
+              parameters:
+                - in: path
+                  name: role
+                  schema:
+                    type: string
+                  required: true
+              security:
+                - CognitoAuthentication: []
+              responses:
+                '200':
+                  description: Successful fetching of role. Returns the requested role
+                  content:
+                    "application/json":
+                      schema:
+                        $ref: '#/components/schemas/Role'
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetRoleHandler.Arn}/invocations
+                responses: {}
+                httpMethod: POST
+                type: aws_proxy
         components:
           schemas:
             Role:
@@ -57,6 +85,7 @@ Resources:
               type: "apiKey"
               name: "Authorization"
               in: "header"
+
 
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
@@ -127,4 +156,24 @@ Resources:
           Properties:
             Path: /roles
             Method: post
+            RestApiId: !Ref RestApi
+
+  GetRoleHandler:
+    DependsOn: [ LambdaRole, UserRoleMappings]
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.GetRoleHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /roles/{role}
+            Method: get
             RestApiId: !Ref RestApi
