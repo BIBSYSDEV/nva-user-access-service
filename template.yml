@@ -12,11 +12,11 @@ Resources:
     Properties:
       StageName: Prod
       EndpointConfiguration: REGIONAL
-      #      Models:
-      #        Role:
-      #          properties:
-      #            rolename:
-      #              type: string
+      Models:
+        Role:
+          properties:
+            rolename:
+              type: string
       Auth:
         ApiKeyRequired: false
         DefaultAuthorizer: CognitoAuthentication
@@ -180,4 +180,7 @@ Resources:
           Properties:
             Path: /roles/{role}
             Method: get
+            RequestModel:
+              Model: Role
+              Required: true
             RestApiId: !Ref RestApi
