@@ -12,11 +12,6 @@ Resources:
     Properties:
       StageName: Prod
       EndpointConfiguration: REGIONAL
-      #      Models:
-      #        Role:
-      #          properties:
-      #            rolename:
-      #              type: string
       Auth:
         ApiKeyRequired: false
         DefaultAuthorizer: CognitoAuthentication
