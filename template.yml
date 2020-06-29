@@ -150,6 +150,13 @@ Resources:
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /roles
+            Method: post
+            RestApiId: !Ref RestApi
 
   GetRoleHandler:
     DependsOn: [ LambdaRole, UserRoleMappings]
@@ -163,3 +170,10 @@ Resources:
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /roles/{role}
+            Method: get
+            RestApiId: !Ref RestApi
