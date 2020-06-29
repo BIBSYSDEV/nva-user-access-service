@@ -44,12 +44,12 @@ Resources:
                     "application/json":
                       schema:
                         $ref: '#/components/schemas/Role'
-                  x-amazon-apigateway-integration:
-                    uri:
-                      Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
-                    responses: {}
-                    httpMethod: POST
-                    type: aws_proxy
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddRoleHandler.Arn}/invocations
+                responses: {}
+                httpMethod: POST
+                type: aws_proxy
         components:
           schemas:
             Role:
