@@ -78,7 +78,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     public void addRole(RoleDto roleDto) throws InvalidInputRoleException {
         Try.of(roleDto)
             .forEach(role -> mapper.save(roleDto.toRoleDb()))
-            .orElseThrow(failure -> new InvalidInputRoleException(failure.getException()));
+            .orElseThrow(failure -> new InvalidInputRoleException(INVALID_ROLE_ERROR));
     }
 
     @Override
