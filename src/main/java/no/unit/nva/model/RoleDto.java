@@ -5,8 +5,8 @@ import static nva.commons.utils.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 import no.unit.nva.database.RoleDb;
-import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.database.intefaces.WithCopy;
+import no.unit.nva.exceptions.InvalidRoleInternalException;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.JsonUtils;
 import nva.commons.utils.StringUtils;
@@ -76,13 +76,13 @@ public class RoleDto implements WithCopy<RoleDto.Builder> {
                 .orElseThrow(this::newUnexpectedException);
     }
 
-    private RuntimeException newUnexpectedException(Failure<String> fail) {
-        throw new RuntimeException(fail.getException());
-    }
-
     @Override
     public RoleDto.Builder copy() {
         return RoleDto.newBuilder().withName(getRoleName());
+    }
+
+    private RuntimeException newUnexpectedException(Failure<String> fail) {
+        throw new RuntimeException(fail.getException());
     }
 
     public static final class Builder {

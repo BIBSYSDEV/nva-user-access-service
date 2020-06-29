@@ -36,6 +36,13 @@ public class UserDbTest extends DatabaseTest {
     private UserDb dynamoFunctionalityTestUser;
     private UserDb sampleUser;
 
+    @Test
+    public void builderShouldSetTheHashKeyBasedOnusername() throws InvalidUserInternalException {
+        sampleUser.setPrimaryHashKey("SomeOtherHashKey");
+        String expectedHashKey = String.join(UserDb.FIELD_DELIMITER, UserDb.TYPE, SOME_USERNAME);
+        assertThat(sampleUser.getPrimaryHashKey(), is(equalTo(expectedHashKey)));
+    }
+
     @BeforeEach
     private void init() throws InvalidUserInternalException {
         dynamoFunctionalityTestUser = new UserDb();
@@ -76,13 +83,6 @@ public class UserDbTest extends DatabaseTest {
 
     @Test
     void getHashKeyKeyShouldReturnTypeAndUsernameConcatenation() {
-        String expectedHashKey = String.join(UserDb.FIELD_DELIMITER, UserDb.TYPE, SOME_USERNAME);
-        assertThat(sampleUser.getPrimaryHashKey(), is(equalTo(expectedHashKey)));
-    }
-
-    @Test
-    public void builderShouldSetTheHashKeyBasedOnusername() throws InvalidUserInternalException {
-        sampleUser.setPrimaryHashKey("SomeOtherHashKey");
         String expectedHashKey = String.join(UserDb.FIELD_DELIMITER, UserDb.TYPE, SOME_USERNAME);
         assertThat(sampleUser.getPrimaryHashKey(), is(equalTo(expectedHashKey)));
     }

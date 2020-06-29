@@ -19,6 +19,10 @@ public class DoesNotHaveNullFields<T> extends BaseMatcher<T> {
     public static final String GETTER_GET_PREFIX = "get";
     public static final String GETTER_IS_PREFIX = "is";
 
+    public static <R> DoesNotHaveNullFields<R> doesNotHaveNullFields() {
+        return new DoesNotHaveNullFields<>();
+    }
+
     @Override
     public boolean matches(Object actual) {
         return assertThatNoPublicFieldIsNull(actual);
@@ -27,10 +31,6 @@ public class DoesNotHaveNullFields<T> extends BaseMatcher<T> {
     @Override
     public void describeTo(Description description) {
         description.appendText("All fields to be non empty");
-    }
-
-    public static <R> DoesNotHaveNullFields<R> doesNotHaveNullFields() {
-        return new DoesNotHaveNullFields<>();
     }
 
     private boolean assertThatNoPublicFieldIsNull(Object insertedUser) {
@@ -55,21 +55,6 @@ public class DoesNotHaveNullFields<T> extends BaseMatcher<T> {
         return m.getName().startsWith(GETTER_GET_PREFIX) || m.getName().startsWith(GETTER_IS_PREFIX);
     }
 
-    private static class MethodInvocationResult {
-
-        public final String methodName;
-        public final Object result;
-
-        public MethodInvocationResult(String methodName, Object result) {
-            this.methodName = methodName;
-            this.result = result;
-        }
-
-        public String toString() {
-            return this.methodName;
-        }
-    }
-
     private boolean isEmpty(MethodInvocationResult mir) {
         if (isNull(mir.result)) {
             return true;
@@ -83,6 +68,21 @@ public class DoesNotHaveNullFields<T> extends BaseMatcher<T> {
             } else {
                 return false;
             }
+        }
+    }
+
+    private static class MethodInvocationResult {
+
+        public final String methodName;
+        public final Object result;
+
+        public MethodInvocationResult(String methodName, Object result) {
+            this.methodName = methodName;
+            this.result = result;
+        }
+
+        public String toString() {
+            return this.methodName;
         }
     }
 }
