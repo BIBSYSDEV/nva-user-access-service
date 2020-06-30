@@ -1,6 +1,8 @@
 package no.unit.nva.model;
 
+import static no.unit.nva.hamcrest.DoesNotHaveNullOrEmptyFields.doesNotHaveNullOrEmptyFields;
 import static no.unit.nva.model.UserDto.ERROR_DUE_TO_INVALID_ROLE;
+import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -11,6 +13,8 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -130,13 +134,33 @@ public class UserDtoTest {
     }
 
     @Test
-    void updateShouldUpdateUserInDatabase() throws InvalidUserInternalException {
-        UserDto initialUser = UserDto.newBuilder().withUsername(SOME_USERNAME).withInstitution(SOME_INSTITUTION)
-            .withRoles(sampleRoles).build();
+    void copyShouldCopyUserDto() throws InvalidUserInternalException {
+        UserDto initialUser = createUserWithUsernameRolesAndInstitution();
         UserDto copiedUser = initialUser.copy().build();
 
         assertThat(copiedUser, is(equalTo(initialUser)));
         assertThat(copiedUser, is(not(sameInstance(initialUser))));
+    }
+
+    private UserDto createUserWithUsernameRolesAndInstitution() throws InvalidUserInternalException {
+        return UserDto.newBuilder().withUsername(SOME_USERNAME).withInstitution(SOME_INSTITUTION)
+            .withRoles(sampleRoles).build();
+    }
+
+    @Test
+    void userDtoIsSerialized() throws InvalidUserInternalException, IOException {
+        UserDto initialUser = createUserWithUsernameRolesAndInstitution();
+
+        assertThat(initialUser, doesNotHaveNullOrEmptyFields());
+
+        String jsonString = objectMapper.writeValueAsString(initialUser);
+        JsonNode actualJson = objectMapper.readTree(jsonString);
+        JsonNode expectedJson = objectMapper.convertValue(initialUser, JsonNode.class);
+        assertThat(actualJson, is(equalTo(expectedJson)));
+
+        UserDto deserializedObject = objectMapper.readValue(jsonString, UserDto.class);
+        assertThat(deserializedObject, is(equalTo(initialUser)));
+        assertThat(deserializedObject, is(not(sameInstance(initialUser))));
     }
 
     private UserDto convertToUserDbAndBack(UserDto userDto) throws InvalidUserInternalException {
