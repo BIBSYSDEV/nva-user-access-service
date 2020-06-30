@@ -1,5 +1,6 @@
 package no.unit.nva.model;
 
+import static java.util.Objects.isNull;
 import static nva.commons.utils.attempt.Try.attempt;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.UserDb;
+import no.unit.nva.exceptions.EmptyUsernameException;
 import no.unit.nva.exceptions.InvalidUserInternalException;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.StringUtils;
@@ -100,6 +102,13 @@ public class UserDto {
 
     private void setRoles(List<RoleDto> roles) {
         this.roles = roles;
+    }
+
+    public UserDto validate() throws EmptyUsernameException {
+        if (isNull(username) || username.isBlank()) {
+            throw new EmptyUsernameException();
+        }
+        return this;
     }
 
     /**
