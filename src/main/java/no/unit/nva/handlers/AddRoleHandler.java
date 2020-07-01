@@ -18,10 +18,10 @@ import org.slf4j.LoggerFactory;
 
 public class AddRoleHandler extends ApiGatewayHandler<RoleDto, RoleDto> {
 
-    private static final int MAX_EFFORTS_FOR_FETCHING_ROLE = 2;
-    private static final long WAITING_TIME = 100;
     public static final String INTERRPTION_ERROR = "Interuption while waiting to get role.";
     public static final String ERROR_FETCHING_SAVED_ROLE = "Could not fetch role with name: ";
+    private static final int MAX_EFFORTS_FOR_FETCHING_ROLE = 2;
+    private static final long WAITING_TIME = 100;
     private final DatabaseService databaseService;
 
     /**
@@ -50,6 +50,11 @@ public class AddRoleHandler extends ApiGatewayHandler<RoleDto, RoleDto> {
             .orElseThrow(() -> new DataHandlingError(ERROR_FETCHING_SAVED_ROLE + input.getRoleName()));
     }
 
+    @Override
+    protected Integer getSuccessStatusCode(RoleDto input, RoleDto output) {
+        return HttpStatus.SC_OK;
+    }
+
     private Optional<RoleDto> getEventuallyConsistentRole(RoleDto input)
         throws InvalidRoleInternalException, UnexpectedException {
         Optional<RoleDto> role = databaseService.getRole(input);
@@ -69,10 +74,5 @@ public class AddRoleHandler extends ApiGatewayHandler<RoleDto, RoleDto> {
             logger.error(INTERRPTION_ERROR, e);
             throw new UnexpectedException(INTERRPTION_ERROR, e);
         }
-    }
-
-    @Override
-    protected Integer getSuccessStatusCode(RoleDto input, RoleDto output) {
-        return HttpStatus.SC_OK;
     }
 }

@@ -12,9 +12,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import no.unit.nva.database.UserDb.Builder;
-import no.unit.nva.exceptions.InvalidUserInternalException;
 import no.unit.nva.database.intefaces.DynamoEntry;
 import no.unit.nva.database.intefaces.WithCopy;
+import no.unit.nva.exceptions.InvalidUserInternalException;
 import nva.commons.utils.JacocoGenerated;
 
 @DynamoDBTable(tableName = "UsersRoles")
@@ -53,6 +53,23 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder> {
         return this.primaryHashKey;
     }
 
+    /**
+     * Do not use this function. This function is defined only for internal usage (by DynamoDB). The function does not
+     * reset the primaryKey once it has been set. It does not throw an Exception because this method is supposed ot be
+     * used only by DynamoDb. For any other purpose use the {@link UserDb.Builder}
+     *
+     * @param primaryKey the primaryKey
+     * @throws InvalidUserInternalException when the primary key is invalid.
+     */
+    public void setPrimaryHashKey(String primaryKey) throws InvalidUserInternalException {
+        if (primaryKeyHasNotBeenSet()) {
+            if (!primaryKey.startsWith(TYPE)) {
+                throw new InvalidUserInternalException(INVALID_PRIMARY_HASH_KEY);
+            }
+            this.primaryHashKey = primaryKey;
+        }
+    }
+
     @JacocoGenerated
     @DynamoDBRangeKey(attributeName = "PK1B")
     @Override
@@ -73,18 +90,6 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder> {
         return username;
     }
 
-    @JacocoGenerated
-    @DynamoDBAttribute(attributeName = "roles")
-    public List<RoleDb> getRoles() {
-        return roles;
-    }
-
-    @JacocoGenerated
-    @DynamoDBAttribute(attributeName = "institution")
-    public String getInstitution() {
-        return institution;
-    }
-
     /**
      * Method for using only for DynamoDb mapper. Do not use. Use the builder instead.
      *
@@ -94,13 +99,10 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder> {
         this.username = username;
     }
 
-    /**
-     * Method for using only for DynamoDb mapper. Do not use. Use the builder instead.
-     *
-     * @param institution the institution.
-     */
-    public void setInstitution(String institution) {
-        this.institution = institution;
+    @JacocoGenerated
+    @DynamoDBAttribute(attributeName = "roles")
+    public List<RoleDb> getRoles() {
+        return roles;
     }
 
     /**
@@ -112,21 +114,19 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder> {
         this.roles = roles;
     }
 
+    @JacocoGenerated
+    @DynamoDBAttribute(attributeName = "institution")
+    public String getInstitution() {
+        return institution;
+    }
+
     /**
-     * Do not use this function. This function is defined only for internal usage (by DynamoDB). The function does not
-     * reset the primaryKey once it has been set. It does not throw an Exception because this method is supposed ot be
-     * used only by DynamoDb. For any other purpose use the {@link UserDb.Builder}
+     * Method for using only for DynamoDb mapper. Do not use. Use the builder instead.
      *
-     * @param primaryKey the primaryKey
-     * @throws InvalidUserInternalException when the primary key is invalid.
+     * @param institution the institution.
      */
-    public void setPrimaryHashKey(String primaryKey) throws InvalidUserInternalException {
-        if (primaryKeyHasNotBeenSet()) {
-            if (!primaryKey.startsWith(TYPE)) {
-                throw new InvalidUserInternalException(INVALID_PRIMARY_HASH_KEY);
-            }
-            this.primaryHashKey = primaryKey;
-        }
+    public void setInstitution(String institution) {
+        this.institution = institution;
     }
 
     @Override

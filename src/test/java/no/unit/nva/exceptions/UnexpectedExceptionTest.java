@@ -38,17 +38,17 @@ public class UnexpectedExceptionTest {
         assertThat(stackTrace, containsString(INTERNAL_EXCEPTION_MESSAGE));
     }
 
+    @Test
+    public void unexpectedExceptionReturnsInternalServerError() {
+        UnexpectedException error = new UnexpectedException(SOME_MESSAGE, SOME_EXCEPTION);
+        assertThat(error.statusCode(), is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
+    }
+
     private String getStackTraceString(UnexpectedException exception) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         exception.printStackTrace(printWriter);
 
         return stringWriter.toString();
-    }
-
-    @Test
-    public void unexpectedExceptionReturnsInternalServerError() {
-        UnexpectedException error = new UnexpectedException(SOME_MESSAGE, SOME_EXCEPTION);
-        assertThat(error.statusCode(), is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
     }
 }
