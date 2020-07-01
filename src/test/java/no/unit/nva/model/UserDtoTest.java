@@ -40,14 +40,6 @@ public class UserDtoTest implements UserDtoCreator {
     public static final List<RoleDto> sampleRoles = createSampleRoles();
     public static final String SOME_INSTITUTION = "someInstitution";
 
-    private static List<RoleDto> createSampleRoles() {
-        try {
-            return Arrays.asList(RoleDto.newBuilder().withName(SOME_ROLENAME).build());
-        } catch (InvalidRoleInternalException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Test
     void userDtoHasAConstructorWithoutArgs() {
         new UserDto();
@@ -173,5 +165,13 @@ public class UserDtoTest implements UserDtoCreator {
     private UserDto convertToUserDbAndBack(UserDto userDto) throws InvalidUserInternalException {
         UserDb userDb = userDto.toUserDb();
         return UserDto.fromUserDb(userDb);
+    }
+
+    private static List<RoleDto> createSampleRoles() {
+        try {
+            return Arrays.asList(RoleDto.newBuilder().withName(SOME_ROLENAME).build());
+        } catch (InvalidRoleInternalException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

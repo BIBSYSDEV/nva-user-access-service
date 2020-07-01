@@ -117,6 +117,7 @@ public class AddRoleHandlerTest extends DatabaseTest {
 
         Class<InvalidRoleInternalException> expectedExceptionClass = InvalidRoleInternalException.class;
         RoleDto inputRole = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
+
         AddRoleHandler addRoleHandler = addRoleHandlerThrowsUnexpectedException(expectedExceptionClass);
         Executable action = () -> addRoleHandler.processInput(inputRole, null, null);
 
@@ -126,18 +127,17 @@ public class AddRoleHandlerTest extends DatabaseTest {
     }
 
     @Test
-    public void errorMessageIsLoggedWhenaddRoleHandlerThrowsUnexpectedException()
+    public void errorMessageIsLoggedWhenAddRoleHandlerThrowsUnexpectedException()
         throws InvalidRoleInternalException, IOException {
-
-        TestAppender appender = LogUtils.getTestingAppender(AddRoleHandler.class);
+        TestAppender testingAppender = LogUtils.getTestingAppender(AddRoleHandler.class);
         Class<InvalidRoleInternalException> expectedExceptionClass = InvalidRoleInternalException.class;
+
         AddRoleHandler addRoleHandler = addRoleHandlerThrowsUnexpectedException(expectedExceptionClass);
-        InputStream inputRequest = new HandlerRequestBuilder<>(objectMapper)
-            .withBody(sampleRole)
-            .build();
+        InputStream inputRequest = new HandlerRequestBuilder<>(objectMapper).withBody(sampleRole).build();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         addRoleHandler.handleRequest(inputRequest, outputStream, context);
-        assertThat(appender.getMessages(), containsString(AddRoleHandler.UNEXPECTED_ERROR_MESSAGE));
+
+        assertThat(testingAppender.getMessages(), containsString(AddRoleHandler.UNEXPECTED_ERROR_MESSAGE));
     }
 
     private AddRoleHandler addRoleHandlerThrowsUnexpectedException(
