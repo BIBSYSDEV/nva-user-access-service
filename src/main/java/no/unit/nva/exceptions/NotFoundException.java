@@ -1,6 +1,5 @@
 package no.unit.nva.exceptions;
 
-import java.util.function.Supplier;
 import nva.commons.exceptions.ApiGatewayException;
 import org.apache.http.HttpStatus;
 
