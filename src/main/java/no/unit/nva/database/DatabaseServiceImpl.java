@@ -34,6 +34,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     public static final String USER_ALREAD_EXISTS_ERROR_MESSAGE = "User already exists:";
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
+    public static final String EMPTY_INPUT_ERROR = "empty input";
     private final DynamoDBMapper mapper;
     private AmazonDynamoDB client;
 
@@ -57,7 +58,8 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Optional<UserDto> getUser(UserDto queryObject) throws InvalidUserInternalException {
-        logger.debug("Getting user:" + queryObject.toString());
+        logger.debug(
+            "Adding user:" + Optional.ofNullable(queryObject).map(UserDto::toString).orElse(EMPTY_INPUT_ERROR));
         DynamoDBQueryExpression<UserDb> searchUserRequest = createGetQuery(queryObject.toUserDb());
         List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserRequest);
 
@@ -72,7 +74,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public void addUser(UserDto user) throws InvalidUserInternalException, ConflictException {
-
+        logger.debug("Adding user:" + Optional.ofNullable(user).map(UserDto::toString).orElse(EMPTY_INPUT_ERROR));
         if (userAlreadyExists(user)) {
             throw new ConflictException(USER_ALREAD_EXISTS_ERROR_MESSAGE + user.getUsername());
         }
@@ -85,6 +87,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public void addRole(RoleDto roleDto) throws InvalidInputRoleException {
+        logger.debug("Adding role:" + Optional.ofNullable(roleDto).map(RoleDto::toString).orElse(EMPTY_INPUT_ERROR));
         Try.of(roleDto)
             .forEach(role -> mapper.save(roleDto.toRoleDb()))
             .orElseThrow(failure -> new InvalidInputRoleException(INVALID_ROLE_ERROR));
@@ -97,6 +100,8 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Optional<RoleDto> getRole(RoleDto queryObject) throws InvalidRoleInternalException {
+        logger.debug(
+            "Adding role:" + Optional.ofNullable(queryObject).map(RoleDto::toString).orElse(EMPTY_INPUT_ERROR));
         RoleDb searchObject = queryObject.toRoleDb();
         DynamoDBQueryExpression<RoleDb> searchRoleByName = createGetQuery(searchObject);
 
