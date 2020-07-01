@@ -72,6 +72,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public void addUser(UserDto user) throws InvalidUserInternalException, ConflictException {
+        logger.debug("Adding user:" + user.toString());
 
         if (userAlreadyExists(user)) {
             throw new ConflictException(USER_ALREAD_EXISTS_ERROR_MESSAGE + user.getUsername());
@@ -85,6 +86,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public void addRole(RoleDto roleDto) throws InvalidInputRoleException {
+        logger.debug("Adding role:" + roleDto.toString());
         Try.of(roleDto)
             .forEach(role -> mapper.save(roleDto.toRoleDb()))
             .orElseThrow(failure -> new InvalidInputRoleException(INVALID_ROLE_ERROR));
@@ -97,6 +99,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Optional<RoleDto> getRole(RoleDto queryObject) throws InvalidRoleInternalException {
+        logger.debug("Getting role:" + queryObject.toString());
         RoleDb searchObject = queryObject.toRoleDb();
         DynamoDBQueryExpression<RoleDb> searchRoleByName = createGetQuery(searchObject);
 
