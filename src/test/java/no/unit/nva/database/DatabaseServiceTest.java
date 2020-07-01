@@ -71,9 +71,9 @@ public class DatabaseServiceTest extends DatabaseTest {
                                                                   InvalidRoleInternalException {
         UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, null, SOME_ROLE);
         Optional<UserDto> actualUser = db.getUser(expectedUser);
+
         assertThat(actualUser.isPresent(), is(true));
         assertThat(actualUser.get(), is(equalTo(expectedUser)));
-
         assertThat(actualUser.get().getInstitution(), is(equalTo(null)));
     }
 
