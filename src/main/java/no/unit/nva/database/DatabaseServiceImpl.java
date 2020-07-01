@@ -13,6 +13,7 @@ import com.amazonaws.services.dynamodbv2.model.Condition;
 import java.util.List;
 import java.util.Optional;
 import no.unit.nva.database.intefaces.WithType;
+import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidInputRoleException;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.exceptions.InvalidUserInternalException;
@@ -29,8 +30,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     public static final String RANGE_KEY_NAME = "PK1B";
     public static final String INVALID_USER_IN_DATABASE = "Invalid user stored in the database:";
-    public static final String MISSING_USERNAME = "missing username";
     public static final String INVALID_ROLE_ERROR = "InvalidRole, null object or missing data.";
+    public static final String USER_ALREAD_EXISTS_ERROR_MESSAGE = "User already exists:";
+
     private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
     private final DynamoDBMapper mapper;
     private AmazonDynamoDB client;
@@ -55,7 +57,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Optional<UserDto> getUser(UserDto queryObject) throws InvalidUserInternalException {
-
+        logger.debug("Getting user:" + queryObject.toString());
         DynamoDBQueryExpression<UserDb> searchUserRequest = createGetQuery(queryObject.toUserDb());
         List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserRequest);
 
@@ -69,8 +71,16 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public void addUser(UserDto user) throws InvalidUserInternalException {
+    public void addUser(UserDto user) throws InvalidUserInternalException, ConflictException {
+
+        if (userAlreadyExists(user)) {
+            throw new ConflictException(USER_ALREAD_EXISTS_ERROR_MESSAGE + user.getUsername());
+        }
         mapper.save(user.toUserDb());
+    }
+
+    private boolean userAlreadyExists(UserDto user) throws InvalidUserInternalException {
+        return this.getUser(user).isPresent();
     }
 
     @Override
@@ -114,7 +124,6 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     private <I> IllegalStateException unexpectedException(Failure<I> failure) {
-        logger.error(INVALID_USER_IN_DATABASE + MISSING_USERNAME);
         throw new IllegalStateException(INVALID_USER_IN_DATABASE, failure.getException());
     }
 }

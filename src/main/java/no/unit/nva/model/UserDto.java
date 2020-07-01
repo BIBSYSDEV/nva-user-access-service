@@ -12,15 +12,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.UserDb;
+import no.unit.nva.database.intefaces.WithCopy;
 import no.unit.nva.exceptions.EmptyUsernameException;
 import no.unit.nva.exceptions.InvalidUserInternalException;
 import nva.commons.utils.JacocoGenerated;
+import nva.commons.utils.JsonUtils;
 import nva.commons.utils.StringUtils;
 import nva.commons.utils.attempt.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UserDto {
+public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable {
 
     public static final String MISSING_FIELD_ERROR = "Invalid User. Missing obligatory field: ";
     public static final String ERROR_DUE_TO_INVALID_ROLE =
@@ -66,7 +68,7 @@ public class UserDto {
     }
 
     /**
-     * Trasnforms the DTO to a database object.
+     * Transforms the DTO to a database object.
      *
      * @return a {@link UserDb}.
      * @throws InvalidUserInternalException when the DTO contains an invalid user.
@@ -104,6 +106,12 @@ public class UserDto {
         this.roles = roles;
     }
 
+    /**
+     * throws exception when the object is invalid.
+     *
+     * @return the object itself.
+     * @throws EmptyUsernameException when the username is empty.
+     */
     public UserDto validate() throws EmptyUsernameException {
         if (isNull(username) || username.isBlank()) {
             throw new EmptyUsernameException();
@@ -111,12 +119,18 @@ public class UserDto {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return toJsonString(JsonUtils.objectMapper);
+    }
+
     /**
      * Creates a copy of the object.
      *
      * @return a Builder containing the field values of the original object.
      */
-    public Builder copy() {
+    @Override
+    public UserDto.Builder copy() {
         return new Builder()
             .withUsername(username)
             .withInstitution(institution)

@@ -1,6 +1,7 @@
 package no.unit.nva.database;
 
 import java.util.Optional;
+import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidInputRoleException;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.exceptions.InvalidUserInternalException;
@@ -13,7 +14,7 @@ public interface DatabaseService {
 
     Optional<UserDto> getUser(UserDto queryObject) throws InvalidUserInternalException;
 
-    void addUser(UserDto user) throws InvalidUserInternalException;
+    void addUser(UserDto user) throws InvalidUserInternalException, ConflictException;
 
     void addRole(RoleDto roleDto) throws InvalidRoleInternalException, InvalidInputRoleException;
 
