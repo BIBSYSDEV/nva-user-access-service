@@ -28,7 +28,8 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable {
     public static final String ERROR_DUE_TO_INVALID_ROLE =
         "Failure while trying to create user with role without role-name";
     private static final Logger logger = LoggerFactory.getLogger(UserDto.class);
-    public List<RoleDto> roles;
+
+    private List<RoleDto> roles;
     private String username;
     private String institution;
 
