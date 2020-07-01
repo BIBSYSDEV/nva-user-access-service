@@ -54,10 +54,10 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public Optional<UserDto> getUser(String username) throws InvalidUserInternalException {
-        UserDb searchObject = UserDto.newBuilder().withUsername(username).build().toUserDb();
-        DynamoDBQueryExpression<UserDb> searchUserByUsername = createGetQuery(searchObject);
-        List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserByUsername);
+    public Optional<UserDto> getUser(UserDto queryObject) throws InvalidUserInternalException {
+
+        DynamoDBQueryExpression<UserDb> searchUserRequest = createGetQuery(queryObject.toUserDb());
+        List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserRequest);
 
         UserDto user = userSearchResult
             .stream()
@@ -106,15 +106,15 @@ public class DatabaseServiceImpl implements DatabaseService {
             .withRangeKeyCondition(RANGE_KEY_NAME, entityTypeAsRangeKey(searchObject));
     }
 
-    private <I> IllegalStateException unexpectedException(Failure<I> failure) {
-        logger.error(INVALID_USER_IN_DATABASE + MISSING_USERNAME);
-        throw new IllegalStateException(INVALID_USER_IN_DATABASE, failure.getException());
-    }
-
     private static <I extends WithType> Condition entityTypeAsRangeKey(I searchObject) {
         Condition comparisonCondition = new Condition();
         comparisonCondition.setComparisonOperator(ComparisonOperator.EQ);
         comparisonCondition.setAttributeValueList(List.of(new AttributeValue(searchObject.getType())));
         return comparisonCondition;
+    }
+
+    private <I> IllegalStateException unexpectedException(Failure<I> failure) {
+        logger.error(INVALID_USER_IN_DATABASE + MISSING_USERNAME);
+        throw new IllegalStateException(INVALID_USER_IN_DATABASE, failure.getException());
     }
 }

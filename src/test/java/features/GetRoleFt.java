@@ -30,6 +30,7 @@ public class GetRoleFt extends ScenarioTest {
 
     private final ScenarioContext scenarioContext;
     private final Context context = mock(Context.class);
+
     private RoleDto actualRoleDto;
     private HandlerRequestBuilder<Void> requestBuilder;
 

@@ -21,11 +21,12 @@ import org.slf4j.LoggerFactory;
 
 public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
 
+    public static final String ROLE_NOT_FOUND_ERROR_MESSAGE = "Could not find role: ";
     public static final String LOG_ROLE_NOT_FOUND = "Could not find role: ";
     public static final String EMPTY_ROLE_NAME = "Role-name cannot be empty";
     public static final String ROLE_PATH_PARAMETER = "role";
     private static final Logger logger = LoggerFactory.getLogger(GetRoleHandler.class);
-    public static String ROLE_NOT_FOUND_ERROR_MESSAGE = "Could not find role: ";
+
     private final DatabaseService databaseService;
 
     /**

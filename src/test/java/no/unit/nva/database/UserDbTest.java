@@ -43,6 +43,17 @@ public class UserDbTest extends DatabaseTest {
         assertThat(sampleUser.getPrimaryHashKey(), is(equalTo(expectedHashKey)));
     }
 
+    private static List<RoleDb> createSampleRoles() {
+        return Stream.of("Role1", "Role2")
+            .map(attempt(UserDbTest::newRole))
+            .map(Try::get)
+            .collect(Collectors.toList());
+    }
+
+    private static RoleDb newRole(String str) throws InvalidRoleInternalException {
+        return RoleDb.newBuilder().withName(str).build();
+    }
+
     @BeforeEach
     private void init() throws InvalidUserInternalException {
         dynamoFunctionalityTestUser = new UserDb();
@@ -144,16 +155,5 @@ public class UserDbTest extends DatabaseTest {
 
     private DynamoDBMapper clientToLocalDatabase() {
         return new DynamoDBMapper(localDynamo);
-    }
-
-    private static List<RoleDb> createSampleRoles() {
-        return Stream.of("Role1", "Role2")
-            .map(attempt(UserDbTest::newRole))
-            .map(Try::get)
-            .collect(Collectors.toList());
-    }
-
-    private static RoleDb newRole(String str) throws InvalidRoleInternalException {
-        return RoleDb.newBuilder().withName(str).build();
     }
 }
