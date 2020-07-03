@@ -13,11 +13,12 @@ import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 
-public interface UserDtoCreator {
+public final class UserDtoCreator {
 
-    String SOME_USERNAME = "SomeUsername";
-    String SOME_ROLENAME = "SomeRole";
-    String SOME_INSTITUTION = "SomeInstitution";
+    public static final String SOME_USERNAME = "SomeUsername";
+    public static final String SOME_ROLENAME = "SomeRole";
+    public static final String SOME_INSTITUTION = "SomeInstitution";
+    public static final String EMPTY_STRING = "";
 
     /**
      * Creates a request for adding a user without a username. To be used with {@code handleRequest()} method.
@@ -30,7 +31,7 @@ public interface UserDtoCreator {
      * @throws IllegalAccessException       reflection related.
      * @throws InvocationTargetException    reflection related.
      */
-    default InputStream createRequestWithUserWithoutUsername()
+    public static InputStream createRequestWithUserWithoutUsername()
         throws JsonProcessingException, InvalidUserInternalException, InvalidRoleInternalException,
                NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         UserDto userWithoutUsername = createUserWithoutUsername();
@@ -49,13 +50,13 @@ public interface UserDtoCreator {
      * @throws InvocationTargetException    reflection related.
      * @throws IllegalAccessException       reflection related.
      */
-    default UserDto createUserWithoutUsername()
+    public static UserDto createUserWithoutUsername()
         throws InvalidRoleInternalException, InvalidUserInternalException, NoSuchMethodException,
                InvocationTargetException, IllegalAccessException {
         UserDto userWithoutUsername = createUserWithRolesAndInstitution();
         Method method = userWithoutUsername.getClass().getDeclaredMethod("setUsername", String.class);
         method.setAccessible(true);
-        method.invoke(userWithoutUsername, "");
+        method.invoke(userWithoutUsername, EMPTY_STRING);
 
         return userWithoutUsername;
     }
@@ -66,7 +67,7 @@ public interface UserDtoCreator {
      * @return {@link UserDto}
      * @throws InvalidUserInternalException When the user is invalid. The user is supposed to be a valid user
      */
-    default UserDto createUserWithoutRoles() throws InvalidUserInternalException {
+    public static UserDto createUserWithoutRoles() throws InvalidUserInternalException {
         return UserDto.newBuilder().withUsername(SOME_USERNAME).build();
     }
 
@@ -76,7 +77,7 @@ public interface UserDtoCreator {
      * @throws InvalidUserInternalException When the user is invalid. The user is supposed to be a valid user.
      * @throws InvalidRoleInternalException When the user roles is invalid. The role is supposed to be a valid role.
      */
-    default UserDto createUserWithRolesAndInstitution()
+    public static UserDto createUserWithRolesAndInstitution()
         throws InvalidUserInternalException, InvalidRoleInternalException {
         return createUserWithRoleWithoutInstitution().copy()
             .withInstitution(SOME_INSTITUTION)
@@ -90,7 +91,7 @@ public interface UserDtoCreator {
      * @throws InvalidUserInternalException When the user is invalid. The user is supposed to be a valid user.
      * @throws InvalidRoleInternalException When the role is invalid. The role is supposed to be a valid role.
      */
-    default UserDto createUserWithRoleWithoutInstitution()
+    public static UserDto createUserWithRoleWithoutInstitution()
         throws InvalidUserInternalException, InvalidRoleInternalException {
         RoleDto sampleRole = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
         return UserDto.newBuilder()

@@ -1,6 +1,11 @@
 package no.unit.nva.handlers;
 
 import static no.unit.nva.handlers.AddUserHandler.SYNC_ERROR_MESSAGE;
+import static no.unit.nva.handlers.UserDtoCreator.createRequestWithUserWithoutUsername;
+import static no.unit.nva.handlers.UserDtoCreator.createUserWithRoleWithoutInstitution;
+import static no.unit.nva.handlers.UserDtoCreator.createUserWithRolesAndInstitution;
+import static no.unit.nva.handlers.UserDtoCreator.createUserWithoutRoles;
+import static no.unit.nva.handlers.UserDtoCreator.createUserWithoutUsername;
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -38,7 +43,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.zalando.problem.Problem;
 
-public class AddUserTest extends DatabaseTest implements UserDtoCreator {
+public class AddUserTest extends DatabaseTest {
 
     public static final String EXCEPTION_MESSAGE_WHEN_GETTING_USER = "Exception when getting user";
     private AddUserHandler handler;
