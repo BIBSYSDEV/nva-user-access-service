@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.database.DatabaseServiceImpl;
-import no.unit.nva.database.DatabaseTest;
+import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.intefaces.WithEnvironment;
 import no.unit.nva.exceptions.BadRequestException;
 import no.unit.nva.exceptions.InvalidInputRoleException;
@@ -26,7 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-public class GetRoleHandlerTest extends DatabaseTest implements WithEnvironment {
+public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironment {
 
     public static final String THE_ROLE = "theRole";
     public static final String BLANK_STR = " ";

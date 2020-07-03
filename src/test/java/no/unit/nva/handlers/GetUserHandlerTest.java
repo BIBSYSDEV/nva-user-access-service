@@ -10,7 +10,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Collections;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
-import no.unit.nva.database.DatabaseTest;
+import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.exceptions.BadRequestException;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
@@ -26,7 +26,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-class GetUserHandlerTest extends DatabaseTest {
+class GetUserHandlerTest extends DatabaseAccessor {
 
     public static final String SOME_USERNAME = "sampleUsername";
     public static final String SOME_ROLE = "SomeRole";

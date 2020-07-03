@@ -135,7 +135,11 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable {
         return new Builder()
             .withUsername(username)
             .withInstitution(institution)
-            .withRoles(new ArrayList<>(roles));
+            .withRoles(listRoles());
+    }
+
+    private List<RoleDto> listRoles() {
+        return new ArrayList<>(Optional.ofNullable(roles).orElse(Collections.emptyList()));
     }
 
     @Override

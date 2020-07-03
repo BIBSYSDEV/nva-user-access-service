@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.collection.IsIn.in;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
@@ -18,6 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import no.unit.nva.exceptions.InvalidInputRoleException;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
@@ -25,6 +27,8 @@ import no.unit.nva.handlers.GetRoleHandler;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.handlers.GatewayResponse;
+import org.apache.http.HttpStatus;
+import org.zalando.problem.Problem;
 
 public class GetRoleFt extends ScenarioTest {
 
@@ -32,7 +36,6 @@ public class GetRoleFt extends ScenarioTest {
     private final Context context = mock(Context.class);
 
     private RoleDto actualRoleDto;
-    private HandlerRequestBuilder<Void> requestBuilder;
 
     /**
      * Default Constructor.
@@ -51,21 +54,41 @@ public class GetRoleFt extends ScenarioTest {
         scenarioContext.getDatabaseService().addRole(newRole);
     }
 
-    @When("the authorized client sends a {string} request with the following path parameters:")
-    public void the_authorized_client_sends_a_GET_request_to_the_path(String method, DataTable pathTable) {
+    @Given("that there is no role with role-name {string}")
+    public void that_there_is_no_role_with_role_name(String roleName) throws InvalidRoleInternalException {
+        RoleDto queryObject = RoleDto.newBuilder().withName(roleName).build();
+        Optional<RoleDto> queryResult = scenarioContext.getDatabaseService().getRole(queryObject);
+        assertThat(queryResult.isEmpty(),is(equalTo(true)));
+    }
+
+    @Then("a NotFound message is returned")
+    public void a_NotFound_message_is_returned() throws IOException {
+        ByteArrayOutputStream outputStream = executeRequest();
+        GatewayResponse<Problem> response = GatewayResponse.fromOutputStream(outputStream);
+        assertThat(response.getStatusCode(),is(equalTo(HttpStatus.SC_NOT_FOUND)));
+    }
+
+
+    @Given("the request has the following path parameters:")
+    public void the_request_has_the_following_path_parameters(io.cucumber.datatable.DataTable pathTable) {
         Map<String, String> pathParameters = pathTable.rows(IGNORE_HEADER_ROW).asMap(String.class, String.class);
-        this.requestBuilder = new HandlerRequestBuilder<Void>(objectMapper).withHttpMethod(method)
-            .withPathParameters(pathParameters);
+        this.scenarioContext.setRequestBuilder(new HandlerRequestBuilder<Map<String,Object>>(objectMapper)
+            .withPathParameters(pathParameters));
     }
 
     @Then("a role description is returned")
     public void a_role_description_is_returned() throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        InputStream inputStream = this.requestBuilder.build();
-        GetRoleHandler getRoleHandler = new GetRoleHandler(mockEnvironment(), scenarioContext.getDatabaseService());
-        getRoleHandler.handleRequest(inputStream, outputStream, context);
+        ByteArrayOutputStream outputStream = executeRequest();
         GatewayResponse<RoleDto> response = GatewayResponse.fromOutputStream(outputStream);
         actualRoleDto = response.getBodyObject(RoleDto.class);
+    }
+
+    private ByteArrayOutputStream executeRequest() throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        InputStream inputStream = this.scenarioContext.getRequestBuilder().build();
+        GetRoleHandler getRoleHandler = new GetRoleHandler(mockEnvironment(), scenarioContext.getDatabaseService());
+        getRoleHandler.handleRequest(inputStream, outputStream, context);
+        return outputStream;
     }
 
     @Then("the role description contains the following fields and respective values:")

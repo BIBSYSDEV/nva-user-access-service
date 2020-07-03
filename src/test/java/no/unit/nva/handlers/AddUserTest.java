@@ -20,7 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
-import no.unit.nva.database.DatabaseTest;
+import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.DataSyncException;
 import no.unit.nva.exceptions.EmptyUsernameException;
@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.zalando.problem.Problem;
 
-public class AddUserTest extends DatabaseTest implements UserDtoCreator {
+public class AddUserTest extends DatabaseAccessor implements UserDtoCreator {
 
     public static final String EXCEPTION_MESSAGE_WHEN_GETTING_USER = "Exception when getting user";
     private AddUserHandler handler;
