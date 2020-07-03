@@ -18,6 +18,7 @@ public final class UserDtoCreator {
     public static final String SOME_USERNAME = "SomeUsername";
     public static final String SOME_ROLENAME = "SomeRole";
     public static final String SOME_INSTITUTION = "SomeInstitution";
+    public static final String EMPTY_STRING = "";
 
     /**
      * Creates a request for adding a user without a username. To be used with {@code handleRequest()} method.
@@ -55,7 +56,7 @@ public final class UserDtoCreator {
         UserDto userWithoutUsername = createUserWithRolesAndInstitution();
         Method method = userWithoutUsername.getClass().getDeclaredMethod("setUsername", String.class);
         method.setAccessible(true);
-        method.invoke(userWithoutUsername, "");
+        method.invoke(userWithoutUsername, EMPTY_STRING);
 
         return userWithoutUsername;
     }
