@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.exceptions.InvalidUserInternalException;
 import no.unit.nva.model.RoleDto;
@@ -38,16 +39,16 @@ public class DatabaseServiceTest extends DatabaseTest {
     }
 
     @Test
-    public void databaseServiceShouldHaveAMethodForInsertingAUser() throws InvalidUserInternalException {
+    public void databaseServiceShouldHaveAMethodForInsertingAUser()
+        throws InvalidUserInternalException, ConflictException {
         UserDto user = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
         db.addUser(user);
     }
 
     @Test
     public void databaseServiceShouldInsertValidItemInDatabase()
-        throws InvalidUserInternalException, InvalidRoleInternalException {
+        throws InvalidUserInternalException, InvalidRoleInternalException, ConflictException {
         UserDto insertedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
-        db.addUser(insertedUser);
         Optional<UserDto> savedUser = db.getUser(insertedUser);
 
         assertThat(savedUser.isPresent(), is(true));
@@ -57,7 +58,7 @@ public class DatabaseServiceTest extends DatabaseTest {
 
     @Test
     public void databaseServiceShouldReturnNonEmptyUserWhenUsernameExistsInDatabase()
-        throws InvalidUserInternalException, InvalidRoleInternalException {
+        throws InvalidUserInternalException, InvalidRoleInternalException, ConflictException {
         UserDto insertedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
         Optional<UserDto> savedUser = db.getUser(insertedUser);
 
@@ -68,7 +69,7 @@ public class DatabaseServiceTest extends DatabaseTest {
 
     @Test
     public void addUserShouldSaveAUserWithoutInstitution() throws InvalidUserInternalException,
-                                                                  InvalidRoleInternalException {
+                                                                  InvalidRoleInternalException, ConflictException {
         UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, null, SOME_ROLE);
         Optional<UserDto> actualUser = db.getUser(expectedUser);
 
@@ -78,7 +79,8 @@ public class DatabaseServiceTest extends DatabaseTest {
     }
 
     @Test
-    public void addUserShouldSaveUserWithoutRoles() throws InvalidUserInternalException, InvalidRoleInternalException {
+    public void addUserShouldSaveUserWithoutRoles()
+        throws InvalidUserInternalException, InvalidRoleInternalException, ConflictException {
         UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, null);
         Optional<UserDto> actualUser = db.getUser(expectedUser);
 
@@ -94,8 +96,8 @@ public class DatabaseServiceTest extends DatabaseTest {
     }
 
     @Test
-    public void dbServiceShouldHaveMethodForUpdatingExistingUser() throws InvalidRoleInternalException,
-                                                                          InvalidUserInternalException {
+    public void dbServiceShouldHaveMethodForUpdatingExistingUser()
+        throws InvalidRoleInternalException, InvalidUserInternalException, ConflictException {
         UserDto user = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
         assertThrows(RuntimeException.class, () -> db.updateUser(user));
     }
@@ -107,7 +109,7 @@ public class DatabaseServiceTest extends DatabaseTest {
     }
 
     private UserDto createSampleUserAndAddUserToDb(String username, String institution, String roleName)
-        throws InvalidRoleInternalException, InvalidUserInternalException {
+        throws InvalidRoleInternalException, InvalidUserInternalException, ConflictException {
         UserDto userDto = UserDto.newBuilder()
             .withRoles(createRoleList(roleName))
             .withInstitution(institution)

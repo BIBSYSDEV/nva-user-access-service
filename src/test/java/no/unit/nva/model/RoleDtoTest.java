@@ -53,18 +53,6 @@ public class RoleDtoTest {
     }
 
     @Test
-    public void unexpectedExceptionThrowsRuntimeException() throws NoSuchMethodException {
-        RoleDto role = new RoleDto();
-        Method method = role.getClass().getDeclaredMethod("newUnexpectedException", Failure.class);
-        method.setAccessible(true);
-        Exception exceptionDuringSerialization = new Exception(SOME_MESSAGE);
-        Failure<Object> failure = new Failure<>(exceptionDuringSerialization);
-        Executable action = () -> method.invoke(role, failure);
-        InvocationTargetException thrown = assertThrows(InvocationTargetException.class, action);
-        assertThat(thrown.getCause().getClass(), is(equalTo(RuntimeException.class)));
-    }
-
-    @Test
     public void copyReturnsABuilderWithAllFieldsOfOriginalObjectPreserved() throws InvalidRoleInternalException {
         RoleDto original = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
         RoleDto copy = original.copy().build();

@@ -1,6 +1,5 @@
 package no.unit.nva.exceptions;
 
-import static no.unit.nva.exceptions.UnexpectedExceptionTest.SOME_MESSAGE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -12,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
 public class InvalidUserInternalExceptionTest {
+
+    private static final String SOME_MESSAGE = "SomeMessage";
 
     @Test
     public void invalidUserInternalExceptionHasConstructorWithMessage() {

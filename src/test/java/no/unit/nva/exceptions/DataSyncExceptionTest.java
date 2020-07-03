@@ -10,22 +10,22 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-public class DataHandlingErrorTest {
+public class DataSyncExceptionTest {
 
     public static final String SOME_MESSAGE = "Some message";
 
     @Test
     public void dataHandlingErrorHasConstructorWithMessage() {
         Executable action = () -> {
-            throw new DataHandlingError(SOME_MESSAGE);
+            throw new DataSyncException(SOME_MESSAGE);
         };
-        DataHandlingError exception = assertThrows(DataHandlingError.class, action);
+        DataSyncException exception = assertThrows(DataSyncException.class, action);
         assertThat(exception.getMessage(), containsString(SOME_MESSAGE));
     }
 
     @Test
     public void dataHandlingErrorReturnsInternalServerError() {
-        DataHandlingError error = new DataHandlingError(SOME_MESSAGE);
+        DataSyncException error = new DataSyncException(SOME_MESSAGE);
         assertThat(error.statusCode(), is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
     }
 }

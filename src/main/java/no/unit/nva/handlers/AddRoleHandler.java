@@ -6,10 +6,9 @@ import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
-import no.unit.nva.exceptions.DataHandlingError;
+import no.unit.nva.exceptions.DataSyncException;
 import no.unit.nva.exceptions.InvalidInputRoleException;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
-import no.unit.nva.exceptions.UnexpectedException;
 import no.unit.nva.model.RoleDto;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.Environment;
@@ -44,10 +43,10 @@ public class AddRoleHandler extends HandlerWithEventualConsistency<RoleDto, Role
 
     @Override
     protected RoleDto processInput(RoleDto input, RequestInfo requestInfo, Context context)
-        throws DataHandlingError, UnexpectedException, InvalidInputRoleException, InvalidRoleInternalException {
+        throws DataSyncException, InvalidInputRoleException, InvalidRoleInternalException {
         databaseService.addRole(input);
         return getEventuallyConsistent(() -> getRole(input))
-            .orElseThrow(() -> new DataHandlingError(ERROR_FETCHING_SAVED_ROLE + input.getRoleName()));
+            .orElseThrow(() -> new DataSyncException(ERROR_FETCHING_SAVED_ROLE + input.getRoleName()));
     }
 
     private Optional<RoleDto> getRole(RoleDto input) {

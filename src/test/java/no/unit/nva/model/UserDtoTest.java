@@ -1,6 +1,13 @@
 package no.unit.nva.model;
 
+import static no.unit.nva.hamcrest.DoesNotHaveNullOrEmptyFields.doesNotHaveNullOrEmptyFields;
+import static no.unit.nva.handlers.UserDtoCreator.SOME_ROLENAME;
+import static no.unit.nva.handlers.UserDtoCreator.SOME_USERNAME;
+import static no.unit.nva.handlers.UserDtoCreator.createUserWithRoleWithoutInstitution;
+import static no.unit.nva.handlers.UserDtoCreator.createUserWithRolesAndInstitution;
+import static no.unit.nva.handlers.UserDtoCreator.createUserWithoutUsername;
 import static no.unit.nva.model.UserDto.ERROR_DUE_TO_INVALID_ROLE;
+import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -11,16 +18,20 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.Arrays;
+import com.fasterxml.jackson.databind.JsonNode;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.UserDb;
+import no.unit.nva.exceptions.EmptyUsernameException;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.exceptions.InvalidUserInternalException;
 import no.unit.nva.model.UserDto.Builder;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,8 +40,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 public class UserDtoTest {
 
-    public static final String SOME_USERNAME = "someUsername";
-    public static final String SOME_ROLENAME = "someRolename";
     public static final List<RoleDto> sampleRoles = createSampleRoles();
     public static final String SOME_INSTITUTION = "someInstitution";
 
@@ -46,9 +55,9 @@ public class UserDtoTest {
     }
 
     @Test
-    void builderReturnsUserDtoWhenInstitutionIsEmpty() throws InvalidUserInternalException {
-        UserDto user = UserDto.newBuilder().withUsername(SOME_USERNAME)
-            .withRoles(sampleRoles).build();
+    void builderReturnsUserDtoWhenInstitutionIsEmpty()
+        throws InvalidUserInternalException, InvalidRoleInternalException {
+        UserDto user = createUserWithRoleWithoutInstitution();
         assertThat(user.getUsername(), is(equalTo(SOME_USERNAME)));
         assertThat(user.getRoles(), is(equalTo(sampleRoles)));
         assertThat(user.getInstitution(), is(equalTo(null)));
@@ -112,23 +121,48 @@ public class UserDtoTest {
         TestAppender appender = LogUtils.getTestingAppender(UserDto.class);
         RoleDto invalidRole = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
         invalidRole.setRoleName(null);
-        List<RoleDto> invlalidRoles = Collections.singletonList(invalidRole);
-        UserDto userWithInvalidRole = UserDto.newBuilder().withUsername(SOME_USERNAME).withRoles(invlalidRoles).build();
+        List<RoleDto> invalidRoles = Collections.singletonList(invalidRole);
+        UserDto userWithInvalidRole = UserDto.newBuilder().withUsername(SOME_USERNAME).withRoles(invalidRoles).build();
 
-        Executable action = () -> userWithInvalidRole.toUserDb();
+        Executable action = userWithInvalidRole::toUserDb;
         assertThrows(RuntimeException.class, action);
 
         assertThat(appender.getMessages(), containsString(ERROR_DUE_TO_INVALID_ROLE));
     }
 
     @Test
-    void updateShouldUpdateUserInDatabase() throws InvalidUserInternalException {
-        UserDto initialUser = UserDto.newBuilder().withUsername(SOME_USERNAME).withInstitution(SOME_INSTITUTION)
-            .withRoles(sampleRoles).build();
+    void copyShouldCopyUserDto() throws InvalidUserInternalException, InvalidRoleInternalException {
+        UserDto initialUser = createUserWithRolesAndInstitution();
         UserDto copiedUser = initialUser.copy().build();
 
         assertThat(copiedUser, is(equalTo(initialUser)));
         assertThat(copiedUser, is(not(sameInstance(initialUser))));
+    }
+
+    @Test
+    void userDtoIsSerialized() throws InvalidUserInternalException, IOException, InvalidRoleInternalException {
+        UserDto initialUser = createUserWithRolesAndInstitution();
+
+        assertThat(initialUser, doesNotHaveNullOrEmptyFields());
+
+        String jsonString = objectMapper.writeValueAsString(initialUser);
+        JsonNode actualJson = objectMapper.readTree(jsonString);
+        JsonNode expectedJson = objectMapper.convertValue(initialUser, JsonNode.class);
+        assertThat(actualJson, is(equalTo(expectedJson)));
+
+        UserDto deserializedObject = objectMapper.readValue(jsonString, UserDto.class);
+        assertThat(deserializedObject, is(equalTo(initialUser)));
+        assertThat(deserializedObject, is(not(sameInstance(initialUser))));
+    }
+
+    @DisplayName("validate() throws UsernameMissingException when username is missing from UserDto instance")
+    @Test
+    public void validateThrowsUsernameMissingExceptionWhenUsernameIsMissingFromUserDto()
+        throws InvalidUserInternalException, NoSuchMethodException, InvalidRoleInternalException,
+               IllegalAccessException, InvocationTargetException {
+        UserDto userDto = createUserWithoutUsername();
+        Executable action = userDto::validate;
+        assertThrows(EmptyUsernameException.class, action);
     }
 
     private UserDto convertToUserDbAndBack(UserDto userDto) throws InvalidUserInternalException {
@@ -138,7 +172,7 @@ public class UserDtoTest {
 
     private static List<RoleDto> createSampleRoles() {
         try {
-            return Arrays.asList(RoleDto.newBuilder().withName(SOME_ROLENAME).build());
+            return Collections.singletonList(RoleDto.newBuilder().withName(SOME_ROLENAME).build());
         } catch (InvalidRoleInternalException e) {
             throw new RuntimeException(e);
         }

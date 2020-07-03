@@ -3,14 +3,14 @@ package no.unit.nva.exceptions;
 import nva.commons.exceptions.ApiGatewayException;
 import org.apache.http.HttpStatus;
 
-public class DataHandlingError extends ApiGatewayException {
+public class ConflictException extends ApiGatewayException {
 
-    public DataHandlingError(String message) {
+    public ConflictException(String message) {
         super(message);
     }
 
     @Override
     protected Integer statusCode() {
-        return HttpStatus.SC_INTERNAL_SERVER_ERROR;
+        return HttpStatus.SC_CONFLICT;
     }
 }
