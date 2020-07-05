@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -39,7 +40,7 @@ public class AddRoleFt extends ScenarioTest {
     }
 
     @Then("a new role is stored in the database")
-    public void a_new_role_is_stored_in_the_database() throws InvalidRoleInternalException, JsonProcessingException {
+    public void a_new_role_is_stored_in_the_database() throws InvalidRoleInternalException, IOException {
 
         RoleDto responseObject = fetchResponseBody();
         Optional<RoleDto> objectReadDirectlyFromDatabase = readRoleDirectlyFromDatabase(responseObject);
@@ -49,7 +50,7 @@ public class AddRoleFt extends ScenarioTest {
     }
 
     @Then("the description of the role is returned to the authorized client")
-    public void the_description_of_the_role_is_returned_to_the_authorized_client() throws JsonProcessingException {
+    public void the_description_of_the_role_is_returned_to_the_authorized_client() throws IOException {
         RoleDto responseObject = fetchResponseBody();
         Map<String, Object> requestObjectMap = fetchOriginalRequestParametersAsMap();
         RoleDto requestObject = convertRequestBodyToRoleDto(requestObjectMap);
@@ -64,7 +65,7 @@ public class AddRoleFt extends ScenarioTest {
         return JsonUtils.objectMapper.convertValue(requestObjectMap, RoleDto.class);
     }
 
-    private RoleDto fetchResponseBody() throws JsonProcessingException {
+    private RoleDto fetchResponseBody() throws IOException {
         return scenarioContext.getResponseBody(RoleDto.class);
     }
 

@@ -7,14 +7,13 @@ import no.unit.nva.exceptions.InvalidUserInternalException;
 import no.unit.nva.handlers.GetUserHandler;
 import no.unit.nva.model.UserDto;
 
-public class GetUserFt extends ScenarioTest{
+public class GetUserFt extends ScenarioTest {
 
     private final ScenarioContext scenarioContext;
 
-    public GetUserFt(ScenarioContext scenarioContext){
+    public GetUserFt(ScenarioContext scenarioContext) {
         this.scenarioContext = scenarioContext;
     }
-
 
     @Given("that the authorized client intends to read a User")
     public void that_the_authorized_client_intends_to_read_a_User() {
@@ -28,7 +27,5 @@ public class GetUserFt extends ScenarioTest{
         throws InvalidUserInternalException, ConflictException {
         UserDto existingUser = UserDto.newBuilder().withUsername(username).build();
         scenarioContext.getDatabaseService().addUser(existingUser);
-
     }
-
 }

@@ -3,7 +3,7 @@ plugins {
     id 'jacoco'
     id 'checkstyle'
     id 'pmd'
-//    id "nebula.lint" version "16.9.0"
+    id "nebula.lint" version "16.9.0"
 }
 
 repositories {
@@ -32,12 +32,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: 'jacksonVersion'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: 'jacksonVersion'
 
-    implementation group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.1.3'
-    implementation group: 'io.swagger.core.v3', name: 'swagger-core', version: '2.1.3'
-    implementation group: 'io.swagger.core.v3', name: 'swagger-jaxrs2', version: '2.1.3'
     implementation group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.1.1'
-
-
 
 
     runtimeOnly(group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: 'jacksonVersion') {
@@ -66,8 +61,12 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: jupiterVersion
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: jupiterVersion
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
-    testImplementation(group: 'io.cucumber', name: 'cucumber-picocontainer', version: '6.1.1') {
-        because("Dependency injection in cucumber glue code")
+    gradleLint.ignore {
+        // gradleLint wants this to be testRuntimeOnly, but cucumber fails to run when this is not
+        // set to testImplementation.
+        testImplementation(group: 'io.cucumber', name: 'cucumber-picocontainer', version: '6.1.1') {
+            because("Dependency injection in cucumber glue code")
+        }
     }
 }
 
@@ -183,8 +182,8 @@ task debugCucumber() {
     }
 }
 
+test.dependsOn(cucumber)
 
-
-//gradleLint {
-//    rules = ['all-dependency', 'duplicate-dependency-class', 'unused-exclude-by-dep']
-//}
+gradleLint {
+    rules = ['all-dependency', 'duplicate-dependency-class', 'unused-exclude-by-dep']
+}

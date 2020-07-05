@@ -52,7 +52,7 @@ public class AddUserFt extends ScenarioTest {
     }
 
     @When("the authorized client sends a POST request")
-    public void the_authorized_client_sends_a_POST_request() {
+    public void the_authorized_client_sends_a_Post_request() {
         HandlerRequestBuilder<Map<String, Object>> requestBuilder =
             new HandlerRequestBuilder<Map<String, Object>>(JsonUtils.objectMapper)
                 .withHttpMethod(HTTP_POST_METHOD);

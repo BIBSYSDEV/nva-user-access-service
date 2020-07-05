@@ -2,8 +2,8 @@ package features;
 
 import static java.util.Objects.isNull;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -21,49 +21,45 @@ public class ScenarioContext {
     private DatabaseServiceImpl databaseService;
     private Supplier<? extends ApiGatewayHandler<?, ?>> handlerSupplier;
 
-    public HandlerRequestBuilder<Map<String, Object>> getRequestBuilder() {
+    protected HandlerRequestBuilder<Map<String, Object>> getRequestBuilder() {
         if (isNull(requestBuilder)) {
             requestBuilder = new HandlerRequestBuilder<>(JsonUtils.objectMapper);
         }
         return requestBuilder;
     }
 
-    public void setRequestBuilder(HandlerRequestBuilder<Map<String, Object>> requestBuilder) {
+    protected void setRequestBuilder(HandlerRequestBuilder<Map<String, Object>> requestBuilder) {
         this.requestBuilder = requestBuilder;
     }
 
-    public DatabaseServiceImpl getDatabaseService() {
+    protected DatabaseServiceImpl getDatabaseService() {
         return databaseService;
     }
 
-    public void setDatabaseService(DatabaseServiceImpl databaseService) {
+    protected void setDatabaseService(DatabaseServiceImpl databaseService) {
         this.databaseService = databaseService;
     }
 
-    public <T> GatewayResponse<T> getApiGatewayResponse(Class<T> responseBodyClass) throws JsonProcessingException {
+    protected <T> GatewayResponse<T> getApiGatewayResponse(Class<T> responseBodyClass) throws IOException {
         JavaType typeRef = JsonUtils.objectMapper.getTypeFactory()
-            .constructParametricType(GatewayResponse.class, responseBodyClass);
+            .constructParametrizedType(GatewayResponse.class, GatewayResponse.class, responseBodyClass);
         return JsonUtils.objectMapper.readValue(requestResponse, typeRef);
     }
 
-    public String getResponseString() throws JsonProcessingException {
-        return this.requestResponse;
+    protected <T> T getResponseBody(Class<T> clazz) throws IOException {
+        return getApiGatewayResponse(clazz).getBodyObject(clazz);
     }
 
-    public <T> T getResponseBody(Class<T> clazz) throws JsonProcessingException {
-        return  getApiGatewayResponse(clazz).getBodyObject(clazz);
-    }
-
-    public void setRequestResponse(String requestResponse) {
+    protected void setRequestResponse(String requestResponse) {
         this.requestResponse = requestResponse;
     }
 
-    public Supplier<? extends ApiGatewayHandler<?, ?>> getHandlerSupplier() {
+    protected Supplier<? extends ApiGatewayHandler<?, ?>> getHandlerSupplier() {
         return Optional.ofNullable(handlerSupplier)
             .orElseThrow(() -> new IllegalStateException(API_GATEWAY_SUPPLIER_HAS_NOT_BEEN_SET));
     }
 
-    public void setHandlerSupplier(Supplier<? extends ApiGatewayHandler<?, ?>> handlerSupplier) {
+    protected void setHandlerSupplier(Supplier<? extends ApiGatewayHandler<?, ?>> handlerSupplier) {
         this.handlerSupplier = handlerSupplier;
     }
 }
