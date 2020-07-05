@@ -12,9 +12,10 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
+import no.unit.nva.handlers.AddRoleHandler;
 import no.unit.nva.model.RoleDto;
-import nva.commons.handlers.GatewayResponse;
 import nva.commons.utils.JsonUtils;
 
 public class AddRoleFt extends ScenarioTest {
@@ -30,27 +31,46 @@ public class AddRoleFt extends ScenarioTest {
         // do nothing
     }
 
+    @Given("that the authorized client intends to add a new Role")
+    public void that_an_authorized_client_intends_to_add_new_Role_withe_role_name() {
+        Supplier<AddRoleHandler> addRoleHandlerSupplier =
+            () -> new AddRoleHandler(mockEnvironment(), scenarioContext.getDatabaseService());
+        scenarioContext.setHandlerSupplier(addRoleHandlerSupplier);
+    }
 
     @Then("a new role is stored in the database")
     public void a_new_role_is_stored_in_the_database() throws InvalidRoleInternalException, JsonProcessingException {
-        GatewayResponse<RoleDto> response = GatewayResponse.fromString(scenarioContext.getRequestResponse());
-        RoleDto resultObject = response.getBodyObject(RoleDto.class);
-        Optional<RoleDto> savedRole = scenarioContext.getDatabaseService().getRole(resultObject);
-        assertTrue(savedRole.isPresent());
-        assertThat(savedRole.get(), is(equalTo(resultObject)));
-        assertThat(savedRole.get(), is(not(sameInstance(resultObject))));
+
+        RoleDto responseObject = fetchResponseBody();
+        Optional<RoleDto> objectReadDirectlyFromDatabase = readRoleDirectlyFromDatabase(responseObject);
+        assertTrue(objectReadDirectlyFromDatabase.isPresent());
+        assertThat(objectReadDirectlyFromDatabase.get(), is(equalTo(responseObject)));
+        assertThat(objectReadDirectlyFromDatabase.get(), is(not(sameInstance(responseObject))));
     }
 
     @Then("the description of the role is returned to the authorized client")
     public void the_description_of_the_role_is_returned_to_the_authorized_client() throws JsonProcessingException {
-        GatewayResponse<RoleDto> response = GatewayResponse.fromString(scenarioContext.getRequestResponse());
-        RoleDto responseObject = response.getBodyObject(RoleDto.class);
-        Map<String, Object> requestObjectMap = scenarioContext.getRequestBuilder().getBody(createRequestBuilderTypeRef());
-        RoleDto requestObject = JsonUtils.objectMapper.convertValue(requestObjectMap, RoleDto.class);
+        RoleDto responseObject = fetchResponseBody();
+        Map<String, Object> requestObjectMap = fetchOriginalRequestParametersAsMap();
+        RoleDto requestObject = convertRequestBodyToRoleDto(requestObjectMap);
         assertThat(requestObject, is(equalTo(responseObject)));
     }
 
+    private Optional<RoleDto> readRoleDirectlyFromDatabase(RoleDto responseObject) throws InvalidRoleInternalException {
+        return scenarioContext.getDatabaseService().getRole(responseObject);
+    }
 
+    private RoleDto convertRequestBodyToRoleDto(Map<String, Object> requestObjectMap) {
+        return JsonUtils.objectMapper.convertValue(requestObjectMap, RoleDto.class);
+    }
 
+    private RoleDto fetchResponseBody() throws JsonProcessingException {
+        return scenarioContext.getResponseBody(RoleDto.class);
+    }
 
+    private Map<String, Object> fetchOriginalRequestParametersAsMap()
+        throws JsonProcessingException {
+        return scenarioContext.getRequestBuilder()
+            .getBody(createRequestBuilderTypeRef());
+    }
 }

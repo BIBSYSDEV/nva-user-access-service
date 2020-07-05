@@ -2,6 +2,9 @@ package features;
 
 import static features.ScenarioTest.IGNORE_HEADER_ROW;
 import static features.ScenarioTest.createRequestBuilderTypeRef;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
@@ -10,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.After;
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,15 +23,18 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.DatabaseServiceImpl;
-import no.unit.nva.handlers.AddRoleHandler;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.handlers.ApiGatewayHandler;
+import nva.commons.handlers.GatewayResponse;
 import nva.commons.utils.JsonUtils;
+import org.apache.http.HttpStatus;
+import org.zalando.problem.Problem;
 
-public class ScenarioCommons extends DatabaseAccessor {
+public class ScenarioCommonSteps extends DatabaseAccessor {
 
     private final ScenarioContext scenarioContext;
 
-    public ScenarioCommons(ScenarioContext scenarioContext) {
+    public ScenarioCommonSteps(ScenarioContext scenarioContext) {
         this.scenarioContext = scenarioContext;
     }
 
@@ -43,10 +50,6 @@ public class ScenarioCommons extends DatabaseAccessor {
         scenarioContext.getRequestBuilder().withHttpMethod(httpMethod.toUpperCase());
     }
 
-    private HandlerRequestBuilder<Map<String, Object>> createRequestBuilder() {
-        return new HandlerRequestBuilder<>(JsonUtils.objectMapper);
-    }
-
     @Given("the request contains a JSON body with following key-value pairs")
     public void the_request_contains_a_Json_body_with_following_key_value_pairs(DataTable dataTable)
         throws JsonProcessingException {
@@ -57,15 +60,35 @@ public class ScenarioCommons extends DatabaseAccessor {
     @When("the authorized client sends the request")
     public void the_authorized_client_sends_the_request() throws IOException {
         InputStream request = buildRequestInputStream();
-        ByteArrayOutputStream outputStream = invokeAddRoleHandler(request);
+        ByteArrayOutputStream outputStream = invokeHandler(request);
         scenarioContext.setRequestResponse(outputStream.toString());
     }
 
-    private ByteArrayOutputStream invokeAddRoleHandler(InputStream request) throws IOException {
-        AddRoleHandler addRoleHandler = new AddRoleHandler(mockEnvironment(), scenarioContext.getDatabaseService());
+    @Then("a NotFound message is returned")
+    public void a_NotFound_message_is_returned() throws IOException {
+        GatewayResponse<Problem> response = scenarioContext.getApiGatewayResponse(Problem.class);
+        assertThat(response.getStatusCode(),is(equalTo(HttpStatus.SC_NOT_FOUND)));
+    }
+
+    /**
+     * After each scenario close the local database.
+     */
+    @After
+    @Override
+    public void closeDB() {
+        super.closeDB();
+    }
+
+    private HandlerRequestBuilder<Map<String, Object>> createRequestBuilder() {
+        return new HandlerRequestBuilder<>(JsonUtils.objectMapper);
+    }
+
+    private ByteArrayOutputStream invokeHandler(InputStream request) throws IOException {
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Context context = mock(Context.class);
-        addRoleHandler.handleRequest(request, outputStream, context);
+        ApiGatewayHandler<?, ?> handler = scenarioContext.getHandlerSupplier().get();
+        handler.handleRequest(request, outputStream, context);
         return outputStream;
     }
 
@@ -84,14 +107,5 @@ public class ScenarioCommons extends DatabaseAccessor {
         return Optional.ofNullable(scenarioContext.getRequestBuilder()
             .getBody(createRequestBuilderTypeRef()))
             .orElse(new ConcurrentHashMap<>());
-    }
-
-    /**
-     * After each scenario close the local database.
-     */
-    @After
-    @Override
-    public void closeDB() {
-        super.closeDB();
     }
 }

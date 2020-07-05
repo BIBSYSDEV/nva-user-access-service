@@ -14,21 +14,19 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import no.unit.nva.exceptions.InvalidInputRoleException;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.handlers.GetRoleHandler;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.handlers.GatewayResponse;
-import org.apache.http.HttpStatus;
-import org.zalando.problem.Problem;
 
 public class GetRoleFt extends ScenarioTest {
 
@@ -46,6 +44,13 @@ public class GetRoleFt extends ScenarioTest {
         this.scenarioContext = scenarioContext;
     }
 
+    @Given("that the authorized client intends to read a Role")
+    public void that_the_authorized_client_intends_to_read_a_Role() {
+        Supplier<GetRoleHandler> getRoleHandlerSupplier = () -> new GetRoleHandler(mockEnvironment(),
+            scenarioContext.getDatabaseService());
+        scenarioContext.setHandlerSupplier(getRoleHandlerSupplier);
+    }
+
     @Given("that there is a role with role-name {string}")
     public void that_there_is_a_role_with_rolename(String roleName)
         throws InvalidInputRoleException, InvalidRoleInternalException {
@@ -58,21 +63,13 @@ public class GetRoleFt extends ScenarioTest {
     public void that_there_is_no_role_with_role_name(String roleName) throws InvalidRoleInternalException {
         RoleDto queryObject = RoleDto.newBuilder().withName(roleName).build();
         Optional<RoleDto> queryResult = scenarioContext.getDatabaseService().getRole(queryObject);
-        assertThat(queryResult.isEmpty(),is(equalTo(true)));
+        assertThat(queryResult.isEmpty(), is(equalTo(true)));
     }
-
-    @Then("a NotFound message is returned")
-    public void a_NotFound_message_is_returned() throws IOException {
-        ByteArrayOutputStream outputStream = executeRequest();
-        GatewayResponse<Problem> response = GatewayResponse.fromOutputStream(outputStream);
-        assertThat(response.getStatusCode(),is(equalTo(HttpStatus.SC_NOT_FOUND)));
-    }
-
 
     @Given("the request has the following path parameters:")
     public void the_request_has_the_following_path_parameters(io.cucumber.datatable.DataTable pathTable) {
         Map<String, String> pathParameters = pathTable.rows(IGNORE_HEADER_ROW).asMap(String.class, String.class);
-        this.scenarioContext.setRequestBuilder(new HandlerRequestBuilder<Map<String,Object>>(objectMapper)
+        this.scenarioContext.setRequestBuilder(new HandlerRequestBuilder<Map<String, Object>>(objectMapper)
             .withPathParameters(pathParameters));
     }
 
@@ -83,14 +80,6 @@ public class GetRoleFt extends ScenarioTest {
         actualRoleDto = response.getBodyObject(RoleDto.class);
     }
 
-    private ByteArrayOutputStream executeRequest() throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        InputStream inputStream = this.scenarioContext.getRequestBuilder().build();
-        GetRoleHandler getRoleHandler = new GetRoleHandler(mockEnvironment(), scenarioContext.getDatabaseService());
-        getRoleHandler.handleRequest(inputStream, outputStream, context);
-        return outputStream;
-    }
-
     @Then("the role description contains the following fields and respective values:")
     public void the_role_description_contains_the_following_fields_and_respective_values(DataTable dataTable)
         throws IOException {
@@ -98,6 +87,14 @@ public class GetRoleFt extends ScenarioTest {
             .asMap(String.class, String.class);
         Map<String, String> actualFieldValuePairs = propertyValues(actualRoleDto);
         compareExpectedAndActualValues(expectedFieldValuePairs, actualFieldValuePairs);
+    }
+
+    private ByteArrayOutputStream executeRequest() throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        InputStream inputStream = this.scenarioContext.getRequestBuilder().build();
+        GetRoleHandler getRoleHandler = new GetRoleHandler(mockEnvironment(), scenarioContext.getDatabaseService());
+        getRoleHandler.handleRequest(inputStream, outputStream, context);
+        return outputStream;
     }
 
     private void compareExpectedAndActualValues(Map<String, String> fieldValuePairs, Map<String, String> propValues) {

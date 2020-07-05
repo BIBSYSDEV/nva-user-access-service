@@ -5,6 +5,8 @@ import static java.util.function.Predicate.not;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Optional;
 import java.util.function.Supplier;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.exceptions.BadRequestException;
@@ -44,7 +46,9 @@ public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
     }
 
     @Override
-    protected RoleDto processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+    @POST
+    @Path("/roles/{role}")
+    public RoleDto processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         String roleName = roleNameThatIsNotNullOrBlank(requestInfo);
 
         RoleDto searchObject = RoleDto.newBuilder().withName(roleName).build();

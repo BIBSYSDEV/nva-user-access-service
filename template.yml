@@ -119,8 +119,6 @@ Resources:
               type: "apiKey"
               name: "Authorization"
               in: "header"
-
-
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
     Properties:
