@@ -5,6 +5,9 @@ Description: >
   The resources for providing a service for listing users and roles.
   It includes a table containing users and roles and lambda functions for accessing the data.
 
+Parameters:
+  CognitoAuthorizerArn:
+    Type: String
 
 Resources:
   RestApi:
@@ -17,7 +20,7 @@ Resources:
         DefaultAuthorizer: CognitoAuthentication
         Authorizers:
           CognitoAuthentication:
-            UserPoolArn: 'arn:aws:cognito-idp:eu-west-1:884807050265:userpool/eu-west-1_XUZ0npK9d'
+            UserPoolArn: !Ref CognitoAuthorizerArn
             AuthType: "COGNITO_USER_POOLS"
       DefinitionBody:
         openapi: 3.0
@@ -119,6 +122,11 @@ Resources:
               type: "apiKey"
               name: "Authorization"
               in: "header"
+              x-amazon-apigateway-authtype: cognito_user_pools
+              x-amazon-apigateway-authorizer:
+                type: cognito_user_pools
+                providerARNs:
+                  - !Ref CognitoAuthorizerArn
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
     Properties:
