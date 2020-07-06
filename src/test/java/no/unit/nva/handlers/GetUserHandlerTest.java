@@ -1,0 +1,79 @@
+package no.unit.nva.handlers;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.mockito.Mockito.mock;
+
+import com.amazonaws.services.lambda.runtime.Context;
+import java.util.Collections;
+import no.unit.nva.database.DatabaseService;
+import no.unit.nva.database.DatabaseServiceImpl;
+import no.unit.nva.database.DatabaseTest;
+import no.unit.nva.exceptions.ConflictException;
+import no.unit.nva.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.InvalidUserInternalException;
+import no.unit.nva.model.RoleDto;
+import no.unit.nva.model.UserDto;
+import nva.commons.exceptions.ApiGatewayException;
+import nva.commons.handlers.RequestInfo;
+import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+class GetUserHandlerTest extends DatabaseTest {
+
+    public static final String SOME_USERNAME = "sampleUsername";
+    public static final String SOME_ROLE = "SomeRole";
+    public static final String SOME_INSTITUTION = "SomeInstitution";
+
+    private DatabaseService databaseService;
+    private RequestInfo requestInfo;
+    private Context context;
+    private GetUserHandler getUserHandler;
+
+    @BeforeEach
+    public void init() {
+        databaseService = new DatabaseServiceImpl(initializeTestDatabase());
+        getUserHandler = new GetUserHandler(mockEnvironment(), databaseService);
+        context = mock(Context.class);
+    }
+
+    @Test
+    void getSuccessStatusCodeReturnsOK() {
+        Integer actual = getUserHandler.getSuccessStatusCode(null, null);
+        assertThat(actual, is(equalTo(HttpStatus.SC_OK)));
+    }
+
+    @DisplayName("processInput() returns UserDto when path parameter contains the username of an existing user")
+    @Test
+    void processInputReturnsUserDtoWhenPathParameterContainsTheUsernameOfExistingUser() throws ApiGatewayException {
+        requestInfo = createRequestInfoForGetUser();
+        UserDto expected = insertSampleUserToDatabase();
+        UserDto actual = getUserHandler.processInput(null, requestInfo, context);
+        assertThat(actual, is(equalTo(expected)));
+    }
+
+    private UserDto insertSampleUserToDatabase()
+        throws InvalidUserInternalException, ConflictException, InvalidRoleInternalException {
+        UserDto sampleUser = createSampleUser();
+        databaseService.addUser(sampleUser);
+        return sampleUser;
+    }
+
+    private UserDto createSampleUser() throws InvalidUserInternalException, InvalidRoleInternalException {
+        RoleDto someRole = RoleDto.newBuilder().withName(SOME_ROLE).build();
+        return UserDto.newBuilder()
+            .withUsername(SOME_USERNAME)
+            .withRoles(Collections.singletonList(someRole))
+            .withInstitution(SOME_INSTITUTION)
+            .build();
+    }
+
+    private RequestInfo createRequestInfoForGetUser() {
+        RequestInfo reqInfo = new RequestInfo();
+        reqInfo.setPathParameters(Collections.singletonMap(GetUserHandler.USERNAME_PATH_PARAMETER, SOME_USERNAME));
+        return reqInfo;
+    }
+}
