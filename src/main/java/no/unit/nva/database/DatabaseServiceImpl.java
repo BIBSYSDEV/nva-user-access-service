@@ -17,6 +17,7 @@ import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidInputRoleException;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.exceptions.InvalidUserInternalException;
+import no.unit.nva.model.JsonSerializable;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 import nva.commons.utils.JacocoGenerated;
@@ -31,10 +32,14 @@ public class DatabaseServiceImpl implements DatabaseService {
     public static final String RANGE_KEY_NAME = "PK1B";
     public static final String INVALID_USER_IN_DATABASE = "Invalid user stored in the database:";
     public static final String INVALID_ROLE_ERROR = "InvalidRole, null object or missing data.";
-    public static final String USER_ALREAD_EXISTS_ERROR_MESSAGE = "User already exists:";
+    public static final String USER_ALREADY_EXISTS_ERROR_MESSAGE = "User already exists:";
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
     public static final String EMPTY_INPUT_ERROR = "empty input";
+    public static final String GET_USER_DEBUG_MESSAGE = "Getting user:";
+    public static final String ADD_USER_DEBUG_MESSAGE = "Adding user:";
+    public static final String ADD_ROLE_DEBUG_MESSAGE = "Adding role:";
+    public static final String GET_ROLE_DEBUG_MESSAGE = "Getting role:";
     private final DynamoDBMapper mapper;
     private AmazonDynamoDB client;
 
@@ -59,7 +64,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     public Optional<UserDto> getUser(UserDto queryObject) throws InvalidUserInternalException {
         logger.debug(
-            "Adding user:" + Optional.ofNullable(queryObject).map(UserDto::toString).orElse(EMPTY_INPUT_ERROR));
+            GET_USER_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(queryObject));
         DynamoDBQueryExpression<UserDb> searchUserRequest = createGetQuery(queryObject.toUserDb());
         List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserRequest);
 
@@ -74,9 +79,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public void addUser(UserDto user) throws InvalidUserInternalException, ConflictException {
-        logger.debug("Adding user:" + Optional.ofNullable(user).map(UserDto::toString).orElse(EMPTY_INPUT_ERROR));
+        logger.debug(ADD_USER_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(user));
         if (userAlreadyExists(user)) {
-            throw new ConflictException(USER_ALREAD_EXISTS_ERROR_MESSAGE + user.getUsername());
+            throw new ConflictException(USER_ALREADY_EXISTS_ERROR_MESSAGE + user.getUsername());
         }
         mapper.save(user.toUserDb());
     }
@@ -87,7 +92,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public void addRole(RoleDto roleDto) throws InvalidInputRoleException {
-        logger.debug("Adding role:" + Optional.ofNullable(roleDto).map(RoleDto::toString).orElse(EMPTY_INPUT_ERROR));
+        logger.debug(ADD_ROLE_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(roleDto));
         Try.of(roleDto)
             .forEach(role -> mapper.save(roleDto.toRoleDb()))
             .orElseThrow(failure -> new InvalidInputRoleException(INVALID_ROLE_ERROR));
@@ -100,8 +105,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public Optional<RoleDto> getRole(RoleDto queryObject) throws InvalidRoleInternalException {
-        logger.debug(
-            "Adding role:" + Optional.ofNullable(queryObject).map(RoleDto::toString).orElse(EMPTY_INPUT_ERROR));
+        logger.debug(GET_ROLE_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(queryObject));
         RoleDb searchObject = queryObject.toRoleDb();
         DynamoDBQueryExpression<RoleDb> searchRoleByName = createGetQuery(searchObject);
 
@@ -113,6 +117,10 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .map(attempt -> attempt.orElseThrow(this::unexpectedException))
                 .collect(SingletonCollector.collectOrElse(null));
         return Optional.ofNullable(retrievedRole);
+    }
+
+    private static String convertToStringOrWriteErrorMessage(JsonSerializable queryObject) {
+        return Optional.ofNullable(queryObject).map(JsonSerializable::toString).orElse(EMPTY_INPUT_ERROR);
     }
 
     private static <I extends WithType> DynamoDBQueryExpression<I> createGetQuery(I searchObject) {

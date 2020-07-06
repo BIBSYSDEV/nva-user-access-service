@@ -1,6 +1,11 @@
 package no.unit.nva.model;
 
 import static no.unit.nva.hamcrest.DoesNotHaveNullOrEmptyFields.doesNotHaveNullOrEmptyFields;
+import static no.unit.nva.handlers.UserDtoCreator.SOME_ROLENAME;
+import static no.unit.nva.handlers.UserDtoCreator.SOME_USERNAME;
+import static no.unit.nva.handlers.UserDtoCreator.createUserWithRoleWithoutInstitution;
+import static no.unit.nva.handlers.UserDtoCreator.createUserWithRolesAndInstitution;
+import static no.unit.nva.handlers.UserDtoCreator.createUserWithoutUsername;
 import static no.unit.nva.model.UserDto.ERROR_DUE_TO_INVALID_ROLE;
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import no.unit.nva.database.RoleDb;
@@ -24,7 +28,6 @@ import no.unit.nva.database.UserDb;
 import no.unit.nva.exceptions.EmptyUsernameException;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.exceptions.InvalidUserInternalException;
-import no.unit.nva.handlers.UserDtoCreator;
 import no.unit.nva.model.UserDto.Builder;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
@@ -35,7 +38,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class UserDtoTest implements UserDtoCreator {
+public class UserDtoTest {
 
     public static final List<RoleDto> sampleRoles = createSampleRoles();
     public static final String SOME_INSTITUTION = "someInstitution";
@@ -121,7 +124,7 @@ public class UserDtoTest implements UserDtoCreator {
         List<RoleDto> invalidRoles = Collections.singletonList(invalidRole);
         UserDto userWithInvalidRole = UserDto.newBuilder().withUsername(SOME_USERNAME).withRoles(invalidRoles).build();
 
-        Executable action = () -> userWithInvalidRole.toUserDb();
+        Executable action = userWithInvalidRole::toUserDb;
         assertThrows(RuntimeException.class, action);
 
         assertThat(appender.getMessages(), containsString(ERROR_DUE_TO_INVALID_ROLE));
@@ -158,7 +161,7 @@ public class UserDtoTest implements UserDtoCreator {
         throws InvalidUserInternalException, NoSuchMethodException, InvalidRoleInternalException,
                IllegalAccessException, InvocationTargetException {
         UserDto userDto = createUserWithoutUsername();
-        Executable action = () -> userDto.validate();
+        Executable action = userDto::validate;
         assertThrows(EmptyUsernameException.class, action);
     }
 
@@ -169,7 +172,7 @@ public class UserDtoTest implements UserDtoCreator {
 
     private static List<RoleDto> createSampleRoles() {
         try {
-            return Arrays.asList(RoleDto.newBuilder().withName(SOME_ROLENAME).build());
+            return Collections.singletonList(RoleDto.newBuilder().withName(SOME_ROLENAME).build());
         } catch (InvalidRoleInternalException e) {
             throw new RuntimeException(e);
         }
