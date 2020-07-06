@@ -1,7 +1,6 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.nonNull;
-import static no.unit.nva.database.DatabaseService.TABLE_NAME;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,31 +19,38 @@ import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import java.util.ArrayList;
 import java.util.List;
 import no.unit.nva.database.intefaces.WithEnvironment;
+import nva.commons.utils.Environment;
 import org.junit.jupiter.api.AfterEach;
 
 public abstract class DatabaseAccessor implements WithEnvironment {
 
+    public static final String USERS_AND_ROLES_TABLE = "UsersAndRolesTable";
+    protected final Environment envWithTableName = mockEnvironment(USERS_AND_ROLES_TABLE);
     protected AmazonDynamoDB localDynamo;
 
+    public DatabaseServiceImpl createDatabaseServiceUsingLocalStorage() {
+        return new DatabaseServiceImpl(initializeTestDatabase(), envWithTableName);
+    }
+
     /**
-     * Initializes a local database.
+     * Initializes a local database. The client is stored in the {@code localDynamo variable}
      *
      * @return a client connected to the local database
      */
     public AmazonDynamoDB initializeTestDatabase() {
 
         localDynamo = DynamoDBEmbedded.create().amazonDynamoDB();
-
+        String tableName = envWithTableName.readEnv(DatabaseService.USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE);
         String hashKeyName = "PK1A";
         String sortKeyName = "PK1B";
-        CreateTableResult res = createTable(localDynamo, TABLE_NAME, hashKeyName, sortKeyName);
+        CreateTableResult res = createTable(localDynamo, tableName, hashKeyName, sortKeyName);
         TableDescription tableDesc = res.getTableDescription();
-        assertEquals(TABLE_NAME, tableDesc.getTableName());
+        assertEquals(tableName, tableDesc.getTableName());
         assertThat(tableDesc.getKeySchema().toString(), containsString(hashKeyName));
         assertThat(tableDesc.getKeySchema().toString(), containsString(sortKeyName));
 
         assertEquals("ACTIVE", tableDesc.getTableStatus());
-        assertThat(tableDesc.getTableArn(), containsString(TABLE_NAME));
+        assertThat(tableDesc.getTableArn(), containsString(tableName));
         ListTablesResult tables = localDynamo.listTables();
         assertEquals(1, tables.getTableNames().size());
         return localDynamo;

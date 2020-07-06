@@ -29,7 +29,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
 
     @BeforeEach
     public void init() throws InvalidUserInternalException {
-        db = new DatabaseServiceImpl(initializeTestDatabase());
+        db = createDatabaseServiceUsingLocalStorage();
         sampleUser = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
     }
 

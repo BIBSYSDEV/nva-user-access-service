@@ -10,7 +10,7 @@ import no.unit.nva.model.UserDto;
 
 public interface DatabaseService {
 
-    String TABLE_NAME = "UsersRoles";
+    String USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE = "USERS_AND_ROLES_TABLE";
 
     Optional<UserDto> getUser(UserDto queryObject) throws InvalidUserInternalException;
 

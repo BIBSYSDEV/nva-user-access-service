@@ -17,7 +17,7 @@ import no.unit.nva.database.intefaces.WithCopy;
 import no.unit.nva.exceptions.InvalidUserInternalException;
 import nva.commons.utils.JacocoGenerated;
 
-@DynamoDBTable(tableName = "UsersRoles")
+@DynamoDBTable(tableName = "OverridenByEnvironmentVariable")
 @DynamoDBTyped
 public class UserDb extends DynamoEntry implements WithCopy<Builder> {
 

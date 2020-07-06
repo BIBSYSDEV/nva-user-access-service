@@ -40,8 +40,7 @@ public class ScenarioCommonSteps extends DatabaseAccessor {
 
     @Given("a database for users and roles")
     public void a_database_for_users_and_roles() {
-        DynamoDBMapper mapper = new DynamoDBMapper(initializeTestDatabase());
-        this.scenarioContext.setDatabaseService(new DatabaseServiceImpl(mapper));
+        this.scenarioContext.setDatabaseService(createDatabaseServiceUsingLocalStorage());
     }
 
     @Given("the authorized client forms a {string} request")

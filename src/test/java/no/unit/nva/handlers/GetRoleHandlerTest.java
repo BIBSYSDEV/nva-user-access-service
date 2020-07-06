@@ -39,7 +39,7 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
      */
     @BeforeEach
     public void init() {
-        databaseService = new DatabaseServiceImpl(initializeTestDatabase());
+        databaseService = createDatabaseServiceUsingLocalStorage();
         getRoleHandler = new GetRoleHandler(mockEnvironment(), databaseService);
         context = mock(Context.class);
     }

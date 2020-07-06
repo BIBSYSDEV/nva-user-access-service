@@ -12,7 +12,7 @@ import no.unit.nva.database.intefaces.WithCopy;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
 import nva.commons.utils.JacocoGenerated;
 
-@DynamoDBTable(tableName = "UsersRoles")
+@DynamoDBTable(tableName = "OverridenByEnvironmentVariable")
 public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder> {
 
     private static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey should start with \"ROLE\"";
