@@ -101,6 +101,30 @@ Resources:
                 responses: {}
                 httpMethod: POST
                 type: aws_proxy
+          /users/{username}:
+            get:
+              summary: Gets an existing User
+              parameters:
+                - in: path
+                  name: username
+                  schema:
+                    type: string
+                  required: true
+              security:
+                - CognitoAuthentication: []
+              responses:
+                '200':
+                  description: Successful fetching of User. Returns the requested User
+                  content:
+                    "application/json":
+                      schema:
+                        $ref: '#/components/schemas/User'
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUserHandler.Arn}/invocations
+                responses: {}
+                httpMethod: POST
+                type: aws_proxy
         components:
           schemas:
             Role:
@@ -235,4 +259,24 @@ Resources:
           Properties:
             Path: /users
             Method: post
+            RestApiId: !Ref RestApi
+
+  GetUserHandler:
+    DependsOn: [ LambdaRole, UserRoleMappings]
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.GetUserHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /users/{username}
+            Method: get
             RestApiId: !Ref RestApi
