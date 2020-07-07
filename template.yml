@@ -6,6 +6,7 @@ Description: >
   It includes a table containing users and roles and lambda functions for accessing the data.
 
 Parameters:
+
   CognitoAuthorizerArn:
     Type: String
 
