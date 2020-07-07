@@ -149,8 +149,8 @@ Resources:
               x-amazon-apigateway-authtype: COGNITO_USER_POOLS
               x-amazon-apigateway-authorizer:
                 type: COGNITO_USER_POOLS
-                  providerARNs:
-                    - !Ref CognitoAuthorizerArn
+                providerARNs:
+                  - !Ref CognitoAuthenticatorArn
 
 
   UserRoleMappings:
