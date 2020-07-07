@@ -146,6 +146,11 @@ Resources:
               type: "apiKey"
               name: "Authorization"
               in: "header"
+              x-amazon-apigateway-authtype: COGNITO_USER_POOLS
+              x-amazon-apigateway-authorizer:
+                type: COGNITO_USER_POOLS
+                  providerARNs:
+                    - !Ref CognitoAuthorizerArn
 
 
   UserRoleMappings:
