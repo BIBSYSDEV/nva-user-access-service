@@ -5,6 +5,9 @@ Description: >
   The resources for providing a service for listing users and roles.
   It includes a table containing users and roles and lambda functions for accessing the data.
 
+Parameters:
+  CognitoAuthenticatorArn:
+    Type: String
 
 Resources:
   RestApi:
@@ -17,7 +20,7 @@ Resources:
         DefaultAuthorizer: CognitoAuthentication
         Authorizers:
           CognitoAuthentication:
-            UserPoolArn: 'arn:aws:cognito-idp:eu-west-1:884807050265:userpool/eu-west-1_XUZ0npK9d'
+            UserPoolArn: !Ref CognitoAuthenticatorArn
             AuthType: "COGNITO_USER_POOLS"
       DefinitionBody:
         openapi: 3.0
