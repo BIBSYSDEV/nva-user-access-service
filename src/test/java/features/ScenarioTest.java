@@ -63,8 +63,7 @@ public class ScenarioTest implements WithEnvironment {
         InputStream request) throws IOException {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Context context = mock(Context.class);
-        handler.handleRequest(request, outputStream, context);
+        handler.handleRequest(request, outputStream,  mock(Context.class));
         return outputStream;
     }
 

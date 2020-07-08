@@ -88,21 +88,13 @@ public class GetRoleFt extends ScenarioTest {
     }
 
     @When("the authorized client sends the request to read the role")
-    public void theAuthorizedClientSendsTheRequestToReadTheRoleWithRoleName() throws IOException {
+    public void the_authorized_client_sends_the_request_to_read_the_role() throws IOException {
         GetRoleHandler getRoleHandler = new GetRoleHandler(mockEnvironment(), getDatabaseService());
         handlerSendsRequestAndUpdatesResponse(getRoleHandler);
     }
 
     private RoleDto getResponseBody() throws IOException {
         return getResponseBody(RoleDto.class);
-    }
-
-    private ByteArrayOutputStream executeRequest() throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        InputStream inputStream = getRequestBuilder().build();
-        GetRoleHandler getRoleHandler = new GetRoleHandler(mockEnvironment(), getDatabaseService());
-        getRoleHandler.handleRequest(inputStream, outputStream, context);
-        return outputStream;
     }
 
     private void compareExpectedAndActualValues(Map<String, String> fieldValuePairs, Map<String, String> propValues) {
