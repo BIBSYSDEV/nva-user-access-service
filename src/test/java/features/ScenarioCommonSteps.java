@@ -14,7 +14,6 @@ import io.cucumber.datatable.DataTable;
 import io.cucumber.java.After;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,13 +56,6 @@ public class ScenarioCommonSteps extends DatabaseAccessor {
         addFieldsToRequestBody(inputData);
     }
 
-    @When("the authorized client sends the request")
-    public void the_authorized_client_sends_the_request() throws IOException {
-        InputStream request = buildRequestInputStream();
-        ByteArrayOutputStream outputStream = invokeHandler(request);
-        scenarioContext.setRequestResponse(outputStream.toString());
-    }
-
     @Then("a NotFound message is returned")
     public void a_NotFound_message_is_returned() throws IOException {
         GatewayResponse<Problem> response = scenarioContext.getApiGatewayResponse(Problem.class);
@@ -83,18 +75,7 @@ public class ScenarioCommonSteps extends DatabaseAccessor {
         return new HandlerRequestBuilder<>(JsonUtils.objectMapper);
     }
 
-    private ByteArrayOutputStream invokeHandler(InputStream request) throws IOException {
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Context context = mock(Context.class);
-        ApiGatewayHandler<?, ?> handler = scenarioContext.getHandlerSupplier().get();
-        handler.handleRequest(request, outputStream, context);
-        return outputStream;
-    }
-
-    private InputStream buildRequestInputStream() throws JsonProcessingException {
-        return scenarioContext.getRequestBuilder().build();
-    }
 
     private void addFieldsToRequestBody(DataTable inputData) throws JsonProcessingException {
         Map<String, Object> bodyFields = inputData.asMap(String.class, Object.class);
