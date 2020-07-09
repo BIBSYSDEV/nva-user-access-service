@@ -20,7 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-public class DatabaseServiceImplTest extends DatabaseTest {
+public class DatabaseServiceImplTest extends DatabaseAccessor {
 
     public static final String SOME_INSTITUTION = "someInstitution";
     public static final String SOME_USERNAME = "someUsername";

@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
-import no.unit.nva.database.DatabaseTest;
+import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.zalando.problem.Problem;
 
-public class AddRoleHandlerTest extends DatabaseTest {
+public class AddRoleHandlerTest extends DatabaseAccessor {
 
     public static final String SOME_ROLE_NAME = "someRoleName";
     private RoleDto sampleRole;

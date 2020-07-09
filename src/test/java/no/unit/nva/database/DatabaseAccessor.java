@@ -22,7 +22,7 @@ import java.util.List;
 import no.unit.nva.database.intefaces.WithEnvironment;
 import org.junit.jupiter.api.AfterEach;
 
-public abstract class DatabaseTest implements WithEnvironment {
+public abstract class DatabaseAccessor implements WithEnvironment {
 
     protected AmazonDynamoDB localDynamo;
 
