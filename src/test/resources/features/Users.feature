@@ -40,4 +40,51 @@ Feature: Users
     Then a NotFound message is returned
 
 
+  Scenario:  Authorized client updates existing user
+    Given that a user entry with the username "someone@institution" exists in the database
+    And the user entry contains a list of roles with the following role-names
+      | role-name |
+      | RoleA     |
+    And the authorized client forms a "PUT" request
+    And the request has the following path parameters:
+      | parameter | value               |
+      | username  | someone@institution |
+    And the request contains a JSON body with following key-value pairs
+      | key         | value               |
+      | username    | someone@institution |
+      | institution | institution         |
+    And the request body also contains a list of roles with the following role-names
+      | role-name |
+      | RoleB     |
+    When the authorized client sends the request to update the user
+    Then the user entry is updated
+    And a user description is returned
+
+
+  Scenario:  Authorized client updates existing user
+    Given that a user entry with the username "someone@institution" does not exist in the database
+    And the authorized client forms a "PUT" request
+    And the request has the following path parameters:
+      | parameter | value               |
+      | username  | someone@institution |
+    And the request contains a JSON body with following key-value pairs
+      | key         | value               |
+      | username    | someone@institution |
+      | institution | institution         |
+    And the request body also contains a list of roles with the following role-names
+      | role-name |
+      | RoleB     |
+    When the authorized client sends the request to update the user
+    Then a NotFound message is returned
+
+  Scenario:  Authorized client updates existing user
+    Given that a user entry with the username "someone@institution" exists in the database
+    And the authorized client forms a "PUT" request
+    And the request has the following path parameters:
+      | parameter | value               |
+      | username  | someone@institution |
+    And the request contains a malformed JSON body
+    When the authorized client sends the request to update the user
+    Then a BadRequest message is returned
+
 
