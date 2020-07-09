@@ -39,8 +39,8 @@ public class RoleDbTest extends DatabaseAccessor {
 
     @BeforeEach
     void init() {
-        initializeTestDatabase();
-        mapper = new DynamoDBMapper(localDynamo);
+        mapper = DatabaseServiceWithTableNameOverride
+            .createMapperOverridingHardCodedTableName(initializeTestDatabase(), envWithTableName);
     }
 
     @Test

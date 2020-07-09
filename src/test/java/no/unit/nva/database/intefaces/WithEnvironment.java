@@ -8,20 +8,30 @@ public interface WithEnvironment {
     String SOME_ENV_VALUE = "*";
 
     /**
-     * mock environment.
+     * mock environment. Returns "*" for
      *
-     * @return an Environment
+     * @return an Environment that returns "*" for all env variables.
      */
     default Environment mockEnvironment() {
+        return mockEnvironment(SOME_ENV_VALUE);
+    }
+
+    /**
+     * Mock environment.
+     *
+     * @param returnValueForAllEnvVariables the value to be returned for every env variable.
+     * @return return the parameter for every env variable.
+     */
+    default Environment mockEnvironment(String returnValueForAllEnvVariables) {
         return new Environment() {
             @Override
             public String readEnv(String variableName) {
-                return SOME_ENV_VALUE;
+                return returnValueForAllEnvVariables;
             }
 
             @Override
             public Optional<String> readEnvOpt(String variableName) {
-                return Optional.of(SOME_ENV_VALUE);
+                return Optional.of(returnValueForAllEnvVariables);
             }
         };
     }
