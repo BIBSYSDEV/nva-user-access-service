@@ -9,7 +9,6 @@ import static org.mockito.Mockito.mock;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Collections;
 import no.unit.nva.database.DatabaseService;
-import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.exceptions.BadRequestException;
 import no.unit.nva.exceptions.ConflictException;
@@ -40,8 +39,8 @@ class GetUserHandlerTest extends DatabaseAccessor {
 
     @BeforeEach
     public void init() {
-        databaseService = new DatabaseServiceImpl(initializeTestDatabase());
-        getUserHandler = new GetUserHandler(mockEnvironment(), databaseService);
+        databaseService = createDatabaseServiceUsingLocalStorage();
+        getUserHandler = new GetUserHandler(envWithTableName, databaseService);
         context = mock(Context.class);
     }
 

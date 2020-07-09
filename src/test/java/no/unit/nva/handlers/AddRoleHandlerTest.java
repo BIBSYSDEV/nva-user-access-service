@@ -23,6 +23,7 @@ import no.unit.nva.exceptions.InvalidRoleInternalException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.handlers.GatewayResponse;
+import nva.commons.utils.Environment;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
 import org.apache.http.HttpStatus;
@@ -36,8 +37,8 @@ public class AddRoleHandlerTest extends DatabaseAccessor {
     public static final String SOME_ROLE_NAME = "someRoleName";
     private RoleDto sampleRole;
     private AddRoleHandler addRoleHandler;
-
     private Context context;
+
 
     /**
      * init.
@@ -46,9 +47,9 @@ public class AddRoleHandlerTest extends DatabaseAccessor {
      */
     @BeforeEach
     public void init() throws InvalidRoleInternalException {
-        initializeTestDatabase();
         context = mock(Context.class);
-        DatabaseService service = new DatabaseServiceImpl(localDynamo);
+
+        DatabaseService service = new DatabaseServiceImpl(initializeTestDatabase(), envWithTableName);
         addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
         sampleRole = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
     }
@@ -148,7 +149,7 @@ public class AddRoleHandlerTest extends DatabaseAccessor {
     }
 
     private DatabaseServiceImpl databaseServiceWithSyncDelay() {
-        return new DatabaseServiceImpl(localDynamo) {
+        return new DatabaseServiceImpl(localDynamo, envWithTableName) {
             private int counter = 0;
 
             @Override
@@ -163,7 +164,7 @@ public class AddRoleHandlerTest extends DatabaseAccessor {
     }
 
     private DatabaseServiceImpl databaseServiceReturningEmpty() {
-        return new DatabaseServiceImpl(localDynamo) {
+        return new DatabaseServiceImpl(localDynamo, envWithTableName) {
             @Override
             public Optional<RoleDto> getRole(RoleDto queryObject) {
                 return Optional.empty();

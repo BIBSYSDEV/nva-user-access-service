@@ -53,7 +53,7 @@ public class AddUserTest extends DatabaseAccessor {
 
     @BeforeEach
     public void init() {
-        databaseService = new DatabaseServiceImpl(initializeTestDatabase());
+        databaseService = createDatabaseServiceUsingLocalStorage();
         handler = new AddUserHandler(mockEnvironment(), databaseService);
 
         requestInfo = new RequestInfo();
@@ -163,7 +163,7 @@ public class AddUserTest extends DatabaseAccessor {
     }
 
     private DatabaseService databaseServiceThrowsExceptionWhenGettingUserAfterSaving() {
-        return new DatabaseServiceImpl(localDynamo) {
+        return new DatabaseServiceImpl(localDynamo, envWithTableName) {
             private boolean checkingIfUserExists = true;
 
             @Override
@@ -179,7 +179,7 @@ public class AddUserTest extends DatabaseAccessor {
     }
 
     private DatabaseService databaseServiceReturnsAlwaysEmptyUser() {
-        return new DatabaseServiceImpl(localDynamo) {
+        return new DatabaseServiceImpl(localDynamo, envWithTableName) {
             @Override
             public Optional<UserDto> getUser(UserDto queryObject) {
                 return Optional.empty();

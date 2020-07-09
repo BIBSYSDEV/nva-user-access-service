@@ -1,5 +1,6 @@
 package no.unit.nva.database;
 
+import static no.unit.nva.database.DatabaseServiceWithTableNameOverride.createMapperOverridingHardCodedTableName;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
@@ -30,7 +31,7 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
 
     @BeforeEach
     public void init() throws InvalidUserInternalException {
-        mapper = new DynamoDBMapper(initializeTestDatabase());
+        mapper = createMapperOverridingHardCodedTableName(initializeTestDatabase(), envWithTableName);
         someUser = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
     }
 

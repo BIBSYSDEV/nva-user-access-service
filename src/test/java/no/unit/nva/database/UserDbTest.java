@@ -1,5 +1,6 @@
 package no.unit.nva.database;
 
+import static no.unit.nva.database.DatabaseServiceWithTableNameOverride.createMapperOverridingHardCodedTableName;
 import static no.unit.nva.model.DoesNotHaveNullFields.doesNotHaveNullFields;
 import static nva.commons.utils.attempt.Try.attempt;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -100,7 +101,7 @@ public class UserDbTest extends DatabaseAccessor {
 
     @Test
     void userDbShouldBeWriteableToDatabase() {
-        DynamoDBMapper mapper = clientToLocalDatabase();
+        DynamoDBMapper mapper = createMapperOverridingHardCodedTableName(initializeTestDatabase(), envWithTableName);
         assertDoesNotThrow(() -> mapper.save(sampleUser));
     }
 
@@ -154,6 +155,6 @@ public class UserDbTest extends DatabaseAccessor {
     }
 
     private DynamoDBMapper clientToLocalDatabase() {
-        return new DynamoDBMapper(localDynamo);
+        return createMapperOverridingHardCodedTableName(initializeTestDatabase(), envWithTableName);
     }
 }
