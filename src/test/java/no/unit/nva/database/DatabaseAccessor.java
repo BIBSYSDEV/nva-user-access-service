@@ -25,6 +25,9 @@ import org.junit.jupiter.api.AfterEach;
 public abstract class DatabaseAccessor implements WithEnvironment {
 
     public static final String USERS_AND_ROLES_TABLE = "UsersAndRolesTable";
+    public static final String HASH_KEY_NAME = "PK1A";
+    public static final String SORT_KEY_NAME = "PK1B";
+    private static final Long CAPACITY_DOES_NOT_MATTER = 1000L;
     protected final Environment envWithTableName = mockEnvironment(USERS_AND_ROLES_TABLE);
     protected AmazonDynamoDB localDynamo;
 
@@ -39,21 +42,27 @@ public abstract class DatabaseAccessor implements WithEnvironment {
      */
     public AmazonDynamoDB initializeTestDatabase() {
 
-        localDynamo = DynamoDBEmbedded.create().amazonDynamoDB();
-        String tableName = envWithTableName.readEnv(DatabaseService.USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE);
-        String hashKeyName = "PK1A";
-        String sortKeyName = "PK1B";
-        CreateTableResult res = createTable(localDynamo, tableName, hashKeyName, sortKeyName);
+        localDynamo = createLocalDynamoDbMock();
+        String tableName = readTableNableFromEnv();
+        CreateTableResult res = createTable(localDynamo, tableName);
         TableDescription tableDesc = res.getTableDescription();
         assertEquals(tableName, tableDesc.getTableName());
-        assertThat(tableDesc.getKeySchema().toString(), containsString(hashKeyName));
-        assertThat(tableDesc.getKeySchema().toString(), containsString(sortKeyName));
+        assertThat(tableDesc.getKeySchema().toString(), containsString(HASH_KEY_NAME));
+        assertThat(tableDesc.getKeySchema().toString(), containsString(SORT_KEY_NAME));
 
         assertEquals("ACTIVE", tableDesc.getTableStatus());
         assertThat(tableDesc.getTableArn(), containsString(tableName));
         ListTablesResult tables = localDynamo.listTables();
         assertEquals(1, tables.getTableNames().size());
         return localDynamo;
+    }
+
+    private AmazonDynamoDB createLocalDynamoDbMock() {
+        return DynamoDBEmbedded.create().amazonDynamoDB();
+    }
+
+    private String readTableNableFromEnv() {
+        return envWithTableName.readEnv(DatabaseService.USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE);
     }
 
     /**
@@ -66,25 +75,37 @@ public abstract class DatabaseAccessor implements WithEnvironment {
         }
     }
 
-    private static CreateTableResult createTable(AmazonDynamoDB ddb, String tableName, String hashKeyName,
-                                                 String sortKeyName) {
-        List<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
-        attributeDefinitions.add(new AttributeDefinition(hashKeyName, ScalarAttributeType.S));
-        attributeDefinitions.add(new AttributeDefinition(sortKeyName, ScalarAttributeType.S));
-
-        List<KeySchemaElement> ks = new ArrayList<KeySchemaElement>();
-        ks.add(new KeySchemaElement(hashKeyName, KeyType.HASH));
-        ks.add(new KeySchemaElement(sortKeyName, KeyType.RANGE));
-
-        ProvisionedThroughput provisionedthroughput = new ProvisionedThroughput(1000L, 1000L);
+    private static CreateTableResult createTable(AmazonDynamoDB ddb, String tableName) {
+        List<AttributeDefinition> attributeDefinitions = defineKeyAttributes();
+        List<KeySchemaElement> keySchema = defineKeySchema();
+        ProvisionedThroughput provisionedthroughput = provisionedThroughputForLocalDatabase();
 
         CreateTableRequest request =
             new CreateTableRequest()
                 .withTableName(tableName)
                 .withAttributeDefinitions(attributeDefinitions)
-                .withKeySchema(ks)
+                .withKeySchema(keySchema)
                 .withProvisionedThroughput(provisionedthroughput);
 
         return ddb.createTable(request);
+    }
+
+    private static List<KeySchemaElement> defineKeySchema() {
+        List<KeySchemaElement> ks = new ArrayList<>();
+        ks.add(new KeySchemaElement(HASH_KEY_NAME, KeyType.HASH));
+        ks.add(new KeySchemaElement(SORT_KEY_NAME, KeyType.RANGE));
+        return ks;
+    }
+
+    private static List<AttributeDefinition> defineKeyAttributes() {
+        List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
+        attributeDefinitions.add(new AttributeDefinition(HASH_KEY_NAME, ScalarAttributeType.S));
+        attributeDefinitions.add(new AttributeDefinition(SORT_KEY_NAME, ScalarAttributeType.S));
+        return attributeDefinitions;
+    }
+
+    private static ProvisionedThroughput provisionedThroughputForLocalDatabase() {
+        // not sure if provisioned throughput plays any role in Local databases.
+        return new ProvisionedThroughput(CAPACITY_DOES_NOT_MATTER, CAPACITY_DOES_NOT_MATTER);
     }
 }
