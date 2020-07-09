@@ -21,7 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class RoleDbTest extends DatabaseTest {
+public class RoleDbTest extends DatabaseAccessor {
 
     public static final String SOME_ROLE_NAME = "someRoleName";
     public static final String SOME_OTHER_RANGE_KEY = "SomeOtherRangeKey";

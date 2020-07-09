@@ -6,7 +6,8 @@ Description: >
   It includes a table containing users and roles and lambda functions for accessing the data.
 
 Parameters:
-  CognitoAuthenticatorArn:
+
+  CognitoAuthorizerArn:
     Type: String
 
 Globals:
@@ -27,8 +28,8 @@ Resources:
         DefaultAuthorizer: CognitoAuthentication
         Authorizers:
           CognitoAuthentication:
-            UserPoolArn: !Ref CognitoAuthenticatorArn
-            AuthType: "COGNITO_USER_POOLS"
+            UserPoolArn: !Ref CognitoAuthorizerArn
+            AuthType: "cognito_user_pools"
       DefinitionBody:
         openapi: 3.0
         info:
@@ -153,13 +154,11 @@ Resources:
               type: "apiKey"
               name: "Authorization"
               in: "header"
-              x-amazon-apigateway-authtype: COGNITO_USER_POOLS
+              x-amazon-apigateway-authtype: cognito_user_pools
               x-amazon-apigateway-authorizer:
-                type: COGNITO_USER_POOLS
+                type: cognito_user_pools
                 providerARNs:
-                  - !Ref CognitoAuthenticatorArn
-
-
+                  - !Ref CognitoAuthorizerArn
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
     Properties:

@@ -37,14 +37,13 @@ public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
         this(new Environment(), new DatabaseServiceImpl());
     }
 
-    public GetRoleHandler(Environment environment, DatabaseService databaseService
-    ) {
+    public GetRoleHandler(Environment environment, DatabaseService databaseService) {
         super(Void.class, environment, logger);
         this.databaseService = databaseService;
     }
 
     @Override
-    protected RoleDto processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+    public RoleDto processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         String roleName = roleNameThatIsNotNullOrBlank(requestInfo);
 
         RoleDto searchObject = RoleDto.newBuilder().withName(roleName).build();

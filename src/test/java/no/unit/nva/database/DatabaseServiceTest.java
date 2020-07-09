@@ -19,7 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-public class DatabaseServiceTest extends DatabaseTest {
+public class DatabaseServiceTest extends DatabaseAccessor {
 
     public static final String SOME_USERNAME = "someusername";
     public static final String SOME_ROLE = "SomeRole";

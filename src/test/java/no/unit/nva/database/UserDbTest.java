@@ -27,7 +27,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
-public class UserDbTest extends DatabaseTest {
+public class UserDbTest extends DatabaseAccessor {
 
     public static final String SOME_USERNAME = "someUser";
     public static final String SOME_INSTITUTION = "SomeInstitution";
