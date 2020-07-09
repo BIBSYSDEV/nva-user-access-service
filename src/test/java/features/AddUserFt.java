@@ -75,7 +75,7 @@ public class AddUserFt extends ScenarioTest {
     }
 
     @When("the authorized client sends the request to add a new User")
-    public void theAuthorizedClientSendsTheRequestToAddANewUser() throws IOException {
+    public void the_authorized_client_sends_the_request_to_add_a_new_user() throws IOException {
         AddUserHandler handler = new AddUserHandler(mockEnvironment(), getDatabaseService());
         handlerSendsRequestAndUpdatesResponse(handler);
     }
