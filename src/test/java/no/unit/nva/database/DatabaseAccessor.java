@@ -28,6 +28,7 @@ public abstract class DatabaseAccessor implements WithEnvironment {
     public static final String HASH_KEY_NAME = "PK1A";
     public static final String SORT_KEY_NAME = "PK1B";
     private static final Long CAPACITY_DOES_NOT_MATTER = 1000L;
+    public static final int SINGLE_TABLE_EXPECTED = 1;
     protected final Environment envWithTableName = mockEnvironment(USERS_AND_ROLES_TABLE);
     protected AmazonDynamoDB localDynamo;
 
@@ -43,25 +44,31 @@ public abstract class DatabaseAccessor implements WithEnvironment {
     public AmazonDynamoDB initializeTestDatabase() {
 
         localDynamo = createLocalDynamoDbMock();
-        String tableName = readTableNableFromEnv();
-        CreateTableResult res = createTable(localDynamo, tableName);
-        TableDescription tableDesc = res.getTableDescription();
-        assertEquals(tableName, tableDesc.getTableName());
-        assertThat(tableDesc.getKeySchema().toString(), containsString(HASH_KEY_NAME));
-        assertThat(tableDesc.getKeySchema().toString(), containsString(SORT_KEY_NAME));
+        String tableName = readTablenNameFronEnvironment();
+        CreateTableResult createTableResult = createTable(localDynamo, tableName);
+        TableDescription tableDescription = createTableResult.getTableDescription();
+        assertEquals(tableName, tableDescription.getTableName());
 
-        assertEquals("ACTIVE", tableDesc.getTableStatus());
-        assertThat(tableDesc.getTableArn(), containsString(tableName));
+        assertThatTableKeySchemaContainsBothKeys(tableDescription.getKeySchema());
+
+        assertEquals("ACTIVE", tableDescription.getTableStatus());
+        assertThat(tableDescription.getTableArn(), containsString(tableName));
+
         ListTablesResult tables = localDynamo.listTables();
-        assertEquals(1, tables.getTableNames().size());
+        assertEquals(SINGLE_TABLE_EXPECTED, tables.getTableNames().size());
         return localDynamo;
+    }
+
+    private void assertThatTableKeySchemaContainsBothKeys(List<KeySchemaElement> tableKeySchema) {
+        assertThat(tableKeySchema.toString(), containsString(HASH_KEY_NAME));
+        assertThat(tableKeySchema.toString(), containsString(SORT_KEY_NAME));
     }
 
     private AmazonDynamoDB createLocalDynamoDbMock() {
         return DynamoDBEmbedded.create().amazonDynamoDB();
     }
 
-    private String readTableNableFromEnv() {
+    private String readTablenNameFronEnvironment() {
         return envWithTableName.readEnv(DatabaseService.USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE);
     }
 
@@ -91,10 +98,10 @@ public abstract class DatabaseAccessor implements WithEnvironment {
     }
 
     private static List<KeySchemaElement> defineKeySchema() {
-        List<KeySchemaElement> ks = new ArrayList<>();
-        ks.add(new KeySchemaElement(HASH_KEY_NAME, KeyType.HASH));
-        ks.add(new KeySchemaElement(SORT_KEY_NAME, KeyType.RANGE));
-        return ks;
+        List<KeySchemaElement> keySchemaElements = new ArrayList<>();
+        keySchemaElements.add(new KeySchemaElement(HASH_KEY_NAME, KeyType.HASH));
+        keySchemaElements.add(new KeySchemaElement(SORT_KEY_NAME, KeyType.RANGE));
+        return keySchemaElements;
     }
 
     private static List<AttributeDefinition> defineKeyAttributes() {
