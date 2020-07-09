@@ -46,8 +46,8 @@ public class ScenarioContext {
         return JsonUtils.objectMapper.readValue(requestResponse, typeRef);
     }
 
-    protected <T> T getResponseBody(Class<T> clazz) throws IOException {
-        return getApiGatewayResponse(clazz).getBodyObject(clazz);
+    protected <T> T getResponseBody(Class<T> requestBodyClass) throws IOException {
+        return getApiGatewayResponse(requestBodyClass).getBodyObject(requestBodyClass);
     }
 
     protected void setRequestResponse(String requestResponse) {

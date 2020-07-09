@@ -6,10 +6,18 @@ Description: >
   It includes a table containing users and roles and lambda functions for accessing the data.
 
 Parameters:
+
   CognitoAuthorizerArn:
     Type: String
   UsersAndRolesTableName:
     Type: String
+
+Globals:
+  Api:
+    Cors:
+      AllowMethods: "'PUT, POST, GET,OPTIONS'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'"
 
 Resources:
   RestApi:
@@ -23,7 +31,7 @@ Resources:
         Authorizers:
           CognitoAuthentication:
             UserPoolArn: !Ref CognitoAuthorizerArn
-            AuthType: "COGNITO_USER_POOLS"
+            AuthType: "cognito_user_pools"
       DefinitionBody:
         openapi: 3.0
         info:
