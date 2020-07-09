@@ -15,7 +15,7 @@ Globals:
       AllowMethods: "'PUT, POST, GET, OPTIONS'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
       AllowOrigin: "'*'"
-|
+
 Resources:
   RestApi:
     Type: AWS::Serverless::Api
