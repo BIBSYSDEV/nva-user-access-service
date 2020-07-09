@@ -22,13 +22,13 @@ Resources:
     Properties:
       StageName: Prod
       EndpointConfiguration: REGIONAL
-      Auth:
-        ApiKeyRequired: false
-        DefaultAuthorizer: CognitoUserPool
-        Authorizers:
-          CognitoUserPool:
-            UserPoolArn: !Ref CognitoAuthorizerArn
-            AuthType: "cognito_user_pools"
+      #      Auth:
+      #        ApiKeyRequired: false
+      #        DefaultAuthorizer: CognitoUserPool
+      #        Authorizers:
+      #          CognitoUserPool:
+      #            UserPoolArn: !Ref CognitoAuthorizerArn
+      #            AuthType: "cognito_user_pools"
       DefinitionBody:
         openapi: 3.0
         info:
