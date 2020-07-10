@@ -2,9 +2,9 @@ package no.unit.nva.database;
 
 import java.util.Optional;
 import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.InvalidInputRoleException;
-import no.unit.nva.exceptions.InvalidRoleInternalException;
-import no.unit.nva.exceptions.InvalidUserInternalException;
+import no.unit.nva.exceptions.InvalidInputException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
+import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 
@@ -12,13 +12,19 @@ public interface DatabaseService {
 
     String USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE = "USERS_AND_ROLES_TABLE";
 
-    Optional<UserDto> getUser(UserDto queryObject) throws InvalidUserInternalException;
+    UserDto getUser(UserDto queryObject) throws InvalidEntryInternalException, NotFoundException;
 
-    void addUser(UserDto user) throws InvalidUserInternalException, ConflictException;
+    Optional<UserDto> getUserAsOptional(UserDto queryObject) throws InvalidEntryInternalException;
 
-    void addRole(RoleDto roleDto) throws InvalidRoleInternalException, InvalidInputRoleException;
+    void addUser(UserDto user) throws InvalidEntryInternalException, ConflictException, InvalidInputException;
 
-    UserDto updateUser(UserDto user);
+    void addRole(RoleDto roleDto)
+        throws ConflictException, InvalidInputException, InvalidEntryInternalException;
 
-    Optional<RoleDto> getRole(RoleDto input) throws InvalidRoleInternalException;
+    void updateUser(UserDto user)
+        throws InvalidEntryInternalException, NotFoundException, InvalidInputException;
+
+    RoleDto getRole(RoleDto input) throws InvalidEntryInternalException, NotFoundException;
+
+    Optional<RoleDto> getRoleAsOptional(RoleDto input) throws InvalidEntryInternalException;
 }

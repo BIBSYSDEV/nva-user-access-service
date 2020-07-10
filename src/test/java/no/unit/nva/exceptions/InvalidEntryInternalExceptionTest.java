@@ -10,22 +10,22 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-public class InvalidUserInternalExceptionTest {
+public class InvalidEntryInternalExceptionTest {
 
     private static final String SOME_MESSAGE = "SomeMessage";
 
     @Test
     public void invalidUserInternalExceptionHasConstructorWithMessage() {
         Executable action = () -> {
-            throw new InvalidUserInternalException(SOME_MESSAGE);
+            throw new InvalidEntryInternalException(SOME_MESSAGE);
         };
-        InvalidUserInternalException exception = assertThrows(InvalidUserInternalException.class, action);
+        InvalidEntryInternalException exception = assertThrows(InvalidEntryInternalException.class, action);
         assertThat(exception.getMessage(), containsString(SOME_MESSAGE));
     }
 
     @Test
     public void invalidUserInternalExceptionReturnsBadRequest() {
-        InvalidUserInternalException error = new InvalidUserInternalException(SOME_MESSAGE);
+        InvalidEntryInternalException error = new InvalidEntryInternalException(SOME_MESSAGE);
         assertThat(error.statusCode(), is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
     }
 }

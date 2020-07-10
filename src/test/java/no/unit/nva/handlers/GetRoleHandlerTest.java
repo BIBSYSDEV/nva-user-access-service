@@ -13,8 +13,9 @@ import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.intefaces.WithEnvironment;
 import no.unit.nva.exceptions.BadRequestException;
-import no.unit.nva.exceptions.InvalidInputRoleException;
-import no.unit.nva.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.ConflictException;
+import no.unit.nva.exceptions.InvalidInputException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import nva.commons.exceptions.ApiGatewayException;
@@ -53,7 +54,7 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
     @Test
     void processInputReturnsRoleDtoWhenARoleWithTheInputRoleNameExists()
         throws ApiGatewayException {
-        addRoleToDatabase(THE_ROLE);
+        addSampleRoleToDatabase();
         RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
         RoleDto roleDto = getRoleHandler.processInput(null, requestInfo, context);
         assertThat(roleDto.getRoleName(), is(equalTo(THE_ROLE)));
@@ -69,10 +70,10 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
 
     @Test
     void processInputLogsWarningWhenNotFoundExceptionIsThrown() {
-        TestAppender testAppender = LogUtils.getTestingAppender(GetRoleHandler.class);
+        TestAppender testAppender = LogUtils.getTestingAppender(DatabaseServiceImpl.class);
         RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
         attempt(() -> getRoleHandler.processInput(null, requestInfo, context));
-        assertThat(testAppender.getMessages(), containsString(GetRoleHandler.LOG_ROLE_NOT_FOUND));
+        assertThat(testAppender.getMessages(), containsString(DatabaseServiceImpl.ROLE_NOT_FOUND_MESSAGE));
     }
 
     @Test
@@ -97,8 +98,9 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
         return requestInfo;
     }
 
-    private void addRoleToDatabase(String roleName) throws InvalidRoleInternalException, InvalidInputRoleException {
-        RoleDto existingRole = RoleDto.newBuilder().withName(roleName).build();
+    private void addSampleRoleToDatabase()
+        throws InvalidEntryInternalException, ConflictException, InvalidInputException {
+        RoleDto existingRole = RoleDto.newBuilder().withName(GetRoleHandlerTest.THE_ROLE).build();
         databaseService.addRole(existingRole);
     }
 }

@@ -13,7 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import no.unit.nva.database.RoleDb.Builder;
-import no.unit.nva.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -29,7 +30,7 @@ public class RoleDbTest extends DatabaseAccessor {
     private final RoleDb sampleRole = createSampleRole();
     private DynamoDBMapper mapper;
 
-    public RoleDbTest() throws InvalidRoleInternalException {
+    public RoleDbTest() throws InvalidEntryInternalException {
     }
 
     @Test
@@ -50,19 +51,19 @@ public class RoleDbTest extends DatabaseAccessor {
     }
 
     @Test
-    void roleDbHasRoleName() throws InvalidRoleInternalException {
+    void roleDbHasRoleName() throws InvalidEntryInternalException {
         RoleDb roleDb = createSampleRole();
         assertThat(roleDb.getName(), is(equalTo(SOME_ROLE_NAME)));
     }
 
     @Test
-    void builderSetsTheRolename() throws InvalidRoleInternalException {
+    void builderSetsTheRolename() throws InvalidEntryInternalException {
         RoleDb role = RoleDb.newBuilder().withName(SOME_ROLE_NAME).build();
         assertThat(role.getName(), is(equalTo(SOME_ROLE_NAME)));
     }
 
     @Test
-    void buildReturnsObjectWithInitializedPrimaryHashKey() throws InvalidRoleInternalException {
+    void buildReturnsObjectWithInitializedPrimaryHashKey() throws InvalidEntryInternalException {
         RoleDb role = RoleDb.newBuilder().withName(SOME_ROLE_NAME).build();
         assertThat(role.getPrimaryHashKey(), is(not(nullValue())));
         assertThat(role.getPrimaryHashKey(), is(not(emptyString())));
@@ -71,7 +72,7 @@ public class RoleDbTest extends DatabaseAccessor {
     @Test
     void buildWithoutRoleNameShouldThrowException() {
         Executable action = () -> RoleDb.newBuilder().build();
-        assertThrows(InvalidRoleInternalException.class, action);
+        assertThrows(InvalidEntryInternalException.class, action);
     }
 
     @Test
@@ -87,7 +88,7 @@ public class RoleDbTest extends DatabaseAccessor {
     }
 
     @Test
-    void setPrimaryHashKeyShouldNotChangeTheValueOfAlreadySetPrimaryHashKey() throws InvalidRoleInternalException {
+    void setPrimaryHashKeyShouldNotChangeTheValueOfAlreadySetPrimaryHashKey() throws InvalidEntryInternalException {
         String someOtherHashKey = "SomeOtherHashKey";
         sampleRole.setPrimaryHashKey(someOtherHashKey);
         assertThat(sampleRole.getPrimaryHashKey(), is(not(equalTo(someOtherHashKey))));
@@ -100,12 +101,12 @@ public class RoleDbTest extends DatabaseAccessor {
     @ValueSource(strings = {" ", "\t", "\n", "\r"})
     void setPrimaryHashKeyThrowsExceptionWhenInputIsBlankOrNullString(String blankString) {
         Executable action = () -> RoleDb.newBuilder().withName(blankString).build();
-        InvalidRoleInternalException exception = assertThrows(InvalidRoleInternalException.class, action);
+        InvalidEntryInternalException exception = assertThrows(InvalidEntryInternalException.class, action);
         assertThat(exception.getMessage(), containsString(Builder.EMPTY_ROLE_NAME_ERROR));
     }
 
     @Test
-    void setPrimaryRangeKeyHasNoEffect() throws InvalidRoleInternalException {
+    void setPrimaryRangeKeyHasNoEffect() throws InvalidEntryInternalException {
         RoleDb originalRole = RoleDb.newBuilder().withName(SOME_ROLE_NAME).build();
         RoleDb copy = originalRole.copy().build();
         copy.setPrimaryRangeKey(SOME_OTHER_RANGE_KEY);
@@ -113,7 +114,7 @@ public class RoleDbTest extends DatabaseAccessor {
     }
 
     @Test
-    void setTypeHasNoEffect() throws InvalidRoleInternalException {
+    void setTypeHasNoEffect() throws InvalidEntryInternalException {
         RoleDb originalRole = RoleDb.newBuilder().withName(SOME_ROLE_NAME).build();
         RoleDb copy = originalRole.copy().build();
         copy.setType(SOME_TYPE);
@@ -121,13 +122,13 @@ public class RoleDbTest extends DatabaseAccessor {
     }
 
     @Test
-    void copyReturnsBuilderContainingAllFieldValuesOfOriginalItem() throws InvalidRoleInternalException {
+    void copyReturnsBuilderContainingAllFieldValuesOfOriginalItem() throws InvalidEntryInternalException {
         RoleDb copyRole = sampleRole.copy().build();
         assertThat(copyRole, is(equalTo(sampleRole)));
         assertThat(copyRole, is(not(sameInstance(sampleRole))));
     }
 
-    private RoleDb createSampleRole() throws InvalidRoleInternalException {
+    private RoleDb createSampleRole() throws InvalidEntryInternalException {
         return RoleDb.newBuilder().withName(SOME_ROLE_NAME).build();
     }
 }

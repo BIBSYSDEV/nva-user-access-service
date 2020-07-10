@@ -28,14 +28,11 @@ import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.DataSyncException;
-import no.unit.nva.exceptions.EmptyUsernameException;
-import no.unit.nva.exceptions.InvalidUserInternalException;
+import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.model.UserDto;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.handlers.RequestInfo;
-import nva.commons.utils.log.LogUtils;
-import nva.commons.utils.log.TestAppender;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,13 +44,12 @@ public class AddUserTest extends DatabaseAccessor {
 
     public static final String EXCEPTION_MESSAGE_WHEN_GETTING_USER = "Exception when getting user";
     private AddUserHandler handler;
-    private DatabaseServiceImpl databaseService;
     private RequestInfo requestInfo;
     private Context context;
 
     @BeforeEach
     public void init() {
-        databaseService = createDatabaseServiceUsingLocalStorage();
+        DatabaseServiceImpl databaseService = createDatabaseServiceUsingLocalStorage();
         handler = new AddUserHandler(mockEnvironment(), databaseService);
 
         requestInfo = new RequestInfo();
@@ -115,7 +111,7 @@ public class AddUserTest extends DatabaseAccessor {
         UserDto userWithoutUsername = createUserWithoutUsername();
 
         Executable action = () -> handler.processInput(userWithoutUsername, requestInfo, context);
-        assertThrows(EmptyUsernameException.class, action);
+        assertThrows(InvalidInputException.class, action);
     }
 
     @DisplayName("handleRequest() returns BadRequest when input user does not have a username")
@@ -133,22 +129,6 @@ public class AddUserTest extends DatabaseAccessor {
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_BAD_REQUEST)));
     }
 
-    @DisplayName("processInput() throws RuntimeException when database service throws unexpected exception "
-        + "when getting user ")
-    @Test
-    public void processInputThrowsUnexpectedExceptionWhenDatabaseServiceThrowsUnexpectedExceptionWhenReadingUser()
-        throws ApiGatewayException {
-        TestAppender testAppender = LogUtils.getTestingAppender(AddUserHandler.class);
-        DatabaseService databaseService = databaseServiceThrowsExceptionWhenGettingUserAfterSaving();
-
-        UserDto sampleUser = createUserWithRolesAndInstitution();
-        AddUserHandler addUserHandler = new AddUserHandler(mockEnvironment(), databaseService);
-        Executable action = () -> addUserHandler.processInput(sampleUser, requestInfo, context);
-        RuntimeException exception = assertThrows(RuntimeException.class, action);
-        assertThat(exception.getMessage(), containsString(EXCEPTION_MESSAGE_WHEN_GETTING_USER));
-        assertThat(testAppender.getMessages(), containsString(EXCEPTION_MESSAGE_WHEN_GETTING_USER));
-    }
-
     @DisplayName("processInput() throws DataSyncException when database service cannot return saved item ")
     @Test
     public void processInputThrowsDataSyncExceptionWhenDatabaseServiceCannotReturnSavedItem()
@@ -162,26 +142,10 @@ public class AddUserTest extends DatabaseAccessor {
         assertThat(exception.getMessage(), containsString(SYNC_ERROR_MESSAGE));
     }
 
-    private DatabaseService databaseServiceThrowsExceptionWhenGettingUserAfterSaving() {
-        return new DatabaseServiceImpl(localDynamo, envWithTableName) {
-            private boolean checkingIfUserExists = true;
-
-            @Override
-            public Optional<UserDto> getUser(UserDto queryObject) throws InvalidUserInternalException {
-                if (!checkingIfUserExists) {
-                    throw new InvalidUserInternalException(EXCEPTION_MESSAGE_WHEN_GETTING_USER);
-                } else {
-                    checkingIfUserExists = false;
-                    return Optional.empty();
-                }
-            }
-        };
-    }
-
     private DatabaseService databaseServiceReturnsAlwaysEmptyUser() {
         return new DatabaseServiceImpl(localDynamo, envWithTableName) {
             @Override
-            public Optional<UserDto> getUser(UserDto queryObject) {
+            public Optional<UserDto> getUserAsOptional(UserDto queryObject) {
                 return Optional.empty();
             }
         };

@@ -14,7 +14,7 @@ import java.util.Objects;
 import no.unit.nva.database.UserDb.Builder;
 import no.unit.nva.database.intefaces.DynamoEntry;
 import no.unit.nva.database.intefaces.WithCopy;
-import no.unit.nva.exceptions.InvalidUserInternalException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.JacocoGenerated;
 
 @DynamoDBTable(tableName = "OverridenByEnvironmentVariable")
@@ -34,7 +34,7 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder> {
         super();
     }
 
-    private UserDb(Builder builder) throws InvalidUserInternalException {
+    private UserDb(Builder builder) throws InvalidEntryInternalException {
         super();
         setUsername(builder.username);
         setInstitution(builder.institution);
@@ -59,12 +59,12 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder> {
      * used only by DynamoDb. For any other purpose use the {@link UserDb.Builder}
      *
      * @param primaryKey the primaryKey
-     * @throws InvalidUserInternalException when the primary key is invalid.
+     * @throws InvalidEntryInternalException when the primary key is invalid.
      */
-    public void setPrimaryHashKey(String primaryKey) throws InvalidUserInternalException {
+    public void setPrimaryHashKey(String primaryKey) throws InvalidEntryInternalException {
         if (primaryKeyHasNotBeenSet()) {
             if (!primaryKey.startsWith(TYPE)) {
-                throw new InvalidUserInternalException(INVALID_PRIMARY_HASH_KEY);
+                throw new InvalidEntryInternalException(INVALID_PRIMARY_HASH_KEY);
             }
             this.primaryHashKey = primaryKey;
         }
@@ -184,14 +184,14 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder> {
             return this;
         }
 
-        public UserDb build() throws InvalidUserInternalException {
+        public UserDb build() throws InvalidEntryInternalException {
             this.primaryHashKey = formatPrimaryHashKey();
             return new UserDb(this);
         }
 
-        private String formatPrimaryHashKey() throws InvalidUserInternalException {
+        private String formatPrimaryHashKey() throws InvalidEntryInternalException {
             if (isNull(username) || username.isBlank()) {
-                throw new InvalidUserInternalException(INVALID_USER_EMPTY_USERNAME);
+                throw new InvalidEntryInternalException(INVALID_USER_EMPTY_USERNAME);
             } else {
                 return String.join(FIELD_DELIMITER, TYPE, username);
             }

@@ -3,9 +3,9 @@ package no.unit.nva.exceptions;
 import nva.commons.exceptions.ApiGatewayException;
 import org.apache.http.HttpStatus;
 
-public class InvalidUserInternalException extends ApiGatewayException {
+public class InvalidEntryInternalException extends ApiGatewayException {
 
-    public InvalidUserInternalException(String message) {
+    public InvalidEntryInternalException(String message) {
         super(message);
     }
 

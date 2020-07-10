@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.unit.nva.database.UserDb.Builder;
-import no.unit.nva.exceptions.InvalidRoleInternalException;
-import no.unit.nva.exceptions.InvalidUserInternalException;
+
+import no.unit.nva.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.attempt.Try;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ public class UserDbTest extends DatabaseAccessor {
     private UserDb sampleUser;
 
     @Test
-    public void builderShouldSetTheHashKeyBasedOnusername() throws InvalidUserInternalException {
+    public void builderShouldSetTheHashKeyBasedOnusername() throws InvalidEntryInternalException {
         sampleUser.setPrimaryHashKey("SomeOtherHashKey");
         String expectedHashKey = String.join(UserDb.FIELD_DELIMITER, UserDb.TYPE, SOME_USERNAME);
         assertThat(sampleUser.getPrimaryHashKey(), is(equalTo(expectedHashKey)));
@@ -51,12 +51,12 @@ public class UserDbTest extends DatabaseAccessor {
             .collect(Collectors.toList());
     }
 
-    private static RoleDb newRole(String str) throws InvalidRoleInternalException {
+    private static RoleDb newRole(String str) throws InvalidEntryInternalException {
         return RoleDb.newBuilder().withName(str).build();
     }
 
     @BeforeEach
-    private void init() throws InvalidUserInternalException {
+    public void init() throws InvalidEntryInternalException {
         dynamoFunctionalityTestUser = new UserDb();
         sampleUser = UserDb.newBuilder().withUsername(SOME_USERNAME).build();
         initializeTestDatabase();
@@ -106,7 +106,7 @@ public class UserDbTest extends DatabaseAccessor {
     }
 
     @Test
-    void userDbShouldBeReadFromDatabaseWithoutDataLoss() throws InvalidUserInternalException {
+    void userDbShouldBeReadFromDatabaseWithoutDataLoss() throws InvalidEntryInternalException {
         UserDb insertedUser = UserDb.newBuilder()
             .withUsername(SOME_USERNAME)
             .withInstitution(SOME_INSTITUTION)
@@ -129,12 +129,12 @@ public class UserDbTest extends DatabaseAccessor {
             .withRoles(SAMPLE_ROLES)
             .build();
 
-        InvalidUserInternalException exception = assertThrows(InvalidUserInternalException.class, action);
+        InvalidEntryInternalException exception = assertThrows(InvalidEntryInternalException.class, action);
         assertThat(exception.getMessage(), containsString(UserDb.INVALID_USER_EMPTY_USERNAME));
     }
 
     @Test
-    void copyShouldReturnBuilderWithFilledInFields() throws InvalidUserInternalException {
+    void copyShouldReturnBuilderWithFilledInFields() throws InvalidEntryInternalException {
         UserDb originalUser = UserDb.newBuilder()
             .withUsername(SOME_USERNAME)
             .withInstitution(SOME_INSTITUTION)
@@ -150,7 +150,7 @@ public class UserDbTest extends DatabaseAccessor {
     void setPrimaryHashKeyThrowsExceptionWhenKeyDoesNotStartWithType() {
         UserDb userDb = new UserDb();
         Executable action = () -> userDb.setPrimaryHashKey("SomeKey");
-        InvalidUserInternalException exception = assertThrows(InvalidUserInternalException.class, action);
+        InvalidEntryInternalException exception = assertThrows(InvalidEntryInternalException.class, action);
         assertThat(exception.getMessage(), containsString(UserDb.INVALID_PRIMARY_HASH_KEY));
     }
 

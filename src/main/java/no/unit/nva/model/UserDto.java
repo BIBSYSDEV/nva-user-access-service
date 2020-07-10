@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.UserDb;
 import no.unit.nva.database.intefaces.WithCopy;
-import no.unit.nva.exceptions.EmptyUsernameException;
-import no.unit.nva.exceptions.InvalidUserInternalException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
+import no.unit.nva.exceptions.InvalidInputException;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.JsonUtils;
 import nva.commons.utils.StringUtils;
@@ -22,13 +22,13 @@ import nva.commons.utils.attempt.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable {
+public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Validable {
 
     public static final String MISSING_FIELD_ERROR = "Invalid User. Missing obligatory field: ";
     public static final String ERROR_DUE_TO_INVALID_ROLE =
         "Failure while trying to create user with role without role-name";
+    public static final String INVALID_USER_ERROR_MESSAGE = "Invalid user. User should have non-empty username.";
     private static final Logger logger = LoggerFactory.getLogger(UserDto.class);
-
     private List<RoleDto> roles;
     private String username;
     private String institution;
@@ -47,9 +47,9 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable {
      *
      * @param userDb a database object {@link UserDb}
      * @return a data transfer object {@link UserDto}
-     * @throws InvalidUserInternalException when database object is invalid (should never happen).
+     * @throws InvalidEntryInternalException when database object is invalid (should never happen).
      */
-    public static UserDto fromUserDb(UserDb userDb) throws InvalidUserInternalException {
+    public static UserDto fromUserDb(UserDb userDb) throws InvalidEntryInternalException {
 
         UserDto.Builder userDto = new UserDto.Builder();
         userDto
@@ -72,9 +72,9 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable {
      * Transforms the DTO to a database object.
      *
      * @return a {@link UserDb}.
-     * @throws InvalidUserInternalException when the DTO contains an invalid user.
+     * @throws InvalidEntryInternalException when the DTO contains an invalid user.
      */
-    public UserDb toUserDb() throws InvalidUserInternalException {
+    public UserDb toUserDb() throws InvalidEntryInternalException {
         UserDb.Builder userDb = UserDb.newBuilder()
             .withUsername(username)
             .withInstitution(institution)
@@ -107,17 +107,14 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable {
         this.roles = roles;
     }
 
-    /**
-     * throws exception when the object is invalid.
-     *
-     * @return the object itself.
-     * @throws EmptyUsernameException when the username is empty.
-     */
-    public UserDto validate() throws EmptyUsernameException {
-        if (isNull(username) || username.isBlank()) {
-            throw new EmptyUsernameException();
-        }
-        return this;
+    @Override
+    public boolean isValid() {
+        return !(isNull(username) || username.isBlank());
+    }
+
+    @Override
+    public InvalidInputException exceptionWhenInvalid() {
+        return new InvalidInputException(INVALID_USER_ERROR_MESSAGE);
     }
 
     @Override
@@ -136,10 +133,6 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable {
             .withUsername(username)
             .withInstitution(institution)
             .withRoles(listRoles());
-    }
-
-    private List<RoleDto> listRoles() {
-        return new ArrayList<>(Optional.ofNullable(roles).orElse(Collections.emptyList()));
     }
 
     @Override
@@ -161,6 +154,10 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable {
     @JacocoGenerated
     public int hashCode() {
         return Objects.hash(getUsername(), getInstitution(), getRoles());
+    }
+
+    private List<RoleDto> listRoles() {
+        return new ArrayList<>(Optional.ofNullable(roles).orElse(Collections.emptyList()));
     }
 
     private static List<RoleDto> extractRoles(UserDb userDb) {
@@ -217,11 +214,11 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable {
          * creates a UserDto instance.
          *
          * @return a {@link UserDto}
-         * @throws InvalidUserInternalException when the used to be built is invalid.
+         * @throws InvalidEntryInternalException when the used to be built is invalid.
          */
-        public UserDto build() throws InvalidUserInternalException {
+        public UserDto build() throws InvalidEntryInternalException {
             if (StringUtils.isEmpty(username)) {
-                throw new InvalidUserInternalException(MISSING_FIELD_ERROR + "username");
+                throw new InvalidEntryInternalException(MISSING_FIELD_ERROR + "username");
             }
             return new UserDto(this);
         }

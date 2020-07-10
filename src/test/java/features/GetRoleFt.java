@@ -16,15 +16,14 @@ import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
-import no.unit.nva.exceptions.InvalidInputRoleException;
-import no.unit.nva.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.ConflictException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
+import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.handlers.GetRoleHandler;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -52,16 +51,16 @@ public class GetRoleFt extends ScenarioTest {
 
     @Given("that there is a role with role-name {string}")
     public void that_there_is_a_role_with_rolename(String roleName)
-        throws InvalidInputRoleException, InvalidRoleInternalException {
+        throws InvalidEntryInternalException, ConflictException, InvalidInputException {
 
         RoleDto newRole = RoleDto.newBuilder().withName(roleName).build();
         getDatabaseService().addRole(newRole);
     }
 
     @Given("that there is no role with role-name {string}")
-    public void that_there_is_no_role_with_role_name(String roleName) throws InvalidRoleInternalException {
+    public void that_there_is_no_role_with_role_name(String roleName) throws InvalidEntryInternalException {
         RoleDto queryObject = RoleDto.newBuilder().withName(roleName).build();
-        Optional<RoleDto> queryResult = getDatabaseService().getRole(queryObject);
+        Optional<RoleDto> queryResult = getDatabaseService().getRoleAsOptional(queryObject);
         assertThat(queryResult.isEmpty(), is(equalTo(true)));
     }
 

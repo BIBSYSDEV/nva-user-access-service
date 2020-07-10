@@ -3,8 +3,6 @@ package no.unit.nva.database;
 import static no.unit.nva.database.DatabaseServiceWithTableNameOverride.createMapperOverridingHardCodedTableName;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -13,9 +11,9 @@ import static org.mockito.Mockito.when;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
-import java.util.Optional;
 import java.util.stream.Stream;
-import no.unit.nva.exceptions.InvalidUserInternalException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
+import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +28,7 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
     private UserDto someUser;
 
     @BeforeEach
-    public void init() throws InvalidUserInternalException {
+    public void init() throws InvalidEntryInternalException {
         mapper = createMapperOverridingHardCodedTableName(initializeTestDatabase(), envWithTableName);
         someUser = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
     }
@@ -53,10 +51,11 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
     }
 
     @Test
-    public void getUserReturnsEmptyOptionalWhenUserIsNotFound() throws InvalidUserInternalException {
+    public void getUserThrowsNotFoundExceptionWhenUserDoesNotExist() {
         DatabaseService service = new DatabaseServiceImpl(mapper);
-        Optional<UserDto> result = service.getUser(someUser);
-        assertThat(result.isEmpty(), is(equalTo(true)));
+        Executable action = () -> service.getUser(someUser);
+        NotFoundException exception = assertThrows(NotFoundException.class, action);
+        assertThat(exception.getMessage(), containsString(DatabaseServiceImpl.USER_NOT_FOUND_MESSAGE));
     }
 
     @SuppressWarnings("unchecked")

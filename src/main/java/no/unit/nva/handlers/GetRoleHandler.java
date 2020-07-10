@@ -4,11 +4,9 @@ import static java.util.function.Predicate.not;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Optional;
-import java.util.function.Supplier;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.exceptions.BadRequestException;
-import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.handlers.ApiGatewayHandler;
@@ -22,7 +20,6 @@ import org.slf4j.LoggerFactory;
 public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
 
     public static final String ROLE_NOT_FOUND_ERROR_MESSAGE = "Could not find role: ";
-    public static final String LOG_ROLE_NOT_FOUND = "Could not find role: ";
     public static final String EMPTY_ROLE_NAME = "Role-name cannot be empty";
     public static final String ROLE_PATH_PARAMETER = "role";
     private static final Logger logger = LoggerFactory.getLogger(GetRoleHandler.class);
@@ -47,8 +44,7 @@ public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
         String roleName = roleNameThatIsNotNullOrBlank(requestInfo);
 
         RoleDto searchObject = RoleDto.newBuilder().withName(roleName).build();
-        Optional<RoleDto> searchResult = databaseService.getRole(searchObject);
-        return searchResult.orElseThrow(roleNotFound(roleName));
+        return databaseService.getRole(searchObject);
     }
 
     @Override
@@ -61,10 +57,5 @@ public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
             .map(pathParams -> pathParams.get(ROLE_PATH_PARAMETER))
             .filter(not(String::isBlank))
             .orElseThrow(() -> new BadRequestException(EMPTY_ROLE_NAME));
-    }
-
-    private Supplier<NotFoundException> roleNotFound(String roleName) {
-        logger.warn(LOG_ROLE_NOT_FOUND + roleName);
-        return () -> new NotFoundException(ROLE_NOT_FOUND_ERROR_MESSAGE + roleName);
     }
 }
