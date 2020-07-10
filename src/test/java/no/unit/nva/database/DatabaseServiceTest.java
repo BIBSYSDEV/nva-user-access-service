@@ -2,6 +2,7 @@ package no.unit.nva.database;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.model.DoesNotHaveNullFields.doesNotHaveNullFields;
+import static no.unit.nva.utils.EntityUtils.createRole;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -16,7 +17,7 @@ import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
-import no.unit.nva.handlers.UserDtoCreator;
+import no.unit.nva.utils.EntityUtils;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -157,7 +158,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
     @DisplayName("addUser() throws Exception when trying to save user without username")
     @Test
     public void addUserShouldNotSaveUserWithoutUsername() {
-        Executable illegalAction = () -> db.addUser(UserDtoCreator.createUserWithoutUsername());
+        Executable illegalAction = () -> db.addUser(EntityUtils.createUserWithoutUsername());
         InvalidInputException exception = assertThrows(InvalidInputException.class, illegalAction);
         assertThat(exception.getClass(), is(equalTo(InvalidInputException.class)));
         assertThat(exception.getMessage(), containsString(UserDto.INVALID_USER_ERROR_MESSAGE));
@@ -173,7 +174,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
 
         UserDto conflictingUser = UserDto.newBuilder().withUsername(conflictingUsername)
             .withInstitution(SOME_OTHER_INSTITUTION)
-            .withRoles(Collections.singletonList(buildRole(SOME_OTHER_ROLE)))
+            .withRoles(Collections.singletonList(createRole(SOME_OTHER_ROLE)))
             .build();
 
         Executable action = () -> db.addUser(conflictingUser);
@@ -200,16 +201,9 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         return illegalRole;
     }
 
-    private RoleDto createRole(String someRole) throws InvalidEntryInternalException {
-        return RoleDto.newBuilder().withName(someRole).build();
-    }
-
-    private RoleDto buildRole(String someOtherRole) throws InvalidEntryInternalException {
-        return createRole(someOtherRole);
-    }
 
     private UserDto cloneAndChangeRole(UserDto existingUser) throws InvalidEntryInternalException {
-        RoleDto someOtherRole = buildRole(SOME_OTHER_ROLE);
+        RoleDto someOtherRole = createRole(SOME_OTHER_ROLE);
         return existingUser.copy().withRoles(Collections.singletonList(someOtherRole)).build();
     }
 
@@ -233,7 +227,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
 
     private List<RoleDto> createRoleList(String rolename) throws InvalidEntryInternalException {
         if (nonNull(rolename)) {
-            RoleDto roleDto = buildRole(rolename);
+            RoleDto roleDto = createRole(rolename);
             return Collections.singletonList(roleDto);
         } else {
             return Collections.emptyList();

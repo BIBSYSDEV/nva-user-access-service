@@ -1,10 +1,10 @@
 package no.unit.nva.model;
 
 import static no.unit.nva.hamcrest.DoesNotHaveNullOrEmptyFields.doesNotHaveNullOrEmptyFields;
-import static no.unit.nva.handlers.UserDtoCreator.SOME_ROLENAME;
-import static no.unit.nva.handlers.UserDtoCreator.SOME_USERNAME;
-import static no.unit.nva.handlers.UserDtoCreator.createUserWithRoleWithoutInstitution;
-import static no.unit.nva.handlers.UserDtoCreator.createUserWithRolesAndInstitution;
+import static no.unit.nva.utils.EntityUtils.SOME_ROLENAME;
+import static no.unit.nva.utils.EntityUtils.SOME_USERNAME;
+import static no.unit.nva.utils.EntityUtils.createUserWithRoleWithoutInstitution;
+import static no.unit.nva.utils.EntityUtils.createUserWithRolesAndInstitution;
 import static no.unit.nva.model.UserDto.ERROR_DUE_TO_INVALID_ROLE;
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;

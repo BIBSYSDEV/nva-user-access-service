@@ -1,4 +1,4 @@
-package no.unit.nva.handlers;
+package no.unit.nva.utils;
 
 import static nva.commons.utils.JsonUtils.objectMapper;
 
@@ -12,7 +12,7 @@ import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 
-public final class UserDtoCreator {
+public final class EntityUtils {
 
     public static final String SOME_USERNAME = "SomeUsername";
     public static final String SOME_ROLENAME = "SomeRole";
@@ -45,9 +45,9 @@ public final class UserDtoCreator {
      * @return a {@link UserDto}
      * @throws InvalidEntryInternalException when the added role is invalid.
      * @throws InvalidEntryInternalException unlikely.  The object is intentionally invalid.
-     * @throws NoSuchMethodException        reflection related.
-     * @throws InvocationTargetException    reflection related.
-     * @throws IllegalAccessException       reflection related.
+     * @throws NoSuchMethodException         reflection related.
+     * @throws InvocationTargetException     reflection related.
+     * @throws IllegalAccessException        reflection related.
      */
     public static UserDto createUserWithoutUsername()
         throws InvalidEntryInternalException, NoSuchMethodException,
@@ -95,5 +95,9 @@ public final class UserDtoCreator {
             .withUsername(SOME_USERNAME)
             .withRoles(Collections.singletonList(sampleRole))
             .build();
+    }
+
+    public static RoleDto createRole(String someRole) throws InvalidEntryInternalException {
+        return RoleDto.newBuilder().withName(someRole).build();
     }
 }
