@@ -17,9 +17,9 @@ import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
-import no.unit.nva.utils.EntityUtils;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
+import no.unit.nva.utils.EntityUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         assertThat(savedRole, is(equalTo(insertedRole)));
     }
 
-    @DisplayName("getRole() throws NotFoundException when the role-name does exist in the database")
+    @DisplayName("getRole() throws NotFoundException when the role-name does not exist in the database")
     @Test
     public void databaseServiceThrowsNotFoundExceptionWhenRoleNameDoesNotExist() throws InvalidEntryInternalException {
         RoleDto queryObject = createRole(SOME_ROLE);
@@ -200,7 +200,6 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         illegalRole.setRoleName(null);
         return illegalRole;
     }
-
 
     private UserDto cloneAndChangeRole(UserDto existingUser) throws InvalidEntryInternalException {
         RoleDto someOtherRole = createRole(SOME_OTHER_ROLE);
