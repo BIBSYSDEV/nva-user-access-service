@@ -34,17 +34,16 @@ import org.slf4j.LoggerFactory;
 public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
 
     public static final String RANGE_KEY_NAME = "PK1B";
+    public static final String EMPTY_INPUT_ERROR_MESSAGE = "Expected non-empty input, but input is empty";
     public static final String INVALID_USER_IN_DATABASE = "Invalid user stored in the database:";
     public static final String USER_ALREADY_EXISTS_ERROR_MESSAGE = "User already exists: ";
     public static final String USER_NOT_FOUND_MESSAGE = "Could not find user with username: ";
     public static final String ROLE_NOT_FOUND_MESSAGE = "Could not find role: ";
 
-    public static final String EMPTY_INPUT_ERROR = "empty input";
     public static final String GET_USER_DEBUG_MESSAGE = "Getting user:";
+    public static final String GET_ROLE_DEBUG_MESSAGE = "Getting role:";
     public static final String ADD_USER_DEBUG_MESSAGE = "Adding user:";
     public static final String ADD_ROLE_DEBUG_MESSAGE = "Adding role:";
-    public static final String GET_ROLE_DEBUG_MESSAGE = "Getting role:";
-    public static final String EMPTY_INPUT_ERROR_MESSAGE = "Expected non-empty input, but input is empty";
     private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
     private static final String UPDATE_ROLE_DEBUG_MESSAGE = "Updating role: ";
     private static final String ROLE_ALREADY_EXISTS_ERROR_MESSAGE = "Role already exists: ";
@@ -188,7 +187,7 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     }
 
     private static String convertToStringOrWriteErrorMessage(JsonSerializable queryObject) {
-        return Optional.ofNullable(queryObject).map(JsonSerializable::toString).orElse(EMPTY_INPUT_ERROR);
+        return Optional.ofNullable(queryObject).map(JsonSerializable::toString).orElse(EMPTY_INPUT_ERROR_MESSAGE);
     }
 
     private static <I extends WithType> DynamoDBQueryExpression<I> createGetQuery(I searchObject) {
