@@ -9,8 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
@@ -38,53 +36,49 @@ public class DatabaseServiceTest extends DatabaseAccessor {
     }
 
     @Test
-    public void databaseServiceShouldHaveAMethodForInsertingAUser()
+    public void databaseServiceHasAMethodForInsertingAUser()
         throws InvalidEntryInternalException, ConflictException, InvalidInputException {
         UserDto user = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
         db.addUser(user);
     }
 
     @Test
-    public void databaseServiceShouldInsertValidItemInDatabase()
-        throws InvalidEntryInternalException, ConflictException, InvalidInputException {
+    public void databaseServiceInsertsValidItemInDatabase()
+        throws InvalidEntryInternalException, ConflictException, InvalidInputException, NotFoundException {
         UserDto insertedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
-        Optional<UserDto> savedUser = db.getUserAsOptional(insertedUser);
+        UserDto savedUser = db.getUser(insertedUser);
 
-        assertThat(savedUser.isPresent(), is(true));
         assertThat(insertedUser, doesNotHaveNullFields());
-        assertThat(savedUser.get(), is(equalTo(insertedUser)));
+        assertThat(savedUser, is(equalTo(insertedUser)));
     }
 
     @Test
-    public void databaseServiceShouldReturnNonEmptyUserWhenUsernameExistsInDatabase()
-        throws InvalidEntryInternalException, ConflictException, InvalidInputException {
+    public void databaseServiceReturnsNonEmptyUserWhenUsernameExistsInDatabase()
+        throws InvalidEntryInternalException, ConflictException, InvalidInputException, NotFoundException {
         UserDto insertedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
-        Optional<UserDto> savedUser = db.getUserAsOptional(insertedUser);
+        UserDto savedUser = db.getUser(insertedUser);
 
-        assertThat(savedUser.isPresent(), is(true));
         assertThat(insertedUser, doesNotHaveNullFields());
-        assertThat(savedUser.get(), is(equalTo(insertedUser)));
+        assertThat(savedUser, is(equalTo(insertedUser)));
     }
 
     @Test
-    public void addUserShouldSaveAUserWithoutInstitution() throws InvalidEntryInternalException, ConflictException,
-                                                                  InvalidInputException {
+    public void addUserSavesAUserWithoutInstitution() throws InvalidEntryInternalException, ConflictException,
+                                                             InvalidInputException, NotFoundException {
         UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, null, SOME_ROLE);
-        Optional<UserDto> actualUser = db.getUserAsOptional(expectedUser);
+        UserDto actualUser = db.getUser(expectedUser);
 
-        assertThat(actualUser.isPresent(), is(true));
-        assertThat(actualUser.get(), is(equalTo(expectedUser)));
-        assertThat(actualUser.get().getInstitution(), is(equalTo(null)));
+        assertThat(actualUser, is(equalTo(expectedUser)));
+        assertThat(actualUser.getInstitution(), is(equalTo(null)));
     }
 
     @Test
     public void addUserShouldSaveUserWithoutRoles()
-        throws InvalidEntryInternalException, ConflictException, InvalidInputException {
+        throws InvalidEntryInternalException, ConflictException, InvalidInputException, NotFoundException {
         UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, null);
-        Optional<UserDto> actualUser = db.getUserAsOptional(expectedUser);
+        UserDto actualUser = db.getUser(expectedUser);
 
-        assertThat(actualUser.isPresent(), is(true));
-        assertThat(actualUser.get(), is(equalTo(expectedUser)));
+        assertThat(actualUser, is(equalTo(expectedUser)));
     }
 
     @Test
