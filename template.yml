@@ -6,7 +6,6 @@ Description: >
   It includes a table containing users and roles and lambda functions for accessing the data.
 
 Parameters:
-
   CognitoAuthorizerArn:
     Type: String
   UsersAndRolesTableName:
@@ -15,7 +14,7 @@ Parameters:
 Globals:
   Api:
     Cors:
-      AllowMethods: "'PUT, POST, GET,OPTIONS'"
+      AllowMethods: "'PUT, POST, GET, OPTIONS'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
       AllowOrigin: "'*'"
 
@@ -25,13 +24,6 @@ Resources:
     Properties:
       StageName: Prod
       EndpointConfiguration: REGIONAL
-      Auth:
-        ApiKeyRequired: false
-        DefaultAuthorizer: CognitoAuthentication
-        Authorizers:
-          CognitoAuthentication:
-            UserPoolArn: !Ref CognitoAuthorizerArn
-            AuthType: "cognito_user_pools"
       DefinitionBody:
         openapi: 3.0
         info:
@@ -43,7 +35,7 @@ Resources:
             post:
               summary: Adds new Role
               security:
-                - CognitoAuthentication: []
+                - CognitoUserPool: []
               requestBody:
                 required: true
                 content:
@@ -73,7 +65,7 @@ Resources:
                     type: string
                   required: true
               security:
-                - CognitoAuthentication: []
+                - CognitoUserPool: []
               responses:
                 '200':
                   description: Successful fetching of role. Returns the requested role
@@ -91,7 +83,7 @@ Resources:
             post:
               summary: Adds new user
               security:
-                - CognitoAuthentication: []
+                - CognitoUserPool: []
               requestBody:
                 required: true
                 content:
@@ -121,7 +113,7 @@ Resources:
                     type: string
                   required: true
               security:
-                - CognitoAuthentication: []
+                - CognitoUserPool: []
               responses:
                 '200':
                   description: Successful fetching of User. Returns the requested User
@@ -152,10 +144,10 @@ Resources:
                   items:
                     $ref: '#/components/schemas/Role'
           securitySchemes:
-            CognitoAuthentication:
-              type: "apiKey"
-              name: "Authorization"
-              in: "header"
+            CognitoUserPool:
+              type: apiKey
+              name: Authorization
+              in: header
               x-amazon-apigateway-authtype: cognito_user_pools
               x-amazon-apigateway-authorizer:
                 type: cognito_user_pools
