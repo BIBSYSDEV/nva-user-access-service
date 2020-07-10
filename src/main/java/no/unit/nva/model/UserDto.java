@@ -27,7 +27,7 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
     public static final String MISSING_FIELD_ERROR = "Invalid User. Missing obligatory field: ";
     public static final String ERROR_DUE_TO_INVALID_ROLE =
         "Failure while trying to create user with role without role-name";
-    public static final String INVALID_USER_ERROR_MESSAGE = "Invalid user. User should have non empty username.";
+    public static final String INVALID_USER_ERROR_MESSAGE = "Invalid user. User should have non-empty username.";
     private static final Logger logger = LoggerFactory.getLogger(UserDto.class);
     private List<RoleDto> roles;
     private String username;
