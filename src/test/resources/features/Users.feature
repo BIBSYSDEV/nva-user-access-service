@@ -61,7 +61,7 @@ Feature: Users
     And a user description is returned
 
 
-  Scenario:  Authorized client updates existing user
+  Scenario:Authorized client attempts to update non-existing user
     Given that a user entry with the username "someone@institution" does not exist in the database
     And the authorized client forms a "PUT" request
     And the request has the following path parameters:
@@ -77,7 +77,7 @@ Feature: Users
     When the authorized client sends the request to update the user
     Then a NotFound message is returned
 
-  Scenario:  Authorized client updates existing user
+  Scenario:Authorized client attempts to update existing user with malformed request
     Given that a user entry with the username "someone@institution" exists in the database
     And the authorized client forms a "PUT" request
     And the request has the following path parameters:
