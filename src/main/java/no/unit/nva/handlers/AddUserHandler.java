@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
 public class AddUserHandler extends HandlerWithEventualConsistency<UserDto, UserDto> {
 
     public static final String SYNC_ERROR_MESSAGE = "Error while trying to retrieve saved user:";
-    public static final String PUBLIC_MESSAGE_FOR_INTERNAL_CONSISTENCY_PROBLEMS = "Problem with the data has occured";
-    public static final String INCOSISTEND_DATA_ERROR = "Inconsistent data in the database.";
+    public static final String PUBLIC_MESSAGE_FOR_INTERNAL_CONSISTENCY_PROBLEMS = "Α problem with the data has occured";
+    public static final String INCONSISTENT_DATA_ERROR = "Inconsistent data in the database.";
     private final DatabaseService databaseService;
 
     /**
@@ -55,7 +55,7 @@ public class AddUserHandler extends HandlerWithEventualConsistency<UserDto, User
         try {
             databaseService.addUser(input);
         } catch (InvalidEntryInternalException e) {
-            logger.error(INCOSISTEND_DATA_ERROR, e);
+            logger.error(INCONSISTENT_DATA_ERROR, e);
             throw new RuntimeException(PUBLIC_MESSAGE_FOR_INTERNAL_CONSISTENCY_PROBLEMS);
         }
     }

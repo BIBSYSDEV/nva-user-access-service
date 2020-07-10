@@ -65,8 +65,8 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
 
     @Override
     public UserDto getUser(UserDto queryObject) throws InvalidEntryInternalException, NotFoundException {
-        Optional<UserDto> resultOpt = getUserAsOptional(queryObject);
-        return resultOpt.orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE + queryObject.getUsername()));
+        return getUserAsOptional(queryObject)
+            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE + queryObject.getUsername()));
     }
 
     @Override

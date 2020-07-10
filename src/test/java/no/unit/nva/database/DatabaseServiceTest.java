@@ -90,17 +90,17 @@ public class DatabaseServiceTest extends DatabaseAccessor {
     }
 
     @Test
-    @Disabled
     public void updateUserUpdatesExistingUserWithInputUserWhenInputUserIsValid()
-        throws ConflictException, InvalidEntryInternalException, NotFoundException,
-               InvalidInputException {
+        throws ConflictException, InvalidEntryInternalException, NotFoundException, InvalidInputException {
         UserDto existingUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
-        UserDto expectedUser = alterUser(existingUser);
+        UserDto expectedUser = cloneAndChangeRole(existingUser);
 
         db.updateUser(expectedUser);
+        UserDto actualUser = db.getUser(expectedUser);
+        assertThat(actualUser, is(equalTo(expectedUser)));
     }
 
-    private UserDto alterUser(UserDto existingUser) throws InvalidEntryInternalException {
+    private UserDto cloneAndChangeRole(UserDto existingUser) throws InvalidEntryInternalException {
         RoleDto someOtherRole = RoleDto.newBuilder().withName(SOME_OTHER_ROLE).build();
         return existingUser.copy().withRoles(Collections.singletonList(someOtherRole)).build();
     }
