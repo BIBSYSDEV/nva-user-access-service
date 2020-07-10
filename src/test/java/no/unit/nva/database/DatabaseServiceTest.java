@@ -78,7 +78,6 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, null);
         UserDto actualUser = db.getUser(expectedUser);
 
-        assertThat(actualUser, is(true));
         assertThat(actualUser, is(equalTo(expectedUser)));
     }
 
