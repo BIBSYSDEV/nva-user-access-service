@@ -14,7 +14,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.model.RoleDto.Builder;
-import nva.commons.utils.attempt.Failure;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,7 +23,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 public class RoleDtoTest {
 
     public static final String SOME_ROLE_NAME = "someRoleName";
-    public static final String SOME_MESSAGE = "Some message";
 
     @Test
     public void roleDtoShouldHaveABuilder() {
@@ -59,5 +57,16 @@ public class RoleDtoTest {
         assertThat(original, doesNotHaveNullOrEmptyFields());
         assertThat(copy, is(not(sameInstance(original))));
         assertThat(copy, is(equalTo(original)));
+    }
+
+    @ParameterizedTest(name = "isValid() returns false when username is \"{0}\"")
+    @NullAndEmptySource
+    public void isValidReturnsFalseWhenUsernameIsNullOrBlank(String emptyOrNullRoleName)
+        throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        RoleDto roleDto = new RoleDto();
+        Method setter = RoleDto.class.getDeclaredMethod("setRoleName", String.class);
+        setter.setAccessible(true);
+        setter.invoke(roleDto, emptyOrNullRoleName);
+        assertThat(roleDto.isValid(), is(equalTo(false)));
     }
 }
