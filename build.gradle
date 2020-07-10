@@ -179,7 +179,7 @@ task debugCucumber() {
     }
 }
 
-test.dependsOn(cucumber)
+//test.dependsOn(cucumber)
 
 gradleLint {
     rules = ['all-dependency', 'duplicate-dependency-class', 'unused-exclude-by-dep']
