@@ -1,12 +1,13 @@
 package no.unit.nva.handlers;
 
-import static nva.commons.utils.attempt.Try.attempt;
-
 import com.amazonaws.services.lambda.runtime.Context;
-import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
+import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.DataSyncException;
+import no.unit.nva.exceptions.InvalidInputException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
+import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.UserDto;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.handlers.RequestInfo;
@@ -17,8 +18,9 @@ import org.slf4j.LoggerFactory;
 
 public class AddUserHandler extends HandlerWithEventualConsistency<UserDto, UserDto> {
 
-
     public static final String SYNC_ERROR_MESSAGE = "Error while trying to retrieve saved user:";
+    public static final String PUBLIC_MESSAGE_FOR_INTERNAL_CONSISTENCY_PROBLEMS = "Problem with the data has occured";
+    public static final String INCOSISTEND_DATA_ERROR = "Inconsistent data in the database.";
     private final DatabaseService databaseService;
 
     /**
@@ -37,19 +39,28 @@ public class AddUserHandler extends HandlerWithEventualConsistency<UserDto, User
 
     @Override
     protected UserDto processInput(UserDto input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-        databaseService.addUser(input.validate());
+        tryAddingUser(input);
 
         return getEventuallyConsistent(() -> getUser(input))
             .orElseThrow(() -> new DataSyncException(SYNC_ERROR_MESSAGE + input.getUsername()));
     }
 
-    private Optional<UserDto> getUser(UserDto input) {
-        return attempt(() -> databaseService.getUser(input))
-            .orElseThrow(fail -> unexpectedFailure(fail.getException().getMessage(), fail.getException()));
-    }
-
     @Override
     protected Integer getSuccessStatusCode(UserDto input, UserDto output) {
         return HttpStatus.SC_OK;
+    }
+
+    private void tryAddingUser(UserDto input)
+        throws ConflictException, InvalidInputException {
+        try {
+            databaseService.addUser(input);
+        } catch (InvalidEntryInternalException e) {
+            logger.error(INCOSISTEND_DATA_ERROR, e);
+            throw new RuntimeException(PUBLIC_MESSAGE_FOR_INTERNAL_CONSISTENCY_PROBLEMS);
+        }
+    }
+
+    private UserDto getUser(UserDto input) throws NotFoundException, InvalidEntryInternalException {
+        return databaseService.getUser(input);
     }
 }

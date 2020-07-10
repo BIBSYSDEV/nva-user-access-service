@@ -14,7 +14,7 @@ import io.cucumber.java.en.When;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-import no.unit.nva.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.handlers.AddRoleHandler;
 import no.unit.nva.model.RoleDto;
 import nva.commons.utils.JsonUtils;
@@ -37,7 +37,7 @@ public class AddRoleFt extends ScenarioTest {
     }
 
     @Then("a new role is stored in the database")
-    public void a_new_role_is_stored_in_the_database() throws InvalidRoleInternalException, IOException {
+    public void a_new_role_is_stored_in_the_database() throws IOException, InvalidEntryInternalException {
 
         RoleDto responseObject = getResponseBody();
         Optional<RoleDto> objectReadDirectlyFromDatabase = readRoleDirectlyFromDatabase(responseObject);
@@ -54,8 +54,9 @@ public class AddRoleFt extends ScenarioTest {
         assertThat(requestObject, is(equalTo(responseObject)));
     }
 
-    private Optional<RoleDto> readRoleDirectlyFromDatabase(RoleDto responseObject) throws InvalidRoleInternalException {
-        return getDatabaseService().getRole(responseObject);
+    private Optional<RoleDto> readRoleDirectlyFromDatabase(RoleDto responseObject)
+        throws InvalidEntryInternalException {
+        return getDatabaseService().getRoleAsOptional(responseObject);
     }
 
     private RoleDto convertRequestBodyToRoleDto(Map<String, Object> requestObjectMap) {

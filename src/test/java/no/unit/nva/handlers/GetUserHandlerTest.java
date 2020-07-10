@@ -12,8 +12,8 @@ import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.exceptions.BadRequestException;
 import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.InvalidRoleInternalException;
-import no.unit.nva.exceptions.InvalidUserInternalException;
+import no.unit.nva.exceptions.InvalidInputException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
@@ -85,13 +85,13 @@ class GetUserHandlerTest extends DatabaseAccessor {
     }
 
     private UserDto insertSampleUserToDatabase()
-        throws InvalidUserInternalException, ConflictException, InvalidRoleInternalException {
+        throws InvalidEntryInternalException, ConflictException, InvalidInputException {
         UserDto sampleUser = createSampleUser();
         databaseService.addUser(sampleUser);
         return sampleUser;
     }
 
-    private UserDto createSampleUser() throws InvalidUserInternalException, InvalidRoleInternalException {
+    private UserDto createSampleUser() throws InvalidEntryInternalException {
         RoleDto someRole = RoleDto.newBuilder().withName(SOME_ROLE).build();
         return UserDto.newBuilder()
             .withUsername(SOME_USERNAME)

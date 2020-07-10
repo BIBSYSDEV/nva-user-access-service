@@ -1,14 +1,13 @@
 package no.unit.nva.handlers;
 
-import static nva.commons.utils.attempt.Try.attempt;
-
 import com.amazonaws.services.lambda.runtime.Context;
-import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
+import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.DataSyncException;
-import no.unit.nva.exceptions.InvalidInputRoleException;
-import no.unit.nva.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
+import no.unit.nva.exceptions.InvalidInputException;
+import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.Environment;
@@ -19,8 +18,6 @@ import org.slf4j.LoggerFactory;
 public class AddRoleHandler extends HandlerWithEventualConsistency<RoleDto, RoleDto> {
 
     public static final String ERROR_FETCHING_SAVED_ROLE = "Could not fetch role with name: ";
-    public static final String UNEXPECTED_ERROR_MESSAGE = "Unexpected error while trying to access role";
-
     private final DatabaseService databaseService;
 
     /**
@@ -43,15 +40,14 @@ public class AddRoleHandler extends HandlerWithEventualConsistency<RoleDto, Role
 
     @Override
     protected RoleDto processInput(RoleDto input, RequestInfo requestInfo, Context context)
-        throws DataSyncException, InvalidInputRoleException, InvalidRoleInternalException {
+        throws DataSyncException, ConflictException, InvalidInputException, InvalidEntryInternalException {
         databaseService.addRole(input);
         return getEventuallyConsistent(() -> getRole(input))
             .orElseThrow(() -> new DataSyncException(ERROR_FETCHING_SAVED_ROLE + input.getRoleName()));
     }
 
-    private Optional<RoleDto> getRole(RoleDto input) {
-        return attempt(() -> databaseService.getRole(input))
-            .orElseThrow(fail -> unexpectedFailure(UNEXPECTED_ERROR_MESSAGE, fail.getException()));
+    private RoleDto getRole(RoleDto input) throws NotFoundException, InvalidEntryInternalException {
+        return databaseService.getRole(input);
     }
 
     @Override

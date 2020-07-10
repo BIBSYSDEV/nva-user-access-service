@@ -3,12 +3,10 @@ package no.unit.nva.exceptions;
 import nva.commons.exceptions.ApiGatewayException;
 import org.apache.http.HttpStatus;
 
-public class EmptyUsernameException extends ApiGatewayException {
+public class InvalidInputException extends ApiGatewayException {
 
-    public static final String MESSAGE = "Username cannot be empty";
-
-    public EmptyUsernameException() {
-        super(MESSAGE);
+    public InvalidInputException(String message) {
+        super(message);
     }
 
     @Override

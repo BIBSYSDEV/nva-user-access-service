@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import no.unit.nva.exceptions.InvalidUserInternalException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.handlers.AddUserHandler;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
@@ -36,7 +36,7 @@ public class AddUserFt extends ScenarioTest {
 
     @Given("that a user entry with the username {string} does not exist in the database")
     public void that_a_user_entry_with_the_username_does_not_exist_in_the_database(String username)
-        throws InvalidUserInternalException {
+        throws InvalidEntryInternalException {
         UserDto queryObject = UserDto.newBuilder().withUsername(username).build();
         Optional<UserDto> queryResult = fetchUserDirectlyFromDatabase(queryObject);
         assertTrue(queryResult.isEmpty());
@@ -52,7 +52,7 @@ public class AddUserFt extends ScenarioTest {
 
     @When("the request body also contains a list of roles with the following role-names")
     public void the_request_body_also_contains_a_list_of_roles_with_the_following_role_names(DataTable dataTable)
-        throws JsonProcessingException, InvalidUserInternalException {
+        throws JsonProcessingException, InvalidEntryInternalException {
 
         UserDto updatedRequestObject = addDesiredRolesToRequestObject(dataTable);
 
@@ -91,14 +91,14 @@ public class AddUserFt extends ScenarioTest {
     }
 
     private UserDto addDesiredRolesToRequestObject(DataTable dataTable)
-        throws JsonProcessingException, InvalidUserInternalException {
+        throws JsonProcessingException, InvalidEntryInternalException {
         List<RoleDto> desiredRoles = extractRolesFromScenarioInput(dataTable);
         UserDto currentRequestObject = readRequestBody(getRequestBuilder(), UserDto.class);
         return currentRequestObject.copy().withRoles(desiredRoles).build();
     }
 
-    private Optional<UserDto> fetchUserDirectlyFromDatabase(UserDto queryObject) throws InvalidUserInternalException {
-        return getDatabaseService().getUser(queryObject);
+    private Optional<UserDto> fetchUserDirectlyFromDatabase(UserDto queryObject) throws InvalidEntryInternalException {
+        return getDatabaseService().getUserAsOptional(queryObject);
     }
 
     private List<RoleDto> extractRolesFromScenarioInput(DataTable dataTable) {

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import no.unit.nva.exceptions.InvalidRoleInternalException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.model.RoleDto.Builder;
 import nva.commons.utils.attempt.Failure;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class RoleDtoTest {
     }
 
     @Test
-    public void builderShouldAllowSettingRoleName() throws InvalidRoleInternalException {
+    public void builderShouldAllowSettingRoleName() throws InvalidEntryInternalException {
         RoleDto role = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
         assertThat(role.getRoleName(), is(equalTo(SOME_ROLE_NAME)));
     }
@@ -43,17 +43,17 @@ public class RoleDtoTest {
     @ValueSource(strings = {"", " "})
     public void builderShouldNotAllowEmptyRoleName(String rolename) {
         Executable action = () -> RoleDto.newBuilder().withName(rolename).build();
-        assertThrows(InvalidRoleInternalException.class, action);
+        assertThrows(InvalidEntryInternalException.class, action);
     }
 
     @Test
-    public void toStringReturnsStringContainingTheNameOfTheRole() throws InvalidRoleInternalException {
+    public void toStringReturnsStringContainingTheNameOfTheRole() throws InvalidEntryInternalException {
         RoleDto role = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
         assertThat(role.toString(), containsString(role.getRoleName()));
     }
 
     @Test
-    public void copyReturnsABuilderWithAllFieldsOfOriginalObjectPreserved() throws InvalidRoleInternalException {
+    public void copyReturnsABuilderWithAllFieldsOfOriginalObjectPreserved() throws InvalidEntryInternalException {
         RoleDto original = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
         RoleDto copy = original.copy().build();
         assertThat(original, doesNotHaveNullOrEmptyFields());

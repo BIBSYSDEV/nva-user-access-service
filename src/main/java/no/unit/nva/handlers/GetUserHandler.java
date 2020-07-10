@@ -7,7 +7,7 @@ import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.exceptions.BadRequestException;
-import no.unit.nva.exceptions.InvalidUserInternalException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.UserDto;
 import nva.commons.handlers.ApiGatewayHandler;
@@ -21,7 +21,7 @@ public class GetUserHandler extends ApiGatewayHandler<Void, UserDto> {
 
     public static final String USERNAME_PATH_PARAMETER = "username";
     public static final String EMPTY_USERNAME_PATH_PARAMETER_ERROR = "Path parameter \"username\" cannot be empty";
-    public static final String USER_NOT_FOUND_MESSAGE = "Could not find user with username:";
+
     private final DatabaseService databaseService;
 
     /**
@@ -40,12 +40,10 @@ public class GetUserHandler extends ApiGatewayHandler<Void, UserDto> {
 
     @Override
     protected UserDto processInput(Void input, RequestInfo requestInfo, Context context)
-        throws BadRequestException, InvalidUserInternalException, NotFoundException {
+        throws BadRequestException, InvalidEntryInternalException, NotFoundException {
         String username = extractValidUserNameOrThrowException(requestInfo);
         UserDto queryObject = UserDto.newBuilder().withUsername(username).build();
-        return databaseService
-            .getUser(queryObject)
-            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE + username));
+        return databaseService.getUser(queryObject);
     }
 
     private String extractValidUserNameOrThrowException(RequestInfo requestInfo) throws BadRequestException {

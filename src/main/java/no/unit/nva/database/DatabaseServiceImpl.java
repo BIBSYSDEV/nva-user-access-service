@@ -1,5 +1,7 @@
 package no.unit.nva.database;
 
+import static java.util.Objects.isNull;
+import static nva.commons.utils.JsonUtils.objectMapper;
 import static nva.commons.utils.attempt.Try.attempt;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -14,17 +16,18 @@ import java.util.List;
 import java.util.Optional;
 import no.unit.nva.database.intefaces.WithType;
 import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.InvalidInputRoleException;
-import no.unit.nva.exceptions.InvalidRoleInternalException;
-import no.unit.nva.exceptions.InvalidUserInternalException;
+import no.unit.nva.exceptions.EmptyInputException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
+import no.unit.nva.exceptions.InvalidInputException;
+import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.JsonSerializable;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
+import no.unit.nva.model.Validable;
 import nva.commons.utils.Environment;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.SingletonCollector;
 import nva.commons.utils.attempt.Failure;
-import nva.commons.utils.attempt.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,14 +35,19 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
 
     public static final String RANGE_KEY_NAME = "PK1B";
     public static final String INVALID_USER_IN_DATABASE = "Invalid user stored in the database:";
-    public static final String INVALID_ROLE_ERROR = "InvalidRole, null object or missing data.";
-    public static final String USER_ALREADY_EXISTS_ERROR_MESSAGE = "User already exists:";
+    public static final String USER_ALREADY_EXISTS_ERROR_MESSAGE = "User already exists: ";
+    public static final String USER_NOT_FOUND_MESSAGE = "Could not find user with username: ";
+    public static final String ROLE_NOT_FOUND_MESSAGE = "Could not find role: ";
+
     public static final String EMPTY_INPUT_ERROR = "empty input";
     public static final String GET_USER_DEBUG_MESSAGE = "Getting user:";
     public static final String ADD_USER_DEBUG_MESSAGE = "Adding user:";
     public static final String ADD_ROLE_DEBUG_MESSAGE = "Adding role:";
     public static final String GET_ROLE_DEBUG_MESSAGE = "Getting role:";
+    public static final String EMPTY_INPUT_ERROR_MESSAGE = "Expected non-empty input, but input is empty";
     private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
+    private static final String UPDATE_ROLE_DEBUG_MESSAGE = "Updating role: ";
+    private static final String ROLE_ALREADY_EXISTS_ERROR_MESSAGE = "Role already exists: ";
     private final DynamoDBMapper mapper;
 
     @JacocoGenerated
@@ -57,61 +65,126 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     }
 
     @Override
-    public Optional<UserDto> getUser(UserDto queryObject) throws InvalidUserInternalException {
-        logger.debug(
-            GET_USER_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(queryObject));
-        DynamoDBQueryExpression<UserDb> searchUserRequest = createGetQuery(queryObject.toUserDb());
-        List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserRequest);
-
-        UserDto user = userSearchResult
-            .stream()
-            .map(attempt(UserDto::fromUserDb))
-            .map(attempt -> attempt.orElseThrow(this::unexpectedException))
-            .collect(SingletonCollector.collectOrElse(null));
-
-        return Optional.ofNullable(user);
+    public UserDto getUser(UserDto queryObject) throws InvalidEntryInternalException, NotFoundException {
+        Optional<UserDto> resultOpt = getUserAsOptional(queryObject);
+        return resultOpt.orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE + queryObject.getUsername()));
     }
 
     @Override
-    public void addUser(UserDto user) throws InvalidUserInternalException, ConflictException {
+    public void addUser(UserDto user) throws InvalidEntryInternalException, ConflictException, InvalidInputException {
         logger.debug(ADD_USER_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(user));
-        if (userAlreadyExists(user)) {
-            throw new ConflictException(USER_ALREADY_EXISTS_ERROR_MESSAGE + user.getUsername());
-        }
+
+        validate(user);
+        checkUserDoesNotAlreadyExist(user);
         mapper.save(user.toUserDb());
     }
 
     @Override
-    public void addRole(RoleDto roleDto) throws InvalidInputRoleException {
+    public void addRole(RoleDto roleDto) throws ConflictException, InvalidInputException,
+                                                InvalidEntryInternalException {
+
         logger.debug(ADD_ROLE_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(roleDto));
-        Try.of(roleDto)
-            .forEach(role -> mapper.save(roleDto.toRoleDb()))
-            .orElseThrow(failure -> new InvalidInputRoleException(INVALID_ROLE_ERROR));
+
+        validate(roleDto);
+        checkRoleDoesNotExist(roleDto);
+        mapper.save(roleDto.toRoleDb());
     }
 
     @Override
-    public UserDto updateUser(UserDto user) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void updateUser(UserDto queryObject)
+        throws InvalidEntryInternalException, NotFoundException, InvalidInputException {
+
+        logger.debug(UPDATE_ROLE_DEBUG_MESSAGE + queryObject.toJsonString(objectMapper));
+
+        validate(queryObject);
+        UserDto existingUser = getExistingUserOrSendNotFoundError(queryObject);
+
+        if (!existingUser.equals(queryObject)) {
+            mapper.save(queryObject.toUserDb());
+        }
     }
 
     @Override
-    public Optional<RoleDto> getRole(RoleDto queryObject) throws InvalidRoleInternalException {
+    public RoleDto getRole(RoleDto queryObject) throws NotFoundException, InvalidEntryInternalException {
+        return getRoleAsOptional(queryObject)
+            .orElseThrow(() -> new NotFoundException(ROLE_NOT_FOUND_MESSAGE + queryObject.getRoleName()));
+    }
+
+    @Override
+    public Optional<RoleDto> getRoleAsOptional(RoleDto queryObject) throws InvalidEntryInternalException {
         logger.debug(GET_ROLE_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(queryObject));
         RoleDb searchObject = queryObject.toRoleDb();
         DynamoDBQueryExpression<RoleDb> searchRoleByName = createGetQuery(searchObject);
 
         PaginatedQueryList<RoleDb> searchRoleByNameResult = mapper.query(RoleDb.class, searchRoleByName);
-        RoleDto retrievedRole =
-            searchRoleByNameResult
-                .stream()
-                .map(attempt(RoleDto::fromRoleDb))
-                .map(attempt -> attempt.orElseThrow(this::unexpectedException))
-                .collect(SingletonCollector.collectOrElse(null));
-        return Optional.ofNullable(retrievedRole);
+        return convertQueryResultToOptionalRole(queryObject, searchRoleByNameResult);
     }
 
-    private boolean userAlreadyExists(UserDto user) throws InvalidUserInternalException {
-        return this.getUser(user).isPresent();
+    @Override
+    public Optional<UserDto> getUserAsOptional(UserDto queryObject) throws InvalidEntryInternalException {
+        logger.debug(
+            GET_USER_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(queryObject));
+        DynamoDBQueryExpression<UserDb> searchUserRequest = createGetQuery(queryObject.toUserDb());
+        List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserRequest);
+        return convertQueryResultToOptionalUser(userSearchResult, queryObject);
+    }
+
+    private void checkUserDoesNotAlreadyExist(UserDto user) throws InvalidEntryInternalException, ConflictException {
+        if (userAlreadyExists(user)) {
+            throw new ConflictException(USER_ALREADY_EXISTS_ERROR_MESSAGE + user.getUsername());
+        }
+    }
+
+    private void validate(Validable input) throws InvalidInputException {
+        if (isNull(input)) {
+            throw new EmptyInputException(EMPTY_INPUT_ERROR_MESSAGE);
+        }
+        if (isInvalid(input)) {
+            throw input.exceptionWhenInvalid();
+        }
+    }
+
+    private boolean isInvalid(Validable roleDto) {
+        return isNull(roleDto) || !roleDto.isValid();
+    }
+
+    private UserDto getExistingUserOrSendNotFoundError(UserDto queryObject)
+        throws NotFoundException, InvalidEntryInternalException {
+        return getUserAsOptional(queryObject)
+            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE + queryObject.getUsername()));
+    }
+
+    private Optional<RoleDto> convertQueryResultToOptionalRole(RoleDto queryObject,
+                                                               List<RoleDb> searchRoleByNameResult) {
+        return searchRoleByNameResult
+            .stream()
+            .map(attempt(RoleDto::fromRoleDb))
+            .map(attempt -> attempt.orElseThrow(this::unexpectedException))
+            .collect(SingletonCollector.tryCollect())
+            .toOptional(failure -> logger.debug(ROLE_NOT_FOUND_MESSAGE + queryObject.getRoleName()));
+    }
+
+    private Optional<UserDto> convertQueryResultToOptionalUser(List<UserDb> userSearchResult, UserDto queryObject) {
+        return userSearchResult
+            .stream()
+            .map(attempt(UserDto::fromUserDb))
+            .map(attempt -> attempt.orElseThrow(this::unexpectedException))
+            .collect(SingletonCollector.tryCollect())
+            .toOptional(failure -> logger.debug(USER_NOT_FOUND_MESSAGE + queryObject.getUsername()));
+    }
+
+    private void checkRoleDoesNotExist(RoleDto roleDto) throws ConflictException, InvalidEntryInternalException {
+        if (roleAlreadyExists(roleDto)) {
+            throw new ConflictException(ROLE_ALREADY_EXISTS_ERROR_MESSAGE + roleDto.getRoleName());
+        }
+    }
+
+    private boolean roleAlreadyExists(RoleDto roleDto) throws InvalidEntryInternalException {
+        return getRoleAsOptional(roleDto).isPresent();
+    }
+
+    private boolean userAlreadyExists(UserDto user) throws InvalidEntryInternalException {
+        return this.getUserAsOptional(user).isPresent();
     }
 
     private static String convertToStringOrWriteErrorMessage(JsonSerializable queryObject) {
