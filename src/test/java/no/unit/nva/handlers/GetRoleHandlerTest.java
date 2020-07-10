@@ -1,6 +1,5 @@
 package no.unit.nva.handlers;
 
-import static nva.commons.utils.attempt.Try.attempt;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -9,21 +8,20 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.DatabaseAccessor;
+import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.intefaces.WithEnvironment;
 import no.unit.nva.exceptions.BadRequestException;
 import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
+import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.handlers.RequestInfo;
-import nva.commons.utils.log.LogUtils;
-import nva.commons.utils.log.TestAppender;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -51,6 +49,7 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
         assertThat(successCode, is(equalTo(HttpStatus.SC_OK)));
     }
 
+    @DisplayName("processInput returns RoleDto when a role with the input role-name exists")
     @Test
     void processInputReturnsRoleDtoWhenARoleWithTheInputRoleNameExists()
         throws ApiGatewayException {
@@ -60,20 +59,13 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
         assertThat(roleDto.getRoleName(), is(equalTo(THE_ROLE)));
     }
 
+    @DisplayName("processInput() throws NotFoundException when there is no role with the input role-name")
     @Test
     void processInputThrowsNotFoundExceptionWhenThereIsNoRoleInTheDatabaseWithTheSpecifiedRoleName() {
         RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
         Executable action = () -> getRoleHandler.processInput(null, requestInfo, context);
         NotFoundException exception = assertThrows(NotFoundException.class, action);
         assertThat(exception.getMessage(), containsString(THE_ROLE));
-    }
-
-    @Test
-    void processInputLogsWarningWhenNotFoundExceptionIsThrown() {
-        TestAppender testAppender = LogUtils.getTestingAppender(DatabaseServiceImpl.class);
-        RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
-        attempt(() -> getRoleHandler.processInput(null, requestInfo, context));
-        assertThat(testAppender.getMessages(), containsString(DatabaseServiceImpl.ROLE_NOT_FOUND_MESSAGE));
     }
 
     @Test
