@@ -1,6 +1,5 @@
 package no.unit.nva.database;
 
-import static no.unit.nva.database.DatabaseServiceWithTableNameOverride.createMapperOverridingHardCodedTableName;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,7 +12,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 import java.util.stream.Stream;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
-import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,13 +21,12 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
 
     public static final String SOME_INSTITUTION = "someInstitution";
     public static final String SOME_USERNAME = "someUsername";
-    private DynamoDBMapper mapper;
 
     private UserDto someUser;
 
     @BeforeEach
     public void init() throws InvalidEntryInternalException {
-        mapper = createMapperOverridingHardCodedTableName(initializeTestDatabase(), envWithTableName);
+
         someUser = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
     }
 
@@ -51,14 +48,21 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
     }
 
     @Test
-    public void getUserThrowsNotFoundExceptionWhenUserDoesNotExist() {
-        DatabaseService service = new DatabaseServiceImpl(mapper);
+    public void getRoleThrowsIllegalStateExceptionWhenItReceivesInvalidUserFromDatabase() {
+
+        RoleDb roleWithoutName = new RoleDb();
+
+        PaginatedQueryList<RoleDb> response = mockResponseFromDynamoMapper(roleWithoutName);
+        DynamoDBMapper mockMapper = mockDynamoMapperReturningInvalidRole(response);
+        DatabaseService service = new DatabaseServiceImpl(mockMapper);
+
         Executable action = () -> service.getUser(someUser);
-        NotFoundException exception = assertThrows(NotFoundException.class, action);
-        assertThat(exception.getMessage(), containsString(DatabaseServiceImpl.USER_NOT_FOUND_MESSAGE));
+        IllegalStateException exception = assertThrows(IllegalStateException.class, action);
+
+        String expectedMessageContent = DatabaseServiceImpl.INVALID_USER_IN_DATABASE;
+        assertThat(exception.getMessage(), containsString(expectedMessageContent));
     }
 
-    @SuppressWarnings("unchecked")
     private DynamoDBMapper mockDynamoMapperReturningInvalidUser(PaginatedQueryList<UserDb> response) {
         DynamoDBMapper mockMapper = mock(DynamoDBMapper.class);
         when(mockMapper.query(any(Class.class), any(DynamoDBQueryExpression.class)))
@@ -66,10 +70,22 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
         return mockMapper;
     }
 
-    @SuppressWarnings("unchecked")
+    private DynamoDBMapper mockDynamoMapperReturningInvalidRole(PaginatedQueryList<RoleDb> response) {
+        DynamoDBMapper mockMapper = mock(DynamoDBMapper.class);
+        when(mockMapper.query(any(Class.class), any(DynamoDBQueryExpression.class)))
+            .thenReturn(response);
+        return mockMapper;
+    }
+
     private PaginatedQueryList<UserDb> mockResponseFromDynamoMapper(UserDb userWithoutUsername) {
         PaginatedQueryList<UserDb> response = mock(PaginatedQueryList.class);
         when(response.stream()).thenReturn(Stream.of(userWithoutUsername));
+        return response;
+    }
+
+    private PaginatedQueryList<RoleDb> mockResponseFromDynamoMapper(RoleDb roleWithoutName) {
+        PaginatedQueryList<RoleDb> response = mock(PaginatedQueryList.class);
+        when(response.stream()).thenReturn(Stream.of(roleWithoutName));
         return response;
     }
 }
