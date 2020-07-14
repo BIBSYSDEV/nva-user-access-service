@@ -57,7 +57,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         assertThat(savedRole, is(equalTo(insertedRole)));
     }
 
-    @DisplayName("getRole() throws NotFoundException when the role-name does not exist in the database")
+    @DisplayName("getRole() throws NotFoundException when the role-name does not theexist in the database")
     @Test
     public void databaseServiceThrowsNotFoundExceptionWhenRoleNameDoesNotExist() throws InvalidEntryInternalException {
         RoleDto queryObject = createRole(SOME_ROLE);
