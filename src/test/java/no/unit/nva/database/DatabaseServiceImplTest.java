@@ -65,6 +65,24 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
         assertThat(exception.getMessage(), containsString(expectedMessageContent));
     }
 
+    @Test
+    public void getRoleLogsWarningWhenNotFoundExceptionIsThrown() throws InvalidEntryInternalException {
+        TestAppender testAppender = LogUtils.getTestingAppender(DatabaseServiceImpl.class);
+        RoleDto nonExistingRole = EntityUtils.createRole(EntityUtils.SOME_ROLENAME);
+        attempt(() -> databaseService.getRole(nonExistingRole));
+        assertThat(testAppender.getMessages(),
+            StringContains.containsString(DatabaseServiceImpl.ROLE_NOT_FOUND_MESSAGE));
+    }
+
+    @Test
+    public void getUserLogsWarningWhenNotFoundExceptionIsThrown() {
+        TestAppender testAppender = LogUtils.getTestingAppender(DatabaseServiceImpl.class);
+        UserDto nonExistingUser = someUser;
+        attempt(() -> databaseService.getUser(nonExistingUser));
+        assertThat(testAppender.getMessages(),
+            StringContains.containsString(DatabaseServiceImpl.USER_NOT_FOUND_MESSAGE));
+    }
+
     private DatabaseService mockServiceReceivingInvalidUserDbInstance() {
         UserDb userWithoutUsername = new UserDb();
         PaginatedQueryList<UserDb> response = mockResponseFromDynamoMapper(userWithoutUsername);
@@ -77,24 +95,6 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
         PaginatedQueryList<RoleDb> response = mockResponseFromDynamoMapper(roleWithoutName);
         DynamoDBMapper mockMapper = mockDynamoMapperReturningInvalidRole(response);
         return new DatabaseServiceImpl(mockMapper);
-    }
-
-    @Test
-    void getRoleLogsWarningWhenNotFoundExceptionIsThrown() throws InvalidEntryInternalException {
-        TestAppender testAppender = LogUtils.getTestingAppender(DatabaseServiceImpl.class);
-        RoleDto nonExistingRole = EntityUtils.createRole(EntityUtils.SOME_ROLENAME);
-        attempt(() -> databaseService.getRole(nonExistingRole));
-        assertThat(testAppender.getMessages(),
-            StringContains.containsString(DatabaseServiceImpl.ROLE_NOT_FOUND_MESSAGE));
-    }
-
-    @Test
-    void getUserLogsWarningWhenNotFoundExceptionIsThrown() {
-        TestAppender testAppender = LogUtils.getTestingAppender(DatabaseServiceImpl.class);
-        UserDto nonExistingUser = someUser;
-        attempt(() -> databaseService.getUser(nonExistingUser));
-        assertThat(testAppender.getMessages(),
-            StringContains.containsString(DatabaseServiceImpl.USER_NOT_FOUND_MESSAGE));
     }
 
     @SuppressWarnings("unchecked")
