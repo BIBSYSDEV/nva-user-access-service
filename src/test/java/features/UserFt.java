@@ -67,7 +67,7 @@ public class UserFt extends ScenarioTest {
     }
 
     @Given("the request contains a malformed JSON body")
-    public void the_request_contains_a_malformed_JSON_body()
+    public void the_request_contains_a_malformed_Json_body()
         throws InvocationTargetException, InvalidEntryInternalException, IllegalAccessException, NoSuchMethodException,
                JsonProcessingException {
 
