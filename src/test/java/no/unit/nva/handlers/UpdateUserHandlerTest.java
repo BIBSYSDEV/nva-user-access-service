@@ -64,7 +64,7 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
         throws ApiGatewayException, IOException {
 
         UserDto existingUser = storeUserInDatabase(createSampleUser());
-        UserDto userUpdate = updateUser(existingUser);
+        UserDto userUpdate = createUserUpdate(existingUser);
 
         GatewayResponse<Void> gatewayResponse = sendUpdateRequest(userUpdate.getUsername(), userUpdate);
 
@@ -83,7 +83,7 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
         throws ApiGatewayException, IOException {
 
         UserDto existingUser = storeUserInDatabase(createSampleUser());
-        UserDto userUpdate = updateUser(existingUser);
+        UserDto userUpdate = createUserUpdate(existingUser);
 
         GatewayResponse<Void> gatewayResponse = sendUpdateRequest(userUpdate.getUsername(), userUpdate);
 
@@ -100,7 +100,7 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
         UserDto anotherExistingUser = createSampleUser().copy().withUsername(SOME_OTHER_USERNAME).build();
         storeUserInDatabase(anotherExistingUser);
 
-        UserDto userUpdate = updateUser(existingUser);
+        UserDto userUpdate = createUserUpdate(existingUser);
 
         String falseUsername = anotherExistingUser.getUsername();
         GatewayResponse<Problem> gatewayResponse = sendUpdateRequest(falseUsername, userUpdate);
@@ -135,7 +135,7 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
 
         UserDto existingUser = storeUserInDatabase(createSampleUser());
 
-        UserDto userUpdate = updateUser(existingUser);
+        UserDto userUpdate = createUserUpdate(existingUser);
 
         GatewayResponse<Problem> gatewayResponse = sendUpdateRequestWithoutHeaders(userUpdate);
 
@@ -195,7 +195,7 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
             .build();
     }
 
-    private UserDto updateUser(UserDto userDto) throws InvalidEntryInternalException {
+    private UserDto createUserUpdate(UserDto userDto) throws InvalidEntryInternalException {
         RoleDto someOtherRole = RoleDto.newBuilder().withName(ANOTHER_ROLE).build();
         return updateRoleList(userDto, someOtherRole);
     }
