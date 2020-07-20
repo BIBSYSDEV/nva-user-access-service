@@ -1,11 +1,11 @@
 package no.unit.nva.handlers;
 
 import static no.unit.nva.handlers.AddUserHandler.SYNC_ERROR_MESSAGE;
-import static no.unit.nva.handlers.UserDtoCreator.createRequestWithUserWithoutUsername;
-import static no.unit.nva.handlers.UserDtoCreator.createUserWithRoleWithoutInstitution;
-import static no.unit.nva.handlers.UserDtoCreator.createUserWithRolesAndInstitution;
-import static no.unit.nva.handlers.UserDtoCreator.createUserWithoutRoles;
-import static no.unit.nva.handlers.UserDtoCreator.createUserWithoutUsername;
+import static no.unit.nva.utils.EntityUtils.createRequestWithUserWithoutUsername;
+import static no.unit.nva.utils.EntityUtils.createUserWithRoleWithoutInstitution;
+import static no.unit.nva.utils.EntityUtils.createUserWithRolesAndInstitution;
+import static no.unit.nva.utils.EntityUtils.createUserWithoutRoles;
+import static no.unit.nva.utils.EntityUtils.createUserWithoutUsername;
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -42,7 +42,6 @@ import org.zalando.problem.Problem;
 
 public class AddUserTest extends DatabaseAccessor {
 
-    public static final String EXCEPTION_MESSAGE_WHEN_GETTING_USER = "Exception when getting user";
     private AddUserHandler handler;
     private RequestInfo requestInfo;
     private Context context;
