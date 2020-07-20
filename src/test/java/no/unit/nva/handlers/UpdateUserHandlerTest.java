@@ -31,6 +31,7 @@ import no.unit.nva.model.UserDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.EntityUtils;
 import nva.commons.exceptions.ApiGatewayException;
+import nva.commons.handlers.ApiGatewayHandler;
 import nva.commons.handlers.GatewayResponse;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -142,7 +143,9 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
         assertThat(gatewayResponse.getStatusCode(), is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
 
         Problem problem = gatewayResponse.getBodyObject(Problem.class);
-        assertThat(problem.getDetail(), containsString(NO_USERS_PATH_PARAMETER_FOUND_ERROR_MESSAGE));
+        assertThat(problem.getDetail(),
+            containsString(
+                ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS));
     }
 
     @DisplayName("handleRequest() returns NotFound when trying to update non existing user")
