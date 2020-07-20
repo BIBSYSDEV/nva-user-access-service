@@ -10,6 +10,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.intefaces.WithEnvironment;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -54,16 +56,29 @@ public class ScenarioTest implements WithEnvironment {
         return scenarioContext.getRequestBuilder();
     }
 
+    protected void setRequestBuilder(HandlerRequestBuilder<Map<String, Object>> requestBuilder) {
+        scenarioContext.setRequestBuilder(requestBuilder);
+    }
+
     protected DatabaseServiceImpl getDatabaseService() {
         return scenarioContext.getDatabaseService();
     }
 
+    protected <I> I getResponseBody(Class<I> requestBodyClass) throws IOException {
+        return scenarioContext.getResponseBody(requestBodyClass);
+    }
+
+    protected void addFieldToRequestBody(Map<String, Object> bodyFields) throws JsonProcessingException {
+        Map<String, Object> body = fetchOrCreateRequestBody();
+        body.putAll(bodyFields);
+        scenarioContext.setRequestBuilder(scenarioContext.getRequestBuilder().withBody(body));
+    }
+
     private <I, O> ByteArrayOutputStream invokeHandlerWithRequest(
-        ApiGatewayHandler<I, O> handler,
-        InputStream request) throws IOException {
+        ApiGatewayHandler<I, O> handler, InputStream request) throws IOException {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        handler.handleRequest(request, outputStream,  mock(Context.class));
+        handler.handleRequest(request, outputStream, mock(Context.class));
         return outputStream;
     }
 
@@ -71,11 +86,9 @@ public class ScenarioTest implements WithEnvironment {
         return scenarioContext.getRequestBuilder().build();
     }
 
-    protected void setRequestBuilder(HandlerRequestBuilder<Map<String, Object>> requestBuilder) {
-        scenarioContext.setRequestBuilder(requestBuilder);
-    }
-
-    protected <I> I getResponseBody(Class<I> requestBodyClass) throws IOException {
-        return scenarioContext.getResponseBody(requestBodyClass);
+    private Map<String, Object> fetchOrCreateRequestBody() throws JsonProcessingException {
+        return Optional.ofNullable(scenarioContext.getRequestBuilder()
+            .getBody(createRequestBuilderTypeRef()))
+            .orElse(new ConcurrentHashMap<>());
     }
 }

@@ -22,6 +22,25 @@ public final class EntityUtils {
     /**
      * Creates a request for adding a user without a username. To be used with {@code handleRequest()} method.
      *
+     * @return an RequestBuilder.
+     * @throws JsonProcessingException       if JSON serialization fails.
+     * @throws InvalidEntryInternalException unlikely. The object is intentionally invalid.
+     * @throws InvalidEntryInternalException when role is invalid.
+     * @throws NoSuchMethodException         reflection related.
+     * @throws IllegalAccessException        reflection related.
+     * @throws InvocationTargetException     reflection related.
+     */
+    public static HandlerRequestBuilder<UserDto> createRequestBuilderWithUserWithoutUsername()
+        throws JsonProcessingException, InvalidEntryInternalException,
+               NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        UserDto userWithoutUsername = createUserWithoutUsername();
+        return new HandlerRequestBuilder<UserDto>(objectMapper)
+            .withBody(userWithoutUsername);
+    }
+
+    /**
+     * Creates a request for adding a user without a username. To be used with {@code handleRequest()} method.
+     *
      * @return an InputStream.
      * @throws JsonProcessingException       if JSON serialization fails.
      * @throws InvalidEntryInternalException unlikely. The object is intentionally invalid.
@@ -33,10 +52,7 @@ public final class EntityUtils {
     public static InputStream createRequestWithUserWithoutUsername()
         throws JsonProcessingException, InvalidEntryInternalException,
                NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        UserDto userWithoutUsername = createUserWithoutUsername();
-        return new HandlerRequestBuilder<UserDto>(objectMapper)
-            .withBody(userWithoutUsername)
-            .build();
+        return createRequestBuilderWithUserWithoutUsername().build();
     }
 
     /**

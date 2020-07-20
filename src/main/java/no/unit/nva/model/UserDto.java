@@ -34,6 +34,7 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
     private String institution;
 
     public UserDto() {
+        roles = new ArrayList<>();
     }
 
     private UserDto(Builder builder) {

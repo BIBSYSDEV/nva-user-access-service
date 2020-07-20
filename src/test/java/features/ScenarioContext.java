@@ -54,11 +54,6 @@ public class ScenarioContext {
         this.requestResponse = requestResponse;
     }
 
-    protected Supplier<? extends ApiGatewayHandler<?, ?>> getHandlerSupplier() {
-        return Optional.ofNullable(handlerSupplier)
-            .orElseThrow(() -> new IllegalStateException(API_GATEWAY_SUPPLIER_HAS_NOT_BEEN_SET));
-    }
-
     protected void setHandlerSupplier(Supplier<? extends ApiGatewayHandler<?, ?>> handlerSupplier) {
         this.handlerSupplier = handlerSupplier;
     }
