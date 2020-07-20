@@ -10,8 +10,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.intefaces.WithEnvironment;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -68,12 +66,6 @@ public class ScenarioTest implements WithEnvironment {
         return scenarioContext.getResponseBody(requestBodyClass);
     }
 
-    protected void addFieldToRequestBody(Map<String, Object> bodyFields) throws JsonProcessingException {
-        Map<String, Object> body = fetchOrCreateRequestBody();
-        body.putAll(bodyFields);
-        scenarioContext.setRequestBuilder(scenarioContext.getRequestBuilder().withBody(body));
-    }
-
     private <I, O> ByteArrayOutputStream invokeHandlerWithRequest(
         ApiGatewayHandler<I, O> handler, InputStream request) throws IOException {
 
@@ -84,11 +76,5 @@ public class ScenarioTest implements WithEnvironment {
 
     private InputStream buildRequestInputStream() throws JsonProcessingException {
         return scenarioContext.getRequestBuilder().build();
-    }
-
-    private Map<String, Object> fetchOrCreateRequestBody() throws JsonProcessingException {
-        return Optional.ofNullable(scenarioContext.getRequestBuilder()
-            .getBody(createRequestBuilderTypeRef()))
-            .orElse(new ConcurrentHashMap<>());
     }
 }
