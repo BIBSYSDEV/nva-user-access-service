@@ -69,10 +69,6 @@ public class ScenarioCommonSteps extends DatabaseAccessor {
 
     private void addFieldsToRequestBody(DataTable inputData) throws JsonProcessingException {
         Map<String, Object> bodyFields = inputData.asMap(String.class, Object.class);
-        addFieldToRequestBody(bodyFields);
-    }
-
-    protected void addFieldToRequestBody(Map<String, Object> bodyFields) throws JsonProcessingException {
         Map<String, Object> body = fetchOrCreateRequestBody();
         body.putAll(bodyFields);
         scenarioContext.setRequestBuilder(scenarioContext.getRequestBuilder().withBody(body));
