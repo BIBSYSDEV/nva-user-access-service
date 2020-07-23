@@ -314,6 +314,7 @@ Resources:
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
+          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
@@ -333,6 +334,7 @@ Resources:
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
+          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
