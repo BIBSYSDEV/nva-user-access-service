@@ -25,7 +25,7 @@ dependencies {
     implementation(group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.2.1') {
         because("It implements lambda handlers")
     }
-    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: '1dc6dbede'
+    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: '0.4.0'
     implementation(group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4') {
         because "Because we use the library directly to define loggers in our code"
     }
@@ -83,7 +83,7 @@ test.doFirst {
 
 test {
     useJUnitPlatform()
-    failFast = false
+    failFast = true
     testLogging {
         events('skipped', 'passed', 'failed')
     }
@@ -128,14 +128,14 @@ jacocoTestCoverageVerification {
             limit {
                 counter = 'METHOD'
                 value = 'COVEREDRATIO'
-                minimum = 0.900
+                minimum = 1.000
             }
         }
         rule {
             limit {
                 counter = 'CLASS'
                 value = 'COVEREDRATIO'
-                minimum = 0.900
+                minimum = 1.000
             }
         }
     }
@@ -168,7 +168,8 @@ task debugCucumber() {
             main = "io.cucumber.core.cli.Main"
             systemProperties = ["java.library.path": 'build/dynamodb-local']
             classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--glue', 'features', 'src/test/resources']
+            // add an @runme tag to debug one or more cucumber tests
+            args = ['--plugin', 'pretty', '--glue','features', '--tags', '@runme', 'src/test/resources', ]
             debugOptions {
                 enabled = true
                 suspend = true
@@ -179,7 +180,7 @@ task debugCucumber() {
     }
 }
 
-//test.dependsOn(cucumber)
+test.dependsOn(cucumber)
 
 gradleLint {
     rules = ['all-dependency', 'duplicate-dependency-class', 'unused-exclude-by-dep']

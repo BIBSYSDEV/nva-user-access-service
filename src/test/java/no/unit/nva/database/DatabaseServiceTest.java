@@ -3,6 +3,7 @@ package no.unit.nva.database;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.model.DoesNotHaveNullFields.doesNotHaveNullFields;
 import static no.unit.nva.utils.EntityUtils.createRole;
+import static no.unit.nva.utils.EntityUtils.createUserWithoutUsername;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -11,6 +12,7 @@ import static org.hamcrest.core.IsSame.sameInstance;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
 import no.unit.nva.exceptions.ConflictException;
@@ -19,7 +21,6 @@ import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
-import no.unit.nva.utils.EntityUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
     @Test
     public void databaseServiceHasAMethodForInsertingAUser()
         throws InvalidEntryInternalException, ConflictException, InvalidInputException {
-        UserDto user = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
+        UserDto user = createSampleUserWithoutInstitutionOrRoles(SOME_USERNAME);
         db.addUser(user);
     }
 
@@ -158,7 +159,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
     @DisplayName("addUser() throws Exception when trying to save user without username")
     @Test
     public void addUserShouldNotSaveUserWithoutUsername() {
-        Executable illegalAction = () -> db.addUser(EntityUtils.createUserWithoutUsername());
+        Executable illegalAction = () -> db.addUser(createUserWithoutUsername());
         InvalidInputException exception = assertThrows(InvalidInputException.class, illegalAction);
         assertThat(exception.getClass(), is(equalTo(InvalidInputException.class)));
         assertThat(exception.getMessage(), containsString(UserDto.INVALID_USER_ERROR_MESSAGE));
@@ -195,6 +196,32 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         assertThat(actualUser, is(not(sameInstance(expectedUser))));
     }
 
+    @DisplayName("updateUser() throws NotFoundException when the input username does not exist")
+    @Test
+    public void updateUserThrowsNotFoundExceptionWhenTheInputUsernameDoesNotExist()
+        throws InvalidEntryInternalException {
+        UserDto userUpdate = createSampleUser(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
+        Executable action = () -> db.updateUser(userUpdate);
+        NotFoundException exception = assertThrows(NotFoundException.class, action);
+        assertThat(exception.getMessage(), containsString(DatabaseServiceImpl.USER_NOT_FOUND_MESSAGE));
+    }
+
+    @DisplayName("updateUser() throws InvalidInputException when the input is invalid ")
+    @Test
+    public void updateUserThrowsInvalidInputExceptionWhenTheInputisInvalid()
+        throws ConflictException, InvalidEntryInternalException, InvalidInputException, NoSuchMethodException,
+               IllegalAccessException, InvocationTargetException {
+        createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
+        UserDto invalidUser = createUserWithoutUsername();
+        Executable action = () -> db.updateUser(invalidUser);
+        InvalidInputException exception = assertThrows(InvalidInputException.class, action);
+        assertThat(exception.getMessage(), containsString(UserDto.INVALID_USER_ERROR_MESSAGE));
+    }
+
+    private UserDto createSampleUserWithoutInstitutionOrRoles(String username) throws InvalidEntryInternalException {
+        return createSampleUser(username, null, null);
+    }
+
     private RoleDto createIllegalRole() throws InvalidEntryInternalException {
         RoleDto illegalRole = createRole(SOME_ROLE);
         illegalRole.setRoleName(null);
@@ -208,13 +235,18 @@ public class DatabaseServiceTest extends DatabaseAccessor {
 
     private UserDto createSampleUserAndAddUserToDb(String username, String institution, String roleName)
         throws InvalidEntryInternalException, ConflictException, InvalidInputException {
-        UserDto userDto = UserDto.newBuilder()
+        UserDto userDto = createSampleUser(username, institution, roleName);
+        db.addUser(userDto);
+        return userDto;
+    }
+
+    private UserDto createSampleUser(String username, String institution, String roleName)
+        throws InvalidEntryInternalException {
+        return UserDto.newBuilder()
             .withRoles(createRoleList(roleName))
             .withInstitution(institution)
             .withUsername(username)
             .build();
-        db.addUser(userDto);
-        return userDto;
     }
 
     private RoleDto createSampleRoleAndAddToDb(String roleName)

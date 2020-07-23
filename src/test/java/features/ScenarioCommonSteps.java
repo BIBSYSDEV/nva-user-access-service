@@ -5,25 +5,18 @@ import static features.ScenarioTest.createRequestBuilderTypeRef;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.mockito.Mockito.mock;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.After;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.database.DatabaseAccessor;
-import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.handlers.ApiGatewayHandler;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.utils.JsonUtils;
 import org.apache.http.HttpStatus;
@@ -58,7 +51,7 @@ public class ScenarioCommonSteps extends DatabaseAccessor {
     @Then("a NotFound message is returned")
     public void a_NotFound_message_is_returned() throws IOException {
         GatewayResponse<Problem> response = scenarioContext.getApiGatewayResponse(Problem.class);
-        assertThat(response.getStatusCode(),is(equalTo(HttpStatus.SC_NOT_FOUND)));
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_NOT_FOUND)));
     }
 
     /**
@@ -73,8 +66,6 @@ public class ScenarioCommonSteps extends DatabaseAccessor {
     private HandlerRequestBuilder<Map<String, Object>> createRequestBuilder() {
         return new HandlerRequestBuilder<>(JsonUtils.objectMapper);
     }
-
-
 
     private void addFieldsToRequestBody(DataTable inputData) throws JsonProcessingException {
         Map<String, Object> bodyFields = inputData.asMap(String.class, Object.class);

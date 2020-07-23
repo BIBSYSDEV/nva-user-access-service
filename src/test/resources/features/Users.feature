@@ -19,7 +19,6 @@ Feature: Users
     Then a user description is returned
     And the user object contains all the aforementioned information
 
-
   Scenario: Authorized client gets an existing user
     Given  that a user entry with the username "someone@institution" exists in the database
     And the authorized client forms a "GET" request
@@ -29,7 +28,6 @@ Feature: Users
     When the authorized client sends the request to read the user
     Then a user description is returned
 
-
   Scenario: Authorized client gets a non-existing user
     Given that a user entry with the username "someone@institution" does not exist in the database
     And the authorized client forms a "GET" request
@@ -38,7 +36,6 @@ Feature: Users
       | username  | someone@institution |
     When the authorized client sends the request to read the user
     Then a NotFound message is returned
-
 
   Scenario:  Authorized client updates existing user
     Given that a user entry with the username "someone@institution" exists in the database
@@ -57,9 +54,8 @@ Feature: Users
       | role-name |
       | RoleB     |
     When the authorized client sends the request to update the user
-    Then the user entry is updated
-    And a user description is returned
-
+    Then the user entry is updated asynchronously
+    And a Location header with the updated user URI is included in the response
 
   Scenario:Authorized client attempts to update non-existing user
     Given that a user entry with the username "someone@institution" does not exist in the database
@@ -85,6 +81,6 @@ Feature: Users
       | username  | someone@institution |
     And the request contains a malformed JSON body
     When the authorized client sends the request to update the user
-    Then a BadRequest message is returned
+    Then a BadRequest message is returned containing information about the invalid request
 
 

@@ -54,28 +54,27 @@ public class ScenarioTest implements WithEnvironment {
         return scenarioContext.getRequestBuilder();
     }
 
+    protected void setRequestBuilder(HandlerRequestBuilder<Map<String, Object>> requestBuilder) {
+        scenarioContext.setRequestBuilder(requestBuilder);
+    }
+
     protected DatabaseServiceImpl getDatabaseService() {
         return scenarioContext.getDatabaseService();
     }
 
+    protected <I> I getResponseBody(Class<I> requestBodyClass) throws IOException {
+        return scenarioContext.getResponseBody(requestBodyClass);
+    }
+
     private <I, O> ByteArrayOutputStream invokeHandlerWithRequest(
-        ApiGatewayHandler<I, O> handler,
-        InputStream request) throws IOException {
+        ApiGatewayHandler<I, O> handler, InputStream request) throws IOException {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        handler.handleRequest(request, outputStream,  mock(Context.class));
+        handler.handleRequest(request, outputStream, mock(Context.class));
         return outputStream;
     }
 
     private InputStream buildRequestInputStream() throws JsonProcessingException {
         return scenarioContext.getRequestBuilder().build();
-    }
-
-    protected void setRequestBuilder(HandlerRequestBuilder<Map<String, Object>> requestBuilder) {
-        scenarioContext.setRequestBuilder(requestBuilder);
-    }
-
-    protected <I> I getResponseBody(Class<I> requestBodyClass) throws IOException {
-        return scenarioContext.getResponseBody(requestBodyClass);
     }
 }

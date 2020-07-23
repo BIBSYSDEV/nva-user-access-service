@@ -22,7 +22,28 @@ public final class EntityUtils {
     /**
      * Creates a request for adding a user without a username. To be used with {@code handleRequest()} method.
      *
-     * @return an InputStream.
+     * @return an RequestBuilder that can produce an {@link InputStream} that contains a request to be processed by a
+     *     {@link com.amazonaws.services.lambda.runtime.RequestStreamHandler}.
+     * @throws JsonProcessingException       if JSON serialization fails.
+     * @throws InvalidEntryInternalException unlikely. The object is intentionally invalid.
+     * @throws InvalidEntryInternalException when role is invalid.
+     * @throws NoSuchMethodException         reflection related.
+     * @throws IllegalAccessException        reflection related.
+     * @throws InvocationTargetException     reflection related.
+     */
+    public static HandlerRequestBuilder<UserDto> createRequestBuilderWithUserWithoutUsername()
+        throws JsonProcessingException, InvalidEntryInternalException,
+               NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        UserDto userWithoutUsername = createUserWithoutUsername();
+        return new HandlerRequestBuilder<UserDto>(objectMapper)
+            .withBody(userWithoutUsername);
+    }
+
+    /**
+     * Creates a request for adding a user without a username. To be used with {@code handleRequest()} method.
+     *
+     * @return an InputStream containing the ApiGateway request to be handled by a {@link
+     *     com.amazonaws.services.lambda.runtime.RequestStreamHandler}.
      * @throws JsonProcessingException       if JSON serialization fails.
      * @throws InvalidEntryInternalException unlikely. The object is intentionally invalid.
      * @throws InvalidEntryInternalException when role is invalid.
@@ -33,10 +54,7 @@ public final class EntityUtils {
     public static InputStream createRequestWithUserWithoutUsername()
         throws JsonProcessingException, InvalidEntryInternalException,
                NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        UserDto userWithoutUsername = createUserWithoutUsername();
-        return new HandlerRequestBuilder<UserDto>(objectMapper)
-            .withBody(userWithoutUsername)
-            .build();
+        return createRequestBuilderWithUserWithoutUsername().build();
     }
 
     /**
