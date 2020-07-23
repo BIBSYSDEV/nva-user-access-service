@@ -121,7 +121,7 @@ Resources:
               security:
                 - CognitoUserPool: []
               responses:
-                '201':
+                '200':
                   description: Successful fetching of User. Returns the requested User
                   content:
                     "application/json":
@@ -327,7 +327,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
-      Handler: no.unit.nva.handlers.GetUserHandler::handleRequest
+      Handler: no.unit.nva.handlers.UpdateUserHandler::handleRequest
       Runtime: java11
       MemorySize: 1408
       Role: !GetAtt LambdaRole.Arn
