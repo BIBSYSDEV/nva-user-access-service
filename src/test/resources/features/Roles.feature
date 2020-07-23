@@ -24,8 +24,7 @@ Feature: Role features
     Then a role description is returned
 
   Scenario: Authorized client tries to read non-existent Role
-    Given that the authorized client intends to read a Role
-    And that there is no role with role-name "TheRole"
+    Given that there is no role with role-name "TheRole"
     And the authorized client forms a "GET" request
     And the request has the following path parameters:
       | parameter | value   |

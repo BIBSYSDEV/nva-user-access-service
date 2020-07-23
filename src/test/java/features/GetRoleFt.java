@@ -42,13 +42,6 @@ public class GetRoleFt extends ScenarioTest {
         super(scenarioContext);
     }
 
-    @Given("that the authorized client intends to read a Role")
-    public void that_the_authorized_client_intends_to_read_a_Role() {
-        Supplier<GetRoleHandler> getRoleHandlerSupplier = () -> new GetRoleHandler(mockEnvironment(),
-            getDatabaseService());
-        scenarioContext.setHandlerSupplier(getRoleHandlerSupplier);
-    }
-
     @Given("that there is a role with role-name {string}")
     public void that_there_is_a_role_with_rolename(String roleName)
         throws InvalidEntryInternalException, ConflictException, InvalidInputException {
