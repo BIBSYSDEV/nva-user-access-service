@@ -192,7 +192,7 @@ Resources:
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: UsersRoles
+      TableName: !Ref UsersAndRolesTableName
       AttributeDefinitions:
         - AttributeName: PK1A
           AttributeType: S
