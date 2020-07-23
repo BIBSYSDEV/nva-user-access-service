@@ -83,7 +83,7 @@ test.doFirst {
 
 test {
     useJUnitPlatform()
-    failFast = false
+    failFast = true
     testLogging {
         events('skipped', 'passed', 'failed')
     }

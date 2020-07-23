@@ -3,7 +3,6 @@ package no.unit.nva.handlers;
 import static no.unit.nva.database.DatabaseServiceImpl.USER_NOT_FOUND_MESSAGE;
 import static no.unit.nva.handlers.UpdateUserHandler.INCONSISTENT_USERNAME_IN_PATH_AND_OBJECT_ERROR;
 import static no.unit.nva.handlers.UpdateUserHandler.LOCATION_HEADER;
-import static no.unit.nva.handlers.UpdateUserHandler.NO_USERS_PATH_PARAMETER_FOUND_ERROR_MESSAGE;
 import static no.unit.nva.handlers.UpdateUserHandler.USERNAME_PATH_PARAMETER;
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -97,7 +96,7 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
     public void processInputReturnsBadRequestWhenPathContainsIdDifferentFromIdOfInputObject()
         throws ApiGatewayException, IOException {
 
-        UserDto existingUser = storeUserInDatabase(createSampleUser());
+        UserDto existingUser = createSampleUser();
         UserDto anotherExistingUser = createSampleUser().copy().withUsername(SOME_OTHER_USERNAME).build();
         storeUserInDatabase(anotherExistingUser);
 
@@ -138,7 +137,7 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
 
         UserDto userUpdate = createUserUpdate(existingUser);
 
-        GatewayResponse<Problem> gatewayResponse = sendUpdateRequestWithoutHeaders(userUpdate);
+        GatewayResponse<Problem> gatewayResponse = sendUpdateRequestWithoutPathParameters(userUpdate);
 
         assertThat(gatewayResponse.getStatusCode(), is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
 
@@ -173,7 +172,7 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
         return GatewayResponse.fromOutputStream(output);
     }
 
-    private GatewayResponse<Problem> sendUpdateRequestWithoutHeaders(UserDto userUpdate)
+    private GatewayResponse<Problem> sendUpdateRequestWithoutPathParameters(UserDto userUpdate)
         throws IOException {
         UpdateUserHandler updateUserHandler = new UpdateUserHandler(envWithTableName, databaseService);
         InputStream input = new HandlerRequestBuilder<UserDto>(objectMapper)

@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class UpdateUserHandler extends HandlerWithEventualConsistency<UserDto, Void> {
 
-    public static final String USERS_RELATIVE_PATH = String.format("/users/");
+    public static final String USERS_RELATIVE_PATH = "/users/";
     public static final String LOCATION_HEADER = "Location";
     public static final String USERNAME_PATH_PARAMETER = "username";
     public static final String NO_USERS_PATH_PARAMETER_FOUND_ERROR_MESSAGE =

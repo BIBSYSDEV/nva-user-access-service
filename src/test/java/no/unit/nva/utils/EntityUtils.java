@@ -22,7 +22,8 @@ public final class EntityUtils {
     /**
      * Creates a request for adding a user without a username. To be used with {@code handleRequest()} method.
      *
-     * @return an RequestBuilder.
+     * @return an RequestBuilder that can produce an {@link InputStream} that contains a request to be processed by a
+     *     {@link com.amazonaws.services.lambda.runtime.RequestStreamHandler}.
      * @throws JsonProcessingException       if JSON serialization fails.
      * @throws InvalidEntryInternalException unlikely. The object is intentionally invalid.
      * @throws InvalidEntryInternalException when role is invalid.
@@ -41,7 +42,8 @@ public final class EntityUtils {
     /**
      * Creates a request for adding a user without a username. To be used with {@code handleRequest()} method.
      *
-     * @return an InputStream.
+     * @return an InputStream containing the ApiGateway request to be handled by a {@link
+     *     com.amazonaws.services.lambda.runtime.RequestStreamHandler}.
      * @throws JsonProcessingException       if JSON serialization fails.
      * @throws InvalidEntryInternalException unlikely. The object is intentionally invalid.
      * @throws InvalidEntryInternalException when role is invalid.
