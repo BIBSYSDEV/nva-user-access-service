@@ -27,7 +27,7 @@ Resources:
       DefinitionBody:
         openapi: 3.0
         info:
-          title: roles and users access
+          title: Roles and Users catalogue
           description: Api for updating users and roles
           version: 1.0.0
         paths:
