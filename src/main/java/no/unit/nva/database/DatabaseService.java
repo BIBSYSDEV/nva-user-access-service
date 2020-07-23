@@ -2,8 +2,8 @@ package no.unit.nva.database;
 
 import java.util.Optional;
 import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
+import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
