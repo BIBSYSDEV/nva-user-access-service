@@ -15,11 +15,9 @@ import nva.commons.utils.JsonUtils;
 
 public class ScenarioContext {
 
-    public static final String API_GATEWAY_SUPPLIER_HAS_NOT_BEEN_SET = "ApiGatewayHandler supplier has not been set";
     private HandlerRequestBuilder<Map<String, Object>> requestBuilder;
     private String requestResponse;
     private DatabaseServiceImpl databaseService;
-    private Supplier<? extends ApiGatewayHandler<?, ?>> handlerSupplier;
 
     protected HandlerRequestBuilder<Map<String, Object>> getRequestBuilder() {
         if (isNull(requestBuilder)) {
@@ -52,9 +50,5 @@ public class ScenarioContext {
 
     protected void setRequestResponse(String requestResponse) {
         this.requestResponse = requestResponse;
-    }
-
-    protected void setHandlerSupplier(Supplier<? extends ApiGatewayHandler<?, ?>> handlerSupplier) {
-        this.handlerSupplier = handlerSupplier;
     }
 }
