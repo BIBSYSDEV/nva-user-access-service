@@ -36,7 +36,7 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder> {
     }
 
     @JacocoGenerated
-    @DynamoDBHashKey(attributeName = "PK1A")
+    @DynamoDBHashKey(attributeName = DatabaseServiceImpl.PRIMARY_KEY_HASH_KEY)
     @Override
     public String getPrimaryHashKey() {
         return this.primaryHashKey;
@@ -59,7 +59,7 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder> {
         }
     }
 
-    @DynamoDBRangeKey(attributeName = "PK1B")
+    @DynamoDBRangeKey(attributeName = DatabaseServiceImpl.PRIMARY_KEY_RANGE_KEY)
     @Override
     public String getPrimaryRangeKey() {
         return getType();

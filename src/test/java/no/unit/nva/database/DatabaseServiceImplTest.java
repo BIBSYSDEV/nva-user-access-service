@@ -16,7 +16,6 @@ import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 import no.unit.nva.utils.EntityUtils;
-import nva.commons.utils.Environment;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
 import org.hamcrest.core.StringContains;
@@ -31,13 +30,12 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
 
     private UserDto someUser;
     private DatabaseServiceImpl databaseService;
-    private Environment environment;
+
     @BeforeEach
     public void init() throws InvalidEntryInternalException {
 
         someUser = UserDto.newBuilder().withUsername(SOME_USERNAME).build();
         databaseService = new DatabaseServiceImpl(initializeTestDatabase(), envWithTableName);
-        environment = mockEnvironment();
     }
 
     @Test
@@ -89,14 +87,14 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
         UserDb userWithoutUsername = new UserDb();
         PaginatedQueryList<UserDb> response = mockResponseFromDynamoMapper(userWithoutUsername);
         DynamoDBMapper mockMapper = mockDynamoMapperReturningInvalidUser(response);
-        return new DatabaseServiceImpl(mockMapper, environment);
+        return new DatabaseServiceImpl(mockMapper);
     }
 
     private DatabaseService mockServiceReceivingInvalidRoleDbInstance() {
         RoleDb roleWithoutName = new RoleDb();
         PaginatedQueryList<RoleDb> response = mockResponseFromDynamoMapper(roleWithoutName);
         DynamoDBMapper mockMapper = mockDynamoMapperReturningInvalidRole(response);
-        return new DatabaseServiceImpl(mockMapper, environment);
+        return new DatabaseServiceImpl(mockMapper);
     }
 
     @SuppressWarnings("unchecked")

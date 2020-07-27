@@ -1,7 +1,11 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.isNull;
+import static no.unit.nva.database.DatabaseServiceImpl.PRIMARY_KEY_HASH_KEY;
+import static no.unit.nva.database.DatabaseServiceImpl.PRIMARY_KEY_RANGE_KEY;
 import static no.unit.nva.database.DatabaseServiceImpl.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
+import static no.unit.nva.database.DatabaseServiceImpl.SECONDARY_INDEX_1_HASH_KEY;
+import static no.unit.nva.database.DatabaseServiceImpl.SECONDARY_INDEX_1_RANGE_KEY;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
@@ -50,7 +54,7 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder> {
     }
 
     @JacocoGenerated
-    @DynamoDBHashKey(attributeName = "PrimaryKeyHashKey")
+    @DynamoDBHashKey(attributeName = PRIMARY_KEY_HASH_KEY)
     @Override
     public String getPrimaryHashKey() {
         return this.primaryHashKey;
@@ -74,26 +78,26 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder> {
     }
 
     @JacocoGenerated
-    @DynamoDBRangeKey(attributeName = "PrimaryKeyRangeKey")
+    @DynamoDBRangeKey(attributeName = PRIMARY_KEY_RANGE_KEY)
     @Override
     public String getPrimaryRangeKey() {
         return getType();
     }
 
     @JacocoGenerated
-    @DynamoDBIndexHashKey(attributeName = "SecondaryIndex1HashKey", globalSecondaryIndexName =
-        SEARCH_USERS_BY_INSTITUTION_INDEX_NAME)
+    @DynamoDBIndexHashKey(attributeName = SECONDARY_INDEX_1_HASH_KEY,
+        globalSecondaryIndexName = SEARCH_USERS_BY_INSTITUTION_INDEX_NAME)
     public String getSearchByInstitutionHashKey() {
         return this.getInstitution();
     }
 
+    @JacocoGenerated
     public void setSearchByInstitutionHashKey(String searchByInstitutionHashKey) {
         //DO NOTHING
-        ;
     }
 
     @JacocoGenerated
-    @DynamoDBIndexRangeKey(attributeName = "SecondaryIndex1RangeKey", globalSecondaryIndexName =
+    @DynamoDBIndexRangeKey(attributeName = SECONDARY_INDEX_1_RANGE_KEY, globalSecondaryIndexName =
         SEARCH_USERS_BY_INSTITUTION_INDEX_NAME)
     public String getSearchByInstitutionRangeKey() {
         return this.getUsername();
@@ -102,7 +106,6 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder> {
     @JacocoGenerated
     public void setSearchByInstitutionRangeKey(String searchByInstitutionRangeKey) {
         //DO NOTHING
-        ;
     }
 
     @JacocoGenerated
@@ -176,6 +179,9 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder> {
         }
         UserDb userDb = (UserDb) o;
         return Objects.equals(getPrimaryHashKey(), userDb.getPrimaryHashKey())
+            && Objects.equals(getPrimaryRangeKey(), userDb.getPrimaryRangeKey())
+            && Objects.equals(getSearchByInstitutionHashKey(), userDb.getSearchByInstitutionHashKey())
+            && Objects.equals(getSearchByInstitutionRangeKey(), userDb.getSearchByInstitutionRangeKey())
             && Objects.equals(getUsername(), userDb.getUsername())
             && Objects.equals(getInstitution(), userDb.getInstitution())
             && Objects.equals(getRoles(), userDb.getRoles());
