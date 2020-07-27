@@ -1,11 +1,11 @@
 package no.unit.nva.model;
 
 import static no.unit.nva.hamcrest.DoesNotHaveNullOrEmptyFields.doesNotHaveNullOrEmptyFields;
+import static no.unit.nva.model.UserDto.ERROR_DUE_TO_INVALID_ROLE;
 import static no.unit.nva.utils.EntityUtils.SOME_ROLENAME;
 import static no.unit.nva.utils.EntityUtils.SOME_USERNAME;
 import static no.unit.nva.utils.EntityUtils.createUserWithRoleWithoutInstitution;
 import static no.unit.nva.utils.EntityUtils.createUserWithRolesAndInstitution;
-import static no.unit.nva.model.UserDto.ERROR_DUE_TO_INVALID_ROLE;
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -17,7 +17,10 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,13 +32,14 @@ import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.model.UserDto.Builder;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class UserDtoTest {
+public class UserDtoTest extends DtoTest {
 
     public static final List<RoleDto> sampleRoles = createSampleRoles();
     public static final String SOME_INSTITUTION = "someInstitution";
@@ -49,6 +53,45 @@ public class UserDtoTest {
         setter.setAccessible(true);
         setter.invoke(userDto, emptyOrNullUsername);
         assertThat(userDto.isValid(), is(equalTo(false)));
+    }
+
+    @DisplayName("UserDto object contains type with value \"User\"")
+    @Test
+    public void userDtoSerializedObjectContainsTypeWithValueUser() throws InvalidEntryInternalException {
+        UserDto sampleUser = createUserWithRolesAndInstitution();
+        ObjectNode json = objectMapper.convertValue(sampleUser, ObjectNode.class);
+
+        String actualType = json.get(JSON_TYPE_ATTRIBUTE).asText();
+        assertThat(actualType, is(equalTo(USER_TYPE_LITERAL)));
+    }
+
+    @DisplayName("UserDto cannot be created without type value")
+    @Test
+    public void userDtoCannotBeCreatedWithoutTypeValue() throws InvalidEntryInternalException, JsonProcessingException {
+        UserDto sampleUser = createUserWithRolesAndInstitution();
+        ObjectNode json = objectMapper.convertValue(sampleUser, ObjectNode.class);
+        JsonNode objectWithoutType = json.remove(JSON_TYPE_ATTRIBUTE);
+        String jsonStringWithoutType = objectMapper.writeValueAsString(objectWithoutType);
+
+        Executable action = () -> objectMapper.readValue(jsonStringWithoutType, UserDto.class);
+        InvalidTypeIdException exception = assertThrows(InvalidTypeIdException.class, action);
+        assertThat(exception.getMessage(), containsString(INVALID_TYPE_EXCEPTION_MESSAGE_SAMPLE));
+    }
+
+    @DisplayName("UserDto can be created when it contains the right type value")
+    @Test
+    public void userDtoCanBeDeserializedWhenItContainsTheRightTypeValue()
+        throws InvalidEntryInternalException, JsonProcessingException {
+        UserDto sampleUser = createUserWithRolesAndInstitution();
+        ObjectNode json = objectMapper.convertValue(sampleUser, ObjectNode.class);
+        assertThatSerializedItemContainsType(json, USER_TYPE_LITERAL);
+
+        String jsonStringWithType = objectMapper.writeValueAsString(json);
+
+        UserDto deserializedItem = objectMapper.readValue(jsonStringWithType, UserDto.class);
+
+        assertThat(deserializedItem, is(equalTo(sampleUser)));
+        assertThat(deserializedItem, is(not(sameInstance(sampleUser))));
     }
 
     @Test

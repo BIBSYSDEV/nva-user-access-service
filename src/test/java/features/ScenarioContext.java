@@ -40,7 +40,7 @@ public class ScenarioContext {
 
     protected <T> GatewayResponse<T> getApiGatewayResponse(Class<T> responseBodyClass) throws IOException {
         JavaType typeRef = JsonUtils.objectMapper.getTypeFactory()
-            .constructParametrizedType(GatewayResponse.class, GatewayResponse.class, responseBodyClass);
+            .constructParametricType(GatewayResponse.class, responseBodyClass);
         return JsonUtils.objectMapper.readValue(requestResponse, typeRef);
     }
 
