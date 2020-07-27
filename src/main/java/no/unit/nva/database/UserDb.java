@@ -1,11 +1,11 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.isNull;
-import static no.unit.nva.database.DatabaseServiceImpl.PRIMARY_KEY_HASH_KEY;
-import static no.unit.nva.database.DatabaseServiceImpl.PRIMARY_KEY_RANGE_KEY;
-import static no.unit.nva.database.DatabaseServiceImpl.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
-import static no.unit.nva.database.DatabaseServiceImpl.SECONDARY_INDEX_1_HASH_KEY;
-import static no.unit.nva.database.DatabaseServiceImpl.SECONDARY_INDEX_1_RANGE_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
+import static no.unit.nva.database.DatabaseIndexDetails.SECONDARY_INDEX_1_HASH_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.SECONDARY_INDEX_1_RANGE_KEY;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;

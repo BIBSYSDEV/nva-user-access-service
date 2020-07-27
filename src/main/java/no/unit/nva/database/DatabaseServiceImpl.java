@@ -1,6 +1,8 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.isNull;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static nva.commons.utils.attempt.Try.attempt;
 
@@ -35,12 +37,6 @@ import org.slf4j.LoggerFactory;
 
 public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
 
-    public static final String SECONDARY_INDEX_1_HASH_KEY = "SecondaryIndex1HashKey";
-    public static final String SECONDARY_INDEX_1_RANGE_KEY = "SecondaryIndex1RangeKey";
-    public static final String PRIMARY_KEY_HASH_KEY = "PrimaryKeyHashKey";
-    public static final String PRIMARY_KEY_RANGE_KEY = "PrimaryKeyRangeKey";
-
-    public static final String SEARCH_USERS_BY_INSTITUTION_INDEX_NAME = "SearchUsersByInstitution";
     public static final String EMPTY_INPUT_ERROR_MESSAGE = "Expected non-empty input, but input is empty";
     public static final String INVALID_ENTRY_IN_DATABASE_ERROR = "Invalid entry stored in the database:";
     public static final String USER_ALREADY_EXISTS_ERROR_MESSAGE = "User already exists: ";
@@ -52,10 +48,9 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     public static final String GET_ROLE_DEBUG_MESSAGE = "Getting role:";
     public static final String ADD_USER_DEBUG_MESSAGE = "Adding user:";
     public static final String ADD_ROLE_DEBUG_MESSAGE = "Adding role:";
-
+    public static final String NOT_USED = "NOT_USED";
     private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
     private static final String UPDATE_ROLE_DEBUG_MESSAGE = "Updating role: ";
-    public static final String NOT_USED = "NOT_USED";
     private final DynamoDBMapper mapper;
 
     @JacocoGenerated
@@ -86,15 +81,6 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
             .map(attempt(UserDto::fromUserDb))
             .flatMap(Try::stream)
             .collect(Collectors.toList());
-    }
-
-    private DynamoDBQueryExpression<UserDb> createListUsersQuery(String institution)
-        throws InvalidEntryInternalException {
-        UserDb queryObject = UserDb.newBuilder().withUsername(NOT_USED).withInstitution(institution).build();
-        return new DynamoDBQueryExpression<UserDb>()
-            .withIndexName(SEARCH_USERS_BY_INSTITUTION_INDEX_NAME)
-            .withHashKeyValues(queryObject)
-            .withConsistentRead(false);
     }
 
     @Override
@@ -154,6 +140,15 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
         DynamoDBQueryExpression<UserDb> searchUserRequest = createGetQuery(queryObject.toUserDb());
         List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserRequest);
         return convertQueryResultToOptionalUser(userSearchResult, queryObject);
+    }
+
+    private DynamoDBQueryExpression<UserDb> createListUsersQuery(String institution)
+        throws InvalidEntryInternalException {
+        UserDb queryObject = UserDb.newBuilder().withUsername(NOT_USED).withInstitution(institution).build();
+        return new DynamoDBQueryExpression<UserDb>()
+            .withIndexName(SEARCH_USERS_BY_INSTITUTION_INDEX_NAME)
+            .withHashKeyValues(queryObject)
+            .withConsistentRead(false);
     }
 
     private void checkUserDoesNotAlreadyExist(UserDto user) throws InvalidEntryInternalException, ConflictException {
