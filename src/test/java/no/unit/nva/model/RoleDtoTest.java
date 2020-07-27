@@ -33,6 +33,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 public class RoleDtoTest extends DtoTest {
 
     public static final String SOME_ROLE_NAME = "someRoleName";
+    protected static final String ROLE_TYPE_LITERAL = "Role";
 
     @Test
     public void roleDtoShouldHaveABuilder() {

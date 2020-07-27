@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.UserDb;
-import no.unit.nva.database.intefaces.WithCopy;
+import no.unit.nva.database.interfaces.WithCopy;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import nva.commons.utils.JacocoGenerated;

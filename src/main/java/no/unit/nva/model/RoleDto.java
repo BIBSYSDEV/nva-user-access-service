@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Objects;
 import no.unit.nva.database.RoleDb;
-import no.unit.nva.database.intefaces.WithCopy;
+import no.unit.nva.database.interfaces.WithCopy;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import nva.commons.utils.JacocoGenerated;

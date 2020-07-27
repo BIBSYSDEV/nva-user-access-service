@@ -13,8 +13,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class DtoTest {
 
     protected static final String JSON_TYPE_ATTRIBUTE = "type";
-    protected static final String USER_TYPE_LITERAL = "User";
-    protected static final String ROLE_TYPE_LITERAL = "Role";
     protected static final String INVALID_TYPE_EXCEPTION_MESSAGE_SAMPLE = "Missing type id when trying to resolve "
         + "subtype of";
 

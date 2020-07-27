@@ -43,6 +43,7 @@ public class UserDtoTest extends DtoTest {
 
     public static final List<RoleDto> sampleRoles = createSampleRoles();
     public static final String SOME_INSTITUTION = "someInstitution";
+    protected static final String USER_TYPE_LITERAL = "User";
 
     @ParameterizedTest(name = "isValid() returns false when username is \"{0}\"")
     @NullAndEmptySource
