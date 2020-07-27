@@ -80,7 +80,7 @@ public class RoleDtoTest extends DtoTest {
         assertThat(roleDto.isValid(), is(equalTo(false)));
     }
 
-    @DisplayName("RoleDto object contains type with value \"User\"")
+    @DisplayName("RoleDto object contains type with value \"Role\"")
     @Test
     public void roleDtoSerializedObjectContainsTypeWithValueUser() throws InvalidEntryInternalException {
         RoleDto sampleRole = createRole(SOME_ROLENAME);
