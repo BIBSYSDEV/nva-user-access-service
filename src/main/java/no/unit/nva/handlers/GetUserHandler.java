@@ -10,17 +10,13 @@ import no.unit.nva.exceptions.BadRequestException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.UserDto;
-import nva.commons.handlers.ApiGatewayHandler;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.Environment;
 import nva.commons.utils.JacocoGenerated;
 import org.apache.http.HttpStatus;
 import org.slf4j.LoggerFactory;
 
-public class GetUserHandler extends ApiGatewayHandler<Void, UserDto> implements ExpectingUserPathParameter {
-
-    public static final String EMPTY_USERNAME_PATH_PARAMETER_ERROR =
-        "Path parameter \"" + USERNAME_PATH_PARAMETER + "\" cannot be empty";
+public class GetUserHandler extends HandlerAccessingUser<Void, UserDto> {
 
     private final DatabaseService databaseService;
 
