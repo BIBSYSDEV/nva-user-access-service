@@ -27,7 +27,7 @@ Resources:
       DefinitionBody:
         openapi: 3.0
         info:
-          title: roles and users access
+          title: Roles and Users catalogue
           description: Api for updating users and roles
           version: 1.0.0
         paths:
@@ -112,6 +112,12 @@ Resources:
                   schema:
                     type: string
                   required: true
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/User'
               security:
                 - CognitoUserPool: []
               responses:
@@ -124,6 +130,36 @@ Resources:
               x-amazon-apigateway-integration:
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetUserHandler.Arn}/invocations
+                responses: {}
+                httpMethod: POST
+                type: aws_proxy
+            put:
+              summary: Updates an existing User
+              parameters:
+                - in: path
+                  name: username
+                  schema:
+                    type: string
+                  required: true
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/User'
+              security:
+                - CognitoUserPool: []
+              responses:
+                '202':
+                  description: Successful request for updating the user. User will be eventually updated
+                  headers:
+                    Location:
+                      schema:
+                        type: string
+                      description: Relative path to the user URI
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateUserHandler.Arn}/invocations
                 responses: {}
                 httpMethod: POST
                 type: aws_proxy
@@ -156,7 +192,7 @@ Resources:
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: UsersRoles
+      TableName: !Ref UsersAndRolesTableName
       AttributeDefinitions:
         - AttributeName: PK1A
           AttributeType: S
@@ -278,10 +314,31 @@ Resources:
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
+          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
           Properties:
             Path: /users/{username}
             Method: get
+            RestApiId: !Ref RestApi
+  UpdateUserHandler:
+    DependsOn: [ LambdaRole, UserRoleMappings]
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.UpdateUserHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /users/{username}
+            Method: put
             RestApiId: !Ref RestApi
