@@ -17,11 +17,11 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UpdateUserHandler extends HandlerWithEventualConsistency<UserDto, Void> {
+public class UpdateUserHandler extends HandlerWithEventualConsistency<UserDto, Void>
+    implements ExpectingUserPathParameter {
 
-    public static final String USERS_RELATIVE_PATH = "/users/";
     public static final String LOCATION_HEADER = "Location";
-    public static final String USERNAME_PATH_PARAMETER = "username";
+
     public static final String NO_USERS_PATH_PARAMETER_FOUND_ERROR_MESSAGE =
         "This method should not be called without a \"users\" path parameter";
     public static final String INCONSISTENT_USERNAME_IN_PATH_AND_OBJECT_ERROR =

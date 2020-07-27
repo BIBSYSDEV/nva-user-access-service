@@ -17,10 +17,10 @@ import nva.commons.utils.JacocoGenerated;
 import org.apache.http.HttpStatus;
 import org.slf4j.LoggerFactory;
 
-public class GetUserHandler extends ApiGatewayHandler<Void, UserDto> {
+public class GetUserHandler extends ApiGatewayHandler<Void, UserDto> implements ExpectingUserPathParameter {
 
-    public static final String USERNAME_PATH_PARAMETER = "username";
-    public static final String EMPTY_USERNAME_PATH_PARAMETER_ERROR = "Path parameter \"username\" cannot be empty";
+    public static final String EMPTY_USERNAME_PATH_PARAMETER_ERROR =
+        "Path parameter \"" + USERNAME_PATH_PARAMETER + "\" cannot be empty";
 
     private final DatabaseService databaseService;
 
@@ -46,16 +46,16 @@ public class GetUserHandler extends ApiGatewayHandler<Void, UserDto> {
         return databaseService.getUser(queryObject);
     }
 
+    @Override
+    protected Integer getSuccessStatusCode(Void input, UserDto output) {
+        return HttpStatus.SC_OK;
+    }
+
     private String extractValidUserNameOrThrowException(RequestInfo requestInfo) throws BadRequestException {
         return Optional.of(requestInfo)
             .map(RequestInfo::getPathParameters)
             .map(map -> map.get(USERNAME_PATH_PARAMETER))
             .filter(not(String::isBlank))
             .orElseThrow(() -> new BadRequestException(EMPTY_USERNAME_PATH_PARAMETER_ERROR));
-    }
-
-    @Override
-    protected Integer getSuccessStatusCode(Void input, UserDto output) {
-        return HttpStatus.SC_OK;
     }
 }
