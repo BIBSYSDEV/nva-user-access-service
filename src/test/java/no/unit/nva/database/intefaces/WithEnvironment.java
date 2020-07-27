@@ -36,22 +36,4 @@ public interface WithEnvironment {
             }
         };
     }
-
-    default Environment mockEnvironment(Map<String, String> envVariables, String defaultValue) {
-        return new Environment() {
-            @Override
-            public String readEnv(String variableName) {
-                if (envVariables.containsKey(variableName)) {
-                    return envVariables.get(variableName);
-                } else {
-                    return defaultValue;
-                }
-            }
-
-            @Override
-            public Optional<String> readEnvOpt(String variableName) {
-                return Optional.ofNullable(readEnv(variableName));
-            }
-        };
-    }
 }
