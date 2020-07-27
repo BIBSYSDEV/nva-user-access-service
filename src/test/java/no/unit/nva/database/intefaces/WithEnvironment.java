@@ -1,5 +1,6 @@
 package no.unit.nva.database.intefaces;
 
+import java.util.Map;
 import java.util.Optional;
 import nva.commons.utils.Environment;
 
@@ -32,6 +33,24 @@ public interface WithEnvironment {
             @Override
             public Optional<String> readEnvOpt(String variableName) {
                 return Optional.of(returnValueForAllEnvVariables);
+            }
+        };
+    }
+
+    default Environment mockEnvironment(Map<String, String> envVariables, String defaultValue) {
+        return new Environment() {
+            @Override
+            public String readEnv(String variableName) {
+                if (envVariables.containsKey(variableName)) {
+                    return envVariables.get(variableName);
+                } else {
+                    return defaultValue;
+                }
+            }
+
+            @Override
+            public Optional<String> readEnvOpt(String variableName) {
+                return Optional.ofNullable(readEnv(variableName));
             }
         };
     }

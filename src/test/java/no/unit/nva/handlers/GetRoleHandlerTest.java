@@ -69,6 +69,7 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
     }
 
     @Test
+    @DisplayName("processInput() throws BadRequestException when no role-name is provided")
     void processInputThrowsBadRequestExceptionWhenNoRoleNameIsProvided() {
         RequestInfo requestInfoWithoutRoleName = new RequestInfo();
         Executable action = () -> getRoleHandler.processInput(null, requestInfoWithoutRoleName, context);
@@ -77,6 +78,7 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
     }
 
     @Test
+    @DisplayName("processInput() throws BadRequestException when blank role-name is provided")
     void processInputThrowsBadRequestExceptionWhenBlankRoleNameIsProvided() {
         RequestInfo requestInfoWithBlankRoleName = queryWithRoleName(BLANK_STR);
         Executable action = () -> getRoleHandler.processInput(null, requestInfoWithBlankRoleName, context);

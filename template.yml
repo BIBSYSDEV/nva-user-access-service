@@ -11,6 +11,7 @@ Parameters:
   UsersAndRolesTableName:
     Type: String
 
+
 Globals:
   Api:
     Cors:
@@ -194,16 +195,30 @@ Resources:
     Properties:
       TableName: !Ref UsersAndRolesTableName
       AttributeDefinitions:
-        - AttributeName: PK1A
+        - AttributeName: PrimaryKeyHashKey
           AttributeType: S
-        - AttributeName: PK1B
+        - AttributeName: PrimaryKeyRangeKey
+          AttributeType: S
+        - AttributeName: SecondaryIndex1HashKey
+          AttributeType: S
+        - AttributeName: SecondaryIndex1RangeKey
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
       KeySchema:
-        - AttributeName: PK1A
+        - AttributeName: PrimaryKeyHashKey
           KeyType: HASH
-        - AttributeName: PK1B
+        - AttributeName: PrimaryKeyRangeKey
           KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: SearchUsersByInstitution
+          KeySchema:
+            - Attributename: SecondaryIndex1HashKey
+              KeyType: HASH
+            - Attributename: SecondaryIndex1RangeKey
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
 
   LambdaRole:
     DependsOn: UserRoleMappings

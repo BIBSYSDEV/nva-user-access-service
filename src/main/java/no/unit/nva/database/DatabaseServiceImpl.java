@@ -14,6 +14,8 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import no.unit.nva.database.intefaces.WithType;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.EmptyInputException;
@@ -28,12 +30,17 @@ import nva.commons.utils.Environment;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.SingletonCollector;
 import nva.commons.utils.attempt.Failure;
+import nva.commons.utils.attempt.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
 
-    public static final String RANGE_KEY_NAME = "PK1B";
+    public static final String SecondaryIndex1HashKey = "SecondaryIndex1HashKey";
+    public static final String SecondaryIndex1RangeKey = "SecondaryIndex1RangeKey";
+    public static final String PrimaryKeyRangeKeyName = "PrimaryKeyRangeKey";
+    public static final String SEARCH_BY_INSTITUTION_RANGE_KEY_NAME = "SecondaryIndex1RangeKey";
+    public static final String SEARCH_USERS_BY_INSTITUTION_INDEX_NAME = "SearchUsersByInstitution";
     public static final String EMPTY_INPUT_ERROR_MESSAGE = "Expected non-empty input, but input is empty";
     public static final String INVALID_ENTRY_IN_DATABASE_ERROR = "Invalid entry stored in the database:";
     public static final String USER_ALREADY_EXISTS_ERROR_MESSAGE = "User already exists: ";
@@ -47,6 +54,8 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     public static final String ADD_ROLE_DEBUG_MESSAGE = "Adding role:";
     private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
     private static final String UPDATE_ROLE_DEBUG_MESSAGE = "Updating role: ";
+    public static final String NOT_USED = "NOT_USED";
+    private final Environment environment;
     private final DynamoDBMapper mapper;
 
     @JacocoGenerated
@@ -55,11 +64,12 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     }
 
     public DatabaseServiceImpl(AmazonDynamoDB dynamoDbClient, Environment environment) {
-        this(createMapperOverridingHardCodedTableName(dynamoDbClient, environment));
+        this(createMapperOverridingHardCodedTableName(dynamoDbClient, environment), environment);
     }
 
-    public DatabaseServiceImpl(DynamoDBMapper mapper) {
+    public DatabaseServiceImpl(DynamoDBMapper mapper, Environment environment) {
         super();
+        this.environment = environment;
         this.mapper = mapper;
     }
 
@@ -67,6 +77,26 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     public UserDto getUser(UserDto queryObject) throws InvalidEntryInternalException, NotFoundException {
         return getUserAsOptional(queryObject)
             .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE + queryObject.getUsername()));
+    }
+
+    @Override
+    public List<UserDto> listUsers(String someInstitution) throws InvalidEntryInternalException {
+        DynamoDBQueryExpression<UserDb> listUsersQuery = createListUsersQuery(someInstitution);
+        PaginatedQueryList<UserDb> users = mapper.query(UserDb.class, listUsersQuery);
+        List<UserDto> queryResult = users.stream()
+            .map(attempt(UserDto::fromUserDb))
+            .flatMap(Try::stream)
+            .collect(Collectors.toList());
+        return queryResult;
+    }
+
+    private DynamoDBQueryExpression<UserDb> createListUsersQuery(String institution)
+        throws InvalidEntryInternalException {
+        UserDb queryObject = UserDb.newBuilder().withUsername(NOT_USED).withInstitution(institution).build();
+        return new DynamoDBQueryExpression<UserDb>()
+            .withIndexName(SEARCH_USERS_BY_INSTITUTION_INDEX_NAME)
+            .withHashKeyValues(queryObject)
+            .withConsistentRead(false);
     }
 
     @Override
@@ -193,7 +223,7 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     private static <I extends WithType> DynamoDBQueryExpression<I> createGetQuery(I searchObject) {
         return new DynamoDBQueryExpression<I>()
             .withHashKeyValues(searchObject)
-            .withRangeKeyCondition(RANGE_KEY_NAME, entityTypeAsRangeKey(searchObject));
+            .withRangeKeyCondition(PrimaryKeyRangeKeyName, entityTypeAsRangeKey(searchObject));
     }
 
     private static <I extends WithType> Condition entityTypeAsRangeKey(I searchObject) {

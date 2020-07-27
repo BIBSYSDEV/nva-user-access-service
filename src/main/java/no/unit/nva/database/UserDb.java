@@ -1,9 +1,12 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.isNull;
+import static no.unit.nva.database.DatabaseServiceImpl.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTyped;
@@ -47,7 +50,7 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder> {
     }
 
     @JacocoGenerated
-    @DynamoDBHashKey(attributeName = "PK1A")
+    @DynamoDBHashKey(attributeName = "PrimaryKeyHashKey")
     @Override
     public String getPrimaryHashKey() {
         return this.primaryHashKey;
@@ -71,10 +74,35 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder> {
     }
 
     @JacocoGenerated
-    @DynamoDBRangeKey(attributeName = "PK1B")
+    @DynamoDBRangeKey(attributeName = "PrimaryKeyRangeKey")
     @Override
     public String getPrimaryRangeKey() {
         return getType();
+    }
+
+    @JacocoGenerated
+    @DynamoDBIndexHashKey(attributeName = "SecondaryIndex1HashKey", globalSecondaryIndexName =
+        SEARCH_USERS_BY_INSTITUTION_INDEX_NAME)
+    public String getSearchByInstitutionHashKey() {
+        return this.getInstitution();
+    }
+
+    public void setSearchByInstitutionHashKey(String searchByInstitutionHashKey) {
+        //DO NOTHING
+        ;
+    }
+
+    @JacocoGenerated
+    @DynamoDBIndexRangeKey(attributeName = "SecondaryIndex1RangeKey", globalSecondaryIndexName =
+        SEARCH_USERS_BY_INSTITUTION_INDEX_NAME)
+    public String getSearchByInstitutionRangeKey() {
+        return this.getUsername();
+    }
+
+    @JacocoGenerated
+    public void setSearchByInstitutionRangeKey(String searchByInstitutionRangeKey) {
+        //DO NOTHING
+        ;
     }
 
     @JacocoGenerated
