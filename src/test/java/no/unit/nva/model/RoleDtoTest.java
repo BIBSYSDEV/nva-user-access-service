@@ -82,7 +82,7 @@ public class RoleDtoTest extends DtoTest {
 
     @DisplayName("RoleDto object contains type with value \"Role\"")
     @Test
-    public void roleDtoSerializedObjectContainsTypeWithValueUser() throws InvalidEntryInternalException {
+    public void roleDtoSerializedObjectContainsTypeWithValueRole() throws InvalidEntryInternalException {
         RoleDto sampleRole = createRole(SOME_ROLENAME);
         ObjectNode json = objectMapper.convertValue(sampleRole, ObjectNode.class);
 
