@@ -67,7 +67,7 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
 
         addSampleRoleToDatabase();
 
-        ByteArrayOutputStream outputStream = sendGetRoleRequest(THE_ROLE);
+        ByteArrayOutputStream outputStream = sendGetRoleRequest();
         ObjectNode bodyObject = extractBodyFromResponseAsJsonObject(outputStream);
 
         assertThat(bodyObject.get(TypedObjectsDetails.TYPE_ATTRIBUTE), is(not(nullValue())));
@@ -118,8 +118,8 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
         assertThat(exception.getMessage(), containsString(GetRoleHandler.EMPTY_ROLE_NAME));
     }
 
-    private ByteArrayOutputStream sendGetRoleRequest(String roleName) throws IOException {
-        RequestInfo requestInfo = queryWithRoleName(roleName);
+    private ByteArrayOutputStream sendGetRoleRequest() throws IOException {
+        RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
         InputStream requestStream = new HandlerRequestBuilder<>(JsonUtils.objectMapper)
             .withPathParameters(requestInfo.getPathParameters())
             .withHttpMethod(HttpMethods.GET)
