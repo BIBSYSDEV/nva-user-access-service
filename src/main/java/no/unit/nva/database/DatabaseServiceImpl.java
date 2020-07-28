@@ -74,8 +74,8 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     }
 
     @Override
-    public List<UserDto> listUsers(String someInstitution) throws InvalidEntryInternalException {
-        DynamoDBQueryExpression<UserDb> listUsersQuery = createListUsersQuery(someInstitution);
+    public List<UserDto> listUsers(String institutionId) throws InvalidEntryInternalException {
+        DynamoDBQueryExpression<UserDb> listUsersQuery = createListUsersQuery(institutionId);
         PaginatedQueryList<UserDb> users = mapper.query(UserDb.class, listUsersQuery);
         return users.stream()
             .map(attempt(UserDto::fromUserDb))
