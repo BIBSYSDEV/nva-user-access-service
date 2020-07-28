@@ -56,16 +56,11 @@ class GetUserHandlerTest extends DatabaseAccessor {
 
     @DisplayName("handleRequest returns User object with type \"User\"")
     @Test
-    public void handleRequestReturnsRoleObjectWithTypeRole()
+    public void handleRequestReturnsUserObjectWithTypeRole()
         throws ConflictException, InvalidEntryInternalException, InvalidInputException, IOException {
-        requestInfo = createRequestInfoForGetUser(SOME_USERNAME);
         insertSampleUserToDatabase();
 
-        InputStream inputStream = new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
-            .withPathParameters(requestInfo.getPathParameters())
-            .build();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        getUserHandler.handleRequest(inputStream, outputStream, context);
+        ByteArrayOutputStream outputStream = sendGetUserRequestToHandler();
 
         GatewayResponse<ObjectNode> response = GatewayResponse.fromOutputStream(outputStream);
         ObjectNode bodyObject = response.getBodyObject(ObjectNode.class);
@@ -73,6 +68,16 @@ class GetUserHandlerTest extends DatabaseAccessor {
         assertThat(bodyObject.get(TypedObjectsDetails.TYPE_ATTRIBUTE), is(not(nullValue())));
         String type = bodyObject.get(TypedObjectsDetails.TYPE_ATTRIBUTE).asText();
         assertThat(type, is(equalTo(UserDto.TYPE)));
+    }
+
+    private ByteArrayOutputStream sendGetUserRequestToHandler() throws IOException {
+        requestInfo = createRequestInfoForGetUser(SOME_USERNAME);
+        InputStream inputStream = new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
+            .withPathParameters(requestInfo.getPathParameters())
+            .build();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        getUserHandler.handleRequest(inputStream, outputStream, context);
+        return outputStream;
     }
 
     @Test
@@ -93,7 +98,7 @@ class GetUserHandlerTest extends DatabaseAccessor {
     @DisplayName("processInput() throws NotFoundException when path parameter is a string that is not an existing "
         + "username")
     @Test
-    void processInputThrowsNotFoundExceptionWhenPathParameterIsNonExistingUsername() throws ApiGatewayException {
+    void processInputThrowsNotFoundExceptionWhenPathParameterIsNonExistingUsername() {
         requestInfo = createRequestInfoForGetUser(SOME_USERNAME);
         Executable action = () -> getUserHandler.processInput(null, requestInfo, context);
         assertThrows(NotFoundException.class, action);
