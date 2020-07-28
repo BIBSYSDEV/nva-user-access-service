@@ -25,14 +25,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-class GetUserHandlerTest extends DatabaseAccessor {
+class GetUserHandlerTest extends HandlerTest {
 
-    public static final String SOME_USERNAME = "sampleUsername";
-    public static final String SOME_ROLE = "SomeRole";
-    public static final String SOME_INSTITUTION = "SomeInstitution";
+
     private static final String BLANK_STRING = " ";
 
-    private DatabaseService databaseService;
     private RequestInfo requestInfo;
     private Context context;
     private GetUserHandler getUserHandler;
@@ -84,21 +81,7 @@ class GetUserHandlerTest extends DatabaseAccessor {
         assertThrows(BadRequestException.class, action);
     }
 
-    private UserDto insertSampleUserToDatabase()
-        throws InvalidEntryInternalException, ConflictException, InvalidInputException {
-        UserDto sampleUser = createSampleUser();
-        databaseService.addUser(sampleUser);
-        return sampleUser;
-    }
 
-    private UserDto createSampleUser() throws InvalidEntryInternalException {
-        RoleDto someRole = RoleDto.newBuilder().withName(SOME_ROLE).build();
-        return UserDto.newBuilder()
-            .withUsername(SOME_USERNAME)
-            .withRoles(Collections.singletonList(someRole))
-            .withInstitution(SOME_INSTITUTION)
-            .build();
-    }
 
     private RequestInfo createRequestInfoForGetUser(String username) {
         RequestInfo reqInfo = new RequestInfo();
