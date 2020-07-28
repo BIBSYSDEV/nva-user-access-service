@@ -8,4 +8,8 @@ public final class DatabaseIndexDetails {
     public static final String PRIMARY_KEY_RANGE_KEY = "PrimaryKeyRangeKey";
 
     public static final String SEARCH_USERS_BY_INSTITUTION_INDEX_NAME = "SearchUsersByInstitution";
+
+    private DatabaseIndexDetails() {
+
+    }
 }

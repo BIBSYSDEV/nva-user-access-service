@@ -1,6 +1,5 @@
 package no.unit.nva.database.intefaces;
 
-import java.util.Map;
 import java.util.Optional;
 import nva.commons.utils.Environment;
 

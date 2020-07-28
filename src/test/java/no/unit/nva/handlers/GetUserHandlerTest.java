@@ -8,12 +8,12 @@ import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Collections;
-import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseAccessor;
+import no.unit.nva.database.DatabaseService;
 import no.unit.nva.exceptions.BadRequestException;
 import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
+import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
