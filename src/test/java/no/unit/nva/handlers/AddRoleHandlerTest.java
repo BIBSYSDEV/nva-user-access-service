@@ -142,7 +142,7 @@ public class AddRoleHandlerTest extends HandlerTest {
 
         GatewayResponse<Problem> response = sendRequestToHandlerWithBody(objectWithoutType);
 
-        assertThat(response, is(equalTo(HttpStatus.SC_BAD_REQUEST)));
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_BAD_REQUEST)));
 
         Problem problem = response.getBodyObject(Problem.class);
         assertThat(problem.getDetail(), is(equalTo(InvalidOrMissingTypeException.MESSAGE)));
