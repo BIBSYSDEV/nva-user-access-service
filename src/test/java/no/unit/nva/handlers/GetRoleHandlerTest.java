@@ -3,11 +3,17 @@ package no.unit.nva.handlers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.interfaces.WithEnvironment;
@@ -17,9 +23,14 @@ import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
+import no.unit.nva.model.TypedObjectsDetails;
+import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.exceptions.ApiGatewayException;
+import nva.commons.handlers.GatewayResponse;
 import nva.commons.handlers.RequestInfo;
+import nva.commons.utils.JsonUtils;
 import org.apache.http.HttpStatus;
+import org.eclipse.jetty.http.HttpMethods;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,6 +58,20 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
     public void statusCodeReturnsOkWhenRequestIsSuccessful() {
         Integer successCode = getRoleHandler.getSuccessStatusCode(null, null);
         assertThat(successCode, is(equalTo(HttpStatus.SC_OK)));
+    }
+
+    @DisplayName("handleRequest returns Role object with type \"Role\"")
+    @Test
+    public void handleRequestReturnsRoleObjectWithTypeRole()
+        throws ConflictException, InvalidEntryInternalException, InvalidInputException, IOException {
+        addSampleRoleToDatabase();
+        ByteArrayOutputStream outputStream = sendGetRoleRequest(THE_ROLE);
+        GatewayResponse<ObjectNode> response = GatewayResponse.fromOutputStream(outputStream);
+        ObjectNode bodyObject = response.getBodyObject(ObjectNode.class);
+
+        assertThat(bodyObject.get(TypedObjectsDetails.TYPE_ATTRIBUTE), is(not(nullValue())));
+        String type = bodyObject.get(TypedObjectsDetails.TYPE_ATTRIBUTE).asText();
+        assertThat(type, is(equalTo(RoleDto.TYPE)));
     }
 
     @DisplayName("processInput returns RoleDto when a role with the input role-name exists")
@@ -82,6 +107,17 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
         Executable action = () -> getRoleHandler.processInput(null, requestInfoWithBlankRoleName, context);
         BadRequestException exception = assertThrows(BadRequestException.class, action);
         assertThat(exception.getMessage(), containsString(GetRoleHandler.EMPTY_ROLE_NAME));
+    }
+
+    private ByteArrayOutputStream sendGetRoleRequest(String roleName) throws IOException {
+        RequestInfo requestInfo = queryWithRoleName(roleName);
+        InputStream requestStream = new HandlerRequestBuilder<>(JsonUtils.objectMapper)
+            .withPathParameters(requestInfo.getPathParameters())
+            .withHttpMethod(HttpMethods.GET)
+            .build();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        getRoleHandler.handleRequest(requestStream, outputStream, context);
+        return outputStream;
     }
 
     private RequestInfo queryWithRoleName(String roleName) {

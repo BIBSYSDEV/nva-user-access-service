@@ -13,9 +13,10 @@ import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.JsonUtils;
 import nva.commons.utils.StringUtils;
 
-@JsonTypeName("Role")
+@JsonTypeName(RoleDto.TYPE)
 public class RoleDto implements WithCopy<RoleDto.Builder>, JsonSerializable, Validable, Typed {
 
+    public static final String TYPE = "Role";
     public static final String MISSING_ROLE_NAME_ERROR = "Role should have a name";
     public static final String INVALID_ROLE_ERROR_MESSAGE = "RoleName cannot be null for a role.";
     @JsonProperty("rolename")

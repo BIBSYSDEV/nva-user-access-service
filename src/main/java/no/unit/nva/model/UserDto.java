@@ -23,9 +23,10 @@ import nva.commons.utils.attempt.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@JsonTypeName("User")
+@JsonTypeName(UserDto.TYPE)
 public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Validable, Typed {
 
+    public static final String TYPE = "User";
     public static final String MISSING_FIELD_ERROR = "Invalid User. Missing obligatory field: ";
     public static final String ERROR_DUE_TO_INVALID_ROLE =
         "Failure while trying to create user with role without role-name";

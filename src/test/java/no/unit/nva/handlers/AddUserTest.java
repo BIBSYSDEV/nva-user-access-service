@@ -18,19 +18,21 @@ import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
-import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.DataSyncException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.model.UserDto;
 import nva.commons.exceptions.ApiGatewayException;
+import nva.commons.exceptions.InvalidOrMissingTypeException;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.handlers.RequestInfo;
 import org.apache.http.HttpStatus;
@@ -40,7 +42,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.zalando.problem.Problem;
 
-public class AddUserTest extends DatabaseAccessor {
+public class AddUserTest extends HandlerTest {
 
     private AddUserHandler handler;
     private RequestInfo requestInfo;
@@ -139,6 +141,24 @@ public class AddUserTest extends DatabaseAccessor {
         Executable action = () -> addUserHandler.processInput(sampleUser, requestInfo, context);
         DataSyncException exception = assertThrows(DataSyncException.class, action);
         assertThat(exception.getMessage(), containsString(SYNC_ERROR_MESSAGE));
+    }
+
+    @DisplayName("handleRequest() returns BadRequest when input object has no type")
+    @Test
+    public void handlerRequestReturnsBadRequestWhenInputObjectHasNoType()
+        throws InvalidEntryInternalException, IOException {
+        UserDto sampleUser = createUserWithRolesAndInstitution();
+        ObjectNode inputObjectWithoutType = createInputObjectWithoutType(sampleUser);
+
+        InputStream inputStream = createRequestInputStream(inputObjectWithoutType);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        handler.handleRequest(inputStream, outputStream, context);
+
+        GatewayResponse<Problem> response = GatewayResponse.fromOutputStream(outputStream);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_BAD_REQUEST)));
+
+        Problem problem = response.getBodyObject(Problem.class);
+        assertThat(problem.getDetail(), is(equalTo(InvalidOrMissingTypeException.MESSAGE)));
     }
 
     private DatabaseService databaseServiceReturnsAlwaysEmptyUser() {

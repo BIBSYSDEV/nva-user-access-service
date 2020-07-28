@@ -13,23 +13,25 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
-import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
+import no.unit.nva.model.TypedObjectsDetails;
 import no.unit.nva.model.UserDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.EntityUtils;
 import nva.commons.exceptions.ApiGatewayException;
+import nva.commons.exceptions.InvalidOrMissingTypeException;
 import nva.commons.handlers.ApiGatewayHandler;
 import nva.commons.handlers.GatewayResponse;
 import org.apache.http.HttpStatus;
@@ -38,7 +40,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
 
-public class UpdateUserHandlerTest extends DatabaseAccessor {
+public class UpdateUserHandlerTest extends HandlerTest {
 
     public static final String SAMPLE_ROLE = "someRole";
     public static final String SAMPLE_USERNAME = "some@somewhere";
@@ -161,10 +163,29 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
         assertThat(problem.getDetail(), containsString(USER_NOT_FOUND_MESSAGE));
     }
 
-    private <T> GatewayResponse<T> sendUpdateRequest(String userId, UserDto userUpdate)
+    @Test
+    public void handleRequestReturnsBadRequestWhenInputRoleHasNoType()
+        throws InvalidEntryInternalException, IOException {
+        UserDto userDto = createSampleUser();
+        ObjectNode objectWithoutType = inputObjectWithoutType(userDto);
+
+        GatewayResponse<Problem> response = sendUpdateRequest(userDto.getUsername(), objectWithoutType);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_BAD_REQUEST)));
+
+        Problem problem = response.getBodyObject(Problem.class);
+        assertThat(problem.getDetail(), is(equalTo(InvalidOrMissingTypeException.MESSAGE)));
+    }
+
+    private ObjectNode inputObjectWithoutType(UserDto userDto) {
+        ObjectNode objectWithoutType = objectMapper.convertValue(userDto, ObjectNode.class);
+        objectWithoutType.remove(TypedObjectsDetails.TYPE_ATTRIBUTE);
+        return objectWithoutType;
+    }
+
+    private <I, O> GatewayResponse<O> sendUpdateRequest(String userId, I userUpdate)
         throws IOException {
         UpdateUserHandler updateUserHandler = new UpdateUserHandler(envWithTableName, databaseService);
-        InputStream input = new HandlerRequestBuilder<UserDto>(objectMapper)
+        InputStream input = new HandlerRequestBuilder<I>(objectMapper)
             .withPathParameters(Collections.singletonMap(USERNAME_PATH_PARAMETER, userId))
             .withBody(userUpdate)
             .build();

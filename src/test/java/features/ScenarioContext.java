@@ -5,11 +5,8 @@ import static java.util.Objects.isNull;
 import com.fasterxml.jackson.databind.JavaType;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Supplier;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.handlers.ApiGatewayHandler;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.utils.JsonUtils;
 
