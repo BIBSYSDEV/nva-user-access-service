@@ -64,14 +64,23 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
     @Test
     public void handleRequestReturnsRoleObjectWithTypeRole()
         throws ConflictException, InvalidEntryInternalException, InvalidInputException, IOException {
+
         addSampleRoleToDatabase();
+
         ByteArrayOutputStream outputStream = sendGetRoleRequest(THE_ROLE);
-        GatewayResponse<ObjectNode> response = GatewayResponse.fromOutputStream(outputStream);
-        ObjectNode bodyObject = response.getBodyObject(ObjectNode.class);
+        ObjectNode bodyObject = extractBodyFromResponseAsJsonObject(outputStream);
 
         assertThat(bodyObject.get(TypedObjectsDetails.TYPE_ATTRIBUTE), is(not(nullValue())));
+
         String type = bodyObject.get(TypedObjectsDetails.TYPE_ATTRIBUTE).asText();
         assertThat(type, is(equalTo(RoleDto.TYPE)));
+    }
+
+    private ObjectNode extractBodyFromResponseAsJsonObject(ByteArrayOutputStream outputStream)
+        throws com.fasterxml.jackson.core.JsonProcessingException {
+        GatewayResponse<ObjectNode> response = GatewayResponse.fromOutputStream(outputStream);
+
+        return response.getBodyObject(ObjectNode.class);
     }
 
     @DisplayName("processInput returns RoleDto when a role with the input role-name exists")

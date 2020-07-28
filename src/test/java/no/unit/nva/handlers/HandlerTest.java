@@ -18,8 +18,8 @@ public abstract class HandlerTest extends DatabaseAccessor {
             .build();
     }
 
-    protected <I> ObjectNode createInputObjectWithoutType(I roleDto) {
-        ObjectNode objectWithoutType = objectMapper.convertValue(roleDto, ObjectNode.class);
+    protected <I> ObjectNode createInputObjectWithoutType(I dtoObject) {
+        ObjectNode objectWithoutType = objectMapper.convertValue(dtoObject, ObjectNode.class);
         objectWithoutType.remove(TypedObjectsDetails.TYPE_ATTRIBUTE);
         return objectWithoutType;
     }

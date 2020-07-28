@@ -65,7 +65,7 @@ public class UpdateUserHandlerTest extends HandlerTest {
     public void processInputReturnsUpdatedUserWhenPathAndBodyContainTheSameUserIdAndTheIdExistsAndBodyIsValid()
         throws ApiGatewayException, IOException {
 
-        UserDto existingUser = storeUserInDatabase(createSampleUser());
+        UserDto existingUser = storeUserInDatabase(sampleUser());
         UserDto userUpdate = createUserUpdate(existingUser);
 
         GatewayResponse<Void> gatewayResponse = sendUpdateRequest(userUpdate.getUsername(), userUpdate);
@@ -84,7 +84,7 @@ public class UpdateUserHandlerTest extends HandlerTest {
     public void processInputReturnsAcceptedWhenPathAndBodyContainTheSameUserIdAndTheIdExistsAndBodyIsValid()
         throws ApiGatewayException, IOException {
 
-        UserDto existingUser = storeUserInDatabase(createSampleUser());
+        UserDto existingUser = storeUserInDatabase(sampleUser());
         UserDto userUpdate = createUserUpdate(existingUser);
 
         GatewayResponse<Void> gatewayResponse = sendUpdateRequest(userUpdate.getUsername(), userUpdate);
@@ -98,8 +98,8 @@ public class UpdateUserHandlerTest extends HandlerTest {
     public void processInputReturnsBadRequestWhenPathContainsIdDifferentFromIdOfInputObject()
         throws ApiGatewayException, IOException {
 
-        UserDto existingUser = createSampleUser();
-        UserDto anotherExistingUser = createSampleUser().copy().withUsername(SOME_OTHER_USERNAME).build();
+        UserDto existingUser = sampleUser();
+        UserDto anotherExistingUser = sampleUser().copy().withUsername(SOME_OTHER_USERNAME).build();
         storeUserInDatabase(anotherExistingUser);
 
         UserDto userUpdate = createUserUpdate(existingUser);
@@ -119,7 +119,7 @@ public class UpdateUserHandlerTest extends HandlerTest {
         throws ApiGatewayException, IOException, NoSuchMethodException, IllegalAccessException,
                InvocationTargetException {
 
-        UserDto existingUser = storeUserInDatabase(createSampleUser());
+        UserDto existingUser = storeUserInDatabase(sampleUser());
         UserDto userUpdate = EntityUtils.createUserWithoutUsername();
 
         GatewayResponse<Problem> gatewayResponse = sendUpdateRequest(existingUser.getUsername(), userUpdate);
@@ -135,7 +135,7 @@ public class UpdateUserHandlerTest extends HandlerTest {
     public void processInputReturnsInternalServerErrorWhenHandlerIsCalledWithoutPathParameter()
         throws ApiGatewayException, IOException {
 
-        UserDto existingUser = storeUserInDatabase(createSampleUser());
+        UserDto existingUser = storeUserInDatabase(sampleUser());
 
         UserDto userUpdate = createUserUpdate(existingUser);
 
@@ -154,7 +154,7 @@ public class UpdateUserHandlerTest extends HandlerTest {
     public void processInputReturnsNotFoundWhenHandlerWhenTryingToUpdateNonExistingUser()
         throws ApiGatewayException, IOException {
 
-        UserDto nonExistingUser = createSampleUser();
+        UserDto nonExistingUser = sampleUser();
         GatewayResponse<Problem> gatewayResponse = sendUpdateRequest(nonExistingUser.getUsername(), nonExistingUser);
 
         assertThat(gatewayResponse.getStatusCode(), is(equalTo(HttpStatus.SC_NOT_FOUND)));
@@ -164,9 +164,10 @@ public class UpdateUserHandlerTest extends HandlerTest {
     }
 
     @Test
-    public void handleRequestReturnsBadRequestWhenInputRoleHasNoType()
+    public void handleRequestReturnsBadRequestWhenInputUserHasNoType()
         throws InvalidEntryInternalException, IOException {
-        UserDto userDto = createSampleUser();
+
+        UserDto userDto = sampleUser();
         ObjectNode objectWithoutType = inputObjectWithoutType(userDto);
 
         GatewayResponse<Problem> response = sendUpdateRequest(userDto.getUsername(), objectWithoutType);
@@ -209,7 +210,7 @@ public class UpdateUserHandlerTest extends HandlerTest {
         return databaseService.getUser(userDto);
     }
 
-    private UserDto createSampleUser() throws InvalidEntryInternalException {
+    private UserDto sampleUser() throws InvalidEntryInternalException {
         RoleDto someRole = RoleDto.newBuilder().withName(SAMPLE_ROLE).build();
         return UserDto.newBuilder()
             .withUsername(SAMPLE_USERNAME)

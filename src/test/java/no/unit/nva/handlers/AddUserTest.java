@@ -121,9 +121,8 @@ public class AddUserTest extends HandlerTest {
         throws ApiGatewayException, IOException, NoSuchMethodException, IllegalAccessException,
                InvocationTargetException {
 
-        InputStream inputStream = createRequestWithUserWithoutUsername();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        handler.handleRequest(inputStream, outputStream, context);
+        InputStream requestWithUserWithoutUsername = createRequestWithUserWithoutUsername();
+        ByteArrayOutputStream outputStream = sendRequestToHandler(requestWithUserWithoutUsername);
 
         GatewayResponse<Problem> response = parseResponseStream(outputStream);
 
@@ -147,18 +146,26 @@ public class AddUserTest extends HandlerTest {
     @Test
     public void handlerRequestReturnsBadRequestWhenInputObjectHasNoType()
         throws InvalidEntryInternalException, IOException {
+
         UserDto sampleUser = createUserWithRolesAndInstitution();
         ObjectNode inputObjectWithoutType = createInputObjectWithoutType(sampleUser);
+        InputStream requestInputStream = createRequestInputStream(inputObjectWithoutType);
 
-        InputStream inputStream = createRequestInputStream(inputObjectWithoutType);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        handler.handleRequest(inputStream, outputStream, context);
+        ByteArrayOutputStream outputStream = sendRequestToHandler(requestInputStream);
 
         GatewayResponse<Problem> response = GatewayResponse.fromOutputStream(outputStream);
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_BAD_REQUEST)));
 
         Problem problem = response.getBodyObject(Problem.class);
         assertThat(problem.getDetail(), is(equalTo(InvalidOrMissingTypeException.MESSAGE)));
+    }
+
+    private ByteArrayOutputStream sendRequestToHandler(InputStream requestInputStream)
+        throws IOException {
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        handler.handleRequest(requestInputStream, outputStream, context);
+        return outputStream;
     }
 
     private DatabaseService databaseServiceReturnsAlwaysEmptyUser() {

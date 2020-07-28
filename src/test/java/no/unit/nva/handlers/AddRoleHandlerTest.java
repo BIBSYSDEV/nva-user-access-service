@@ -48,7 +48,7 @@ public class AddRoleHandlerTest extends HandlerTest {
 
         DatabaseService service = new DatabaseServiceImpl(initializeTestDatabase(), envWithTableName);
         addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
-        sampleRole = createSampleRole();
+        sampleRole = sampleRole();
     }
 
     @Test
@@ -65,14 +65,14 @@ public class AddRoleHandlerTest extends HandlerTest {
 
     @Test
     public void handlerRequestReturnsOkWheRequestBodyIsValid() throws InvalidEntryInternalException, IOException {
-        GatewayResponse<RoleDto> response = sendRequest(createSampleRole());
+        GatewayResponse<RoleDto> response = sendRequest(sampleRole());
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_OK)));
     }
 
     @Test
     public void handlerRequestReturnsTheGeneratedObjectWhenInputIsValid()
         throws InvalidEntryInternalException, IOException {
-        RoleDto actualRole = createSampleRole();
+        RoleDto actualRole = sampleRole();
         GatewayResponse<RoleDto> response = sendRequest(actualRole);
         RoleDto savedRole = response.getBodyObject(RoleDto.class);
         assertThat(savedRole, is(equalTo(actualRole)));
@@ -81,7 +81,7 @@ public class AddRoleHandlerTest extends HandlerTest {
     @Test
     public void handlerRequestReturnsTheGeneratedObjectAfterWaitingForSyncingToComplete()
         throws InvalidEntryInternalException, IOException {
-        RoleDto actualRole = createSampleRole();
+        RoleDto actualRole = sampleRole();
         DatabaseService service = databaseServiceWithSyncDelay();
         addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
 
@@ -93,7 +93,7 @@ public class AddRoleHandlerTest extends HandlerTest {
     @Test
     public void handleRequestReturnsInternalServerErrorWhenDatabaseFailsToSaveTheData()
         throws InvalidEntryInternalException, IOException {
-        RoleDto actualRole = createSampleRole();
+        RoleDto actualRole = sampleRole();
         DatabaseService service = databaseServiceReturningEmpty();
         addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
 
@@ -113,7 +113,7 @@ public class AddRoleHandlerTest extends HandlerTest {
     public void addRoleHandlerThrowsDataSyncExceptionWhenDatabaseServiceCannotFetchSavedRole()
         throws InvalidEntryInternalException {
 
-        RoleDto inputRole = createSampleRole();
+        RoleDto inputRole = sampleRole();
         AddRoleHandler addRoleHandler = addRoleHandlerThrowsUnexpectedException();
         Executable action = () -> addRoleHandler.processInput(inputRole, null, null);
 
@@ -129,6 +129,7 @@ public class AddRoleHandlerTest extends HandlerTest {
         AddRoleHandler addRoleHandler = addRoleHandlerThrowsUnexpectedException();
         InputStream inputRequest = new HandlerRequestBuilder<>(objectMapper).withBody(sampleRole).build();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
         addRoleHandler.handleRequest(inputRequest, outputStream, context);
 
         assertThat(testingAppender.getMessages(), containsString(AddRoleHandler.ERROR_FETCHING_SAVED_ROLE));
@@ -137,21 +138,25 @@ public class AddRoleHandlerTest extends HandlerTest {
     @Test
     public void handleRequestReturnsBadRequestWhenInputRoleHasNoType()
         throws InvalidEntryInternalException, IOException {
-        RoleDto roleDto = createSampleRole();
-        ObjectNode objectWithoutType = createInputObjectWithoutType(roleDto);
+        ObjectNode objectWithoutType = createInputObjectWithoutType(sampleRole());
 
-        InputStream requestInput = createRequestInputStream(objectWithoutType);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        GatewayResponse<Problem> response = sendRequestToHandlerWithBody(objectWithoutType);
 
-        addRoleHandler.handleRequest(requestInput, outputStream, context);
-        GatewayResponse<Problem> response = GatewayResponse.fromOutputStream(outputStream);
-        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_BAD_REQUEST)));
+        assertThat(response, is(equalTo(HttpStatus.SC_BAD_REQUEST)));
 
         Problem problem = response.getBodyObject(Problem.class);
         assertThat(problem.getDetail(), is(equalTo(InvalidOrMissingTypeException.MESSAGE)));
     }
 
-    private RoleDto createSampleRole() throws InvalidEntryInternalException {
+    private GatewayResponse<Problem> sendRequestToHandlerWithBody(ObjectNode requestBody)
+        throws IOException {
+        InputStream requestInput = createRequestInputStream(requestBody);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        addRoleHandler.handleRequest(requestInput, outputStream, context);
+        return GatewayResponse.fromOutputStream(outputStream);
+    }
+
+    private RoleDto sampleRole() throws InvalidEntryInternalException {
         return RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
     }
 
