@@ -17,13 +17,10 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UpdateUserHandler extends HandlerWithEventualConsistency<UserDto, Void> {
+public class UpdateUserHandler extends HandlerAccessingUser<UserDto, Void> {
 
-    public static final String USERS_RELATIVE_PATH = "/users/";
     public static final String LOCATION_HEADER = "Location";
-    public static final String USERNAME_PATH_PARAMETER = "username";
-    public static final String NO_USERS_PATH_PARAMETER_FOUND_ERROR_MESSAGE =
-        "This method should not be called without a \"users\" path parameter";
+
     public static final String INCONSISTENT_USERNAME_IN_PATH_AND_OBJECT_ERROR =
         "Path username is different from input object's user-id";
     private final DatabaseService databaseService;
@@ -66,7 +63,7 @@ public class UpdateUserHandler extends HandlerWithEventualConsistency<UserDto, V
     private String extractUsernameFromPathParameters(RequestInfo requestInfo) {
         return Optional.ofNullable(requestInfo.getPathParameters())
             .flatMap(pathParams -> Optional.ofNullable(pathParams.get(USERNAME_PATH_PARAMETER)))
-            .orElseThrow(() -> new RuntimeException(NO_USERS_PATH_PARAMETER_FOUND_ERROR_MESSAGE));
+            .orElseThrow(() -> new RuntimeException(EMPTY_USERNAME_PATH_PARAMETER_ERROR));
     }
 
     private void comparePathAndInputObjectUsername(UserDto input, String userIdFromPathParameter)
