@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import no.unit.nva.database.intefaces.WithEnvironment;
+import no.unit.nva.database.interfaces.WithEnvironment;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
 import org.junit.jupiter.api.Test;

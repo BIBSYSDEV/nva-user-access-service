@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import no.unit.nva.database.DatabaseServiceImpl;
-import no.unit.nva.database.intefaces.WithEnvironment;
+import no.unit.nva.database.interfaces.WithEnvironment;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.handlers.ApiGatewayHandler;
 import nva.commons.utils.JsonUtils;
