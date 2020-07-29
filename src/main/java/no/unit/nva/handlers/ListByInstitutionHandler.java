@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class ListByInstitutionHandler extends ApiGatewayHandler<Void, UserList> {
 
-    public static final String INSTITUTION_ID_PATH_PARAMETER = "institutionId";
+    public static final String INSTITUTION_ID_PATH_PARAMETER = "institution";
     public static final String MISSING_PATH_PARAMETER_ERROR = "Missing institution path parameter. "
         + "Probably error in the Lambda function definition.";
     private final DatabaseService databaseService;
