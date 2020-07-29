@@ -18,9 +18,9 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 
 public class HandlerTest extends DatabaseAccessor {
 
-    public static final String SOME_USERNAME = "sampleUsername";
-    public static final String SOME_ROLE = "SomeRole";
-    public static final String SOME_INSTITUTION = "SomeInstitution";
+    public static final String DEFAULT_USERNAME = "sampleUsername";
+    public static final String DEFAULT_ROLE = "SomeRole";
+    public static final String DEFAULT_INSTITUTION = "SomeInstitution";
 
     protected DatabaseService databaseService;
 
@@ -33,13 +33,13 @@ public class HandlerTest extends DatabaseAccessor {
 
     protected UserDto insertSampleUserToDatabase()
         throws InvalidEntryInternalException, ConflictException, InvalidInputException {
-        UserDto sampleUser = createSampleUser(SOME_USERNAME, SOME_INSTITUTION);
+        UserDto sampleUser = createSampleUser(DEFAULT_USERNAME, DEFAULT_INSTITUTION);
         databaseService.addUser(sampleUser);
         return sampleUser;
     }
 
     protected UserDto createSampleUser(String username, String institution) throws InvalidEntryInternalException {
-        RoleDto someRole = RoleDto.newBuilder().withName(SOME_ROLE).build();
+        RoleDto someRole = RoleDto.newBuilder().withName(DEFAULT_ROLE).build();
         return UserDto.newBuilder()
             .withUsername(username)
             .withRoles(Collections.singletonList(someRole))

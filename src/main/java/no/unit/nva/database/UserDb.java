@@ -25,7 +25,7 @@ import no.unit.nva.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.JacocoGenerated;
 
 @DynamoDBTable(tableName = "OverridenByEnvironmentVariable")
-public class UserDb extends DynamoEntry implements WithCopy<Builder> , WithType {
+public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
 
     public static final String TYPE = "USER";
     public static final String INVALID_USER_EMPTY_USERNAME = "Invalid user entry: Empty username is not allowed";

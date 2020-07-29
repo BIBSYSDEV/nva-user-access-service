@@ -14,14 +14,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-import no.unit.nva.database.DatabaseAccessor;
-import no.unit.nva.database.DatabaseService;
 import no.unit.nva.exceptions.BadRequestException;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
-import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.TypedObjectsDetails;
 import no.unit.nva.model.UserDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -68,7 +65,7 @@ class GetUserHandlerTest extends HandlerTest {
     }
 
     private ByteArrayOutputStream sendGetUserRequestToHandler() throws IOException {
-        requestInfo = createRequestInfoForGetUser(SOME_USERNAME);
+        requestInfo = createRequestInfoForGetUser(DEFAULT_USERNAME);
         InputStream inputStream = new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
             .withPathParameters(requestInfo.getPathParameters())
             .build();
@@ -86,7 +83,7 @@ class GetUserHandlerTest extends HandlerTest {
     @DisplayName("processInput() returns UserDto when path parameter contains the username of an existing user")
     @Test
     void processInputReturnsUserDtoWhenPathParameterContainsTheUsernameOfExistingUser() throws ApiGatewayException {
-        requestInfo = createRequestInfoForGetUser(SOME_USERNAME);
+        requestInfo = createRequestInfoForGetUser(DEFAULT_USERNAME);
         UserDto expected = insertSampleUserToDatabase();
         UserDto actual = getUserHandler.processInput(null, requestInfo, context);
         assertThat(actual, is(equalTo(expected)));
@@ -96,7 +93,7 @@ class GetUserHandlerTest extends HandlerTest {
         + "username")
     @Test
     void processInputThrowsNotFoundExceptionWhenPathParameterIsNonExistingUsername() {
-        requestInfo = createRequestInfoForGetUser(SOME_USERNAME);
+        requestInfo = createRequestInfoForGetUser(DEFAULT_USERNAME);
         Executable action = () -> getUserHandler.processInput(null, requestInfo, context);
         assertThrows(NotFoundException.class, action);
     }
