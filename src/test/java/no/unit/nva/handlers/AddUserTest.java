@@ -18,19 +18,21 @@ import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
-import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.DataSyncException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.model.UserDto;
 import nva.commons.exceptions.ApiGatewayException;
+import nva.commons.exceptions.InvalidOrMissingTypeException;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.handlers.RequestInfo;
 import org.apache.http.HttpStatus;
@@ -40,7 +42,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.zalando.problem.Problem;
 
-public class AddUserTest extends DatabaseAccessor {
+public class AddUserTest extends HandlerTest {
 
     private AddUserHandler handler;
     private RequestInfo requestInfo;
@@ -119,9 +121,8 @@ public class AddUserTest extends DatabaseAccessor {
         throws ApiGatewayException, IOException, NoSuchMethodException, IllegalAccessException,
                InvocationTargetException {
 
-        InputStream inputStream = createRequestWithUserWithoutUsername();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        handler.handleRequest(inputStream, outputStream, context);
+        InputStream requestWithUserWithoutUsername = createRequestWithUserWithoutUsername();
+        ByteArrayOutputStream outputStream = sendRequestToHandler(requestWithUserWithoutUsername);
 
         GatewayResponse<Problem> response = parseResponseStream(outputStream);
 
@@ -139,6 +140,32 @@ public class AddUserTest extends DatabaseAccessor {
         Executable action = () -> addUserHandler.processInput(sampleUser, requestInfo, context);
         DataSyncException exception = assertThrows(DataSyncException.class, action);
         assertThat(exception.getMessage(), containsString(SYNC_ERROR_MESSAGE));
+    }
+
+    @DisplayName("handleRequest() returns BadRequest when input object has no type")
+    @Test
+    public void handlerRequestReturnsBadRequestWhenInputObjectHasNoType()
+        throws InvalidEntryInternalException, IOException {
+
+        UserDto sampleUser = createUserWithRolesAndInstitution();
+        ObjectNode inputObjectWithoutType = createInputObjectWithoutType(sampleUser);
+        InputStream requestInputStream = createRequestInputStream(inputObjectWithoutType);
+
+        ByteArrayOutputStream outputStream = sendRequestToHandler(requestInputStream);
+
+        GatewayResponse<Problem> response = GatewayResponse.fromOutputStream(outputStream);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_BAD_REQUEST)));
+
+        Problem problem = response.getBodyObject(Problem.class);
+        assertThat(problem.getDetail(), is(equalTo(InvalidOrMissingTypeException.MESSAGE)));
+    }
+
+    private ByteArrayOutputStream sendRequestToHandler(InputStream requestInputStream)
+        throws IOException {
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        handler.handleRequest(requestInputStream, outputStream, context);
+        return outputStream;
     }
 
     private DatabaseService databaseServiceReturnsAlwaysEmptyUser() {

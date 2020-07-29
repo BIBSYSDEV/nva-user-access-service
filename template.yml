@@ -167,10 +167,14 @@ Resources:
           schemas:
             Role:
               properties:
+                type:
+                  type: string
                 rolename:
                   type: string
             User:
               properties:
+                type:
+                  type: string
                 username:
                   type: string
                 institution:

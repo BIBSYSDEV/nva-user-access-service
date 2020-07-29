@@ -14,7 +14,7 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 import java.util.List;
 import java.util.Optional;
-import no.unit.nva.database.intefaces.WithType;
+import no.unit.nva.database.interfaces.WithType;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.EmptyInputException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.unit.nva.database.UserDb.Builder;
-
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.attempt.Try;
 import org.junit.jupiter.api.BeforeEach;

@@ -18,7 +18,7 @@ import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import java.util.ArrayList;
 import java.util.List;
-import no.unit.nva.database.intefaces.WithEnvironment;
+import no.unit.nva.database.interfaces.WithEnvironment;
 import nva.commons.utils.Environment;
 import org.junit.jupiter.api.AfterEach;
 

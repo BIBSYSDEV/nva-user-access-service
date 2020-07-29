@@ -13,23 +13,25 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
-import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
+import no.unit.nva.model.TypedObjectsDetails;
 import no.unit.nva.model.UserDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.EntityUtils;
 import nva.commons.exceptions.ApiGatewayException;
+import nva.commons.exceptions.InvalidOrMissingTypeException;
 import nva.commons.handlers.ApiGatewayHandler;
 import nva.commons.handlers.GatewayResponse;
 import org.apache.http.HttpStatus;
@@ -38,7 +40,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
 
-public class UpdateUserHandlerTest extends DatabaseAccessor {
+public class UpdateUserHandlerTest extends HandlerTest {
 
     public static final String SAMPLE_ROLE = "someRole";
     public static final String SAMPLE_USERNAME = "some@somewhere";
@@ -63,11 +65,9 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
     public void processInputReturnsUpdatedUserWhenPathAndBodyContainTheSameUserIdAndTheIdExistsAndBodyIsValid()
         throws ApiGatewayException, IOException {
 
-        UserDto existingUser = storeUserInDatabase(createSampleUser());
-        UserDto userUpdate = createUserUpdate(existingUser);
+        UserDto userUpdate = createUserUpdateOnExistingUser();
 
         GatewayResponse<Void> gatewayResponse = sendUpdateRequest(userUpdate.getUsername(), userUpdate);
-
         Map<String, String> responseHeaders = gatewayResponse.getHeaders();
 
         assertThat(responseHeaders, hasKey(LOCATION_HEADER));
@@ -82,8 +82,7 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
     public void processInputReturnsAcceptedWhenPathAndBodyContainTheSameUserIdAndTheIdExistsAndBodyIsValid()
         throws ApiGatewayException, IOException {
 
-        UserDto existingUser = storeUserInDatabase(createSampleUser());
-        UserDto userUpdate = createUserUpdate(existingUser);
+        UserDto userUpdate = createUserUpdateOnExistingUser();
 
         GatewayResponse<Void> gatewayResponse = sendUpdateRequest(userUpdate.getUsername(), userUpdate);
 
@@ -96,13 +95,10 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
     public void processInputReturnsBadRequestWhenPathContainsIdDifferentFromIdOfInputObject()
         throws ApiGatewayException, IOException {
 
-        UserDto existingUser = createSampleUser();
-        UserDto anotherExistingUser = createSampleUser().copy().withUsername(SOME_OTHER_USERNAME).build();
-        storeUserInDatabase(anotherExistingUser);
-
-        UserDto userUpdate = createUserUpdate(existingUser);
-
+        UserDto userUpdate = userUpdateOnExistingUser();
+        UserDto anotherExistingUser = anotherUserInDatabase();
         String falseUsername = anotherExistingUser.getUsername();
+
         GatewayResponse<Problem> gatewayResponse = sendUpdateRequest(falseUsername, userUpdate);
 
         assertThat(gatewayResponse.getStatusCode(), is(equalTo(HttpStatus.SC_BAD_REQUEST)));
@@ -117,7 +113,7 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
         throws ApiGatewayException, IOException, NoSuchMethodException, IllegalAccessException,
                InvocationTargetException {
 
-        UserDto existingUser = storeUserInDatabase(createSampleUser());
+        UserDto existingUser = storeUserInDatabase(sampleUser());
         UserDto userUpdate = EntityUtils.createUserWithoutUsername();
 
         GatewayResponse<Problem> gatewayResponse = sendUpdateRequest(existingUser.getUsername(), userUpdate);
@@ -133,9 +129,7 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
     public void processInputReturnsInternalServerErrorWhenHandlerIsCalledWithoutPathParameter()
         throws ApiGatewayException, IOException {
 
-        UserDto existingUser = storeUserInDatabase(createSampleUser());
-
-        UserDto userUpdate = createUserUpdate(existingUser);
+        UserDto userUpdate = createUserUpdateOnExistingUser();
 
         GatewayResponse<Problem> gatewayResponse = sendUpdateRequestWithoutPathParameters(userUpdate);
 
@@ -152,7 +146,7 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
     public void processInputReturnsNotFoundWhenHandlerWhenTryingToUpdateNonExistingUser()
         throws ApiGatewayException, IOException {
 
-        UserDto nonExistingUser = createSampleUser();
+        UserDto nonExistingUser = sampleUser();
         GatewayResponse<Problem> gatewayResponse = sendUpdateRequest(nonExistingUser.getUsername(), nonExistingUser);
 
         assertThat(gatewayResponse.getStatusCode(), is(equalTo(HttpStatus.SC_NOT_FOUND)));
@@ -161,10 +155,56 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
         assertThat(problem.getDetail(), containsString(USER_NOT_FOUND_MESSAGE));
     }
 
-    private <T> GatewayResponse<T> sendUpdateRequest(String userId, UserDto userUpdate)
+    @Test
+    public void handleRequestReturnsBadRequestWhenInputUserHasNoType()
+        throws InvalidEntryInternalException, IOException {
+
+        UserDto userDto = sampleUser();
+        ObjectNode objectWithoutType = inputObjectWithoutType(userDto);
+
+        GatewayResponse<Problem> response = sendUpdateRequest(userDto.getUsername(), objectWithoutType);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_BAD_REQUEST)));
+
+        Problem problem = response.getBodyObject(Problem.class);
+        assertThat(problem.getDetail(), is(equalTo(InvalidOrMissingTypeException.MESSAGE)));
+    }
+
+    private UserDto anotherUserInDatabase()
+        throws InvalidEntryInternalException, ConflictException, NotFoundException, InvalidInputException {
+        UserDto anotherExistingUser = sampleUser().copy().withUsername(SOME_OTHER_USERNAME).build();
+        storeUserInDatabase(anotherExistingUser);
+        return anotherExistingUser;
+    }
+
+    private UserDto userUpdateOnExistingUser()
+        throws ConflictException, InvalidEntryInternalException, NotFoundException, InvalidInputException {
+        UserDto existingUser = storeUserInDatabase(sampleUser());
+        UserDto userUpdate = createUserUpdate(existingUser);
+        return userUpdate;
+    }
+
+    private UserDto createUserUpdateOnExistingUser()
+        throws ConflictException, InvalidEntryInternalException, NotFoundException, InvalidInputException {
+        UserDto existingUser = storeUserInDatabase(sampleUser());
+        return createUserUpdate(existingUser);
+    }
+
+    private ObjectNode inputObjectWithoutType(UserDto userDto) {
+        ObjectNode objectWithoutType = objectMapper.convertValue(userDto, ObjectNode.class);
+        objectWithoutType.remove(TypedObjectsDetails.TYPE_ATTRIBUTE);
+        return objectWithoutType;
+    }
+
+    private UserDto storeUserInDatabase(UserDto userDto)
+        throws ConflictException, InvalidEntryInternalException, NotFoundException, InvalidInputException {
+        databaseService.addUser(userDto);
+        return databaseService.getUser(userDto);
+    }
+
+    private <I, O> GatewayResponse<O> sendUpdateRequest(String userId, I userUpdate)
         throws IOException {
         UpdateUserHandler updateUserHandler = new UpdateUserHandler(envWithTableName, databaseService);
-        InputStream input = new HandlerRequestBuilder<UserDto>(objectMapper)
+        InputStream input = new HandlerRequestBuilder<I>(objectMapper)
             .withPathParameters(Collections.singletonMap(USERNAME_PATH_PARAMETER, userId))
             .withBody(userUpdate)
             .build();
@@ -182,13 +222,7 @@ public class UpdateUserHandlerTest extends DatabaseAccessor {
         return GatewayResponse.fromOutputStream(output);
     }
 
-    private UserDto storeUserInDatabase(UserDto userDto)
-        throws ConflictException, InvalidEntryInternalException, NotFoundException, InvalidInputException {
-        databaseService.addUser(userDto);
-        return databaseService.getUser(userDto);
-    }
-
-    private UserDto createSampleUser() throws InvalidEntryInternalException {
+    private UserDto sampleUser() throws InvalidEntryInternalException {
         RoleDto someRole = RoleDto.newBuilder().withName(SAMPLE_ROLE).build();
         return UserDto.newBuilder()
             .withUsername(SAMPLE_USERNAME)
