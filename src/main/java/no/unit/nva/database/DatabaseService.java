@@ -15,7 +15,7 @@ public interface DatabaseService {
 
     UserDto getUser(UserDto queryObject) throws InvalidEntryInternalException, NotFoundException;
 
-    List<UserDto> listUsers(String someInstitution) throws InvalidEntryInternalException;
+    List<UserDto> listUsers(String institutionId) throws InvalidEntryInternalException;
 
     Optional<UserDto> getUserAsOptional(UserDto queryObject) throws InvalidEntryInternalException;
 
