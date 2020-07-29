@@ -3,10 +3,16 @@ package no.unit.nva.handlers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.DatabaseService;
@@ -16,9 +22,13 @@ import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
+import no.unit.nva.model.TypedObjectsDetails;
 import no.unit.nva.model.UserDto;
+import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.exceptions.ApiGatewayException;
+import nva.commons.handlers.GatewayResponse;
 import nva.commons.handlers.RequestInfo;
+import nva.commons.utils.JsonUtils;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +54,32 @@ class GetUserHandlerTest extends DatabaseAccessor {
         context = mock(Context.class);
     }
 
+    @DisplayName("handleRequest returns User object with type \"User\"")
+    @Test
+    public void handleRequestReturnsUserObjectWithTypeRole()
+        throws ConflictException, InvalidEntryInternalException, InvalidInputException, IOException {
+        insertSampleUserToDatabase();
+
+        ByteArrayOutputStream outputStream = sendGetUserRequestToHandler();
+
+        GatewayResponse<ObjectNode> response = GatewayResponse.fromOutputStream(outputStream);
+        ObjectNode bodyObject = response.getBodyObject(ObjectNode.class);
+
+        assertThat(bodyObject.get(TypedObjectsDetails.TYPE_ATTRIBUTE), is(not(nullValue())));
+        String type = bodyObject.get(TypedObjectsDetails.TYPE_ATTRIBUTE).asText();
+        assertThat(type, is(equalTo(UserDto.TYPE)));
+    }
+
+    private ByteArrayOutputStream sendGetUserRequestToHandler() throws IOException {
+        requestInfo = createRequestInfoForGetUser(SOME_USERNAME);
+        InputStream inputStream = new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
+            .withPathParameters(requestInfo.getPathParameters())
+            .build();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        getUserHandler.handleRequest(inputStream, outputStream, context);
+        return outputStream;
+    }
+
     @Test
     void getSuccessStatusCodeReturnsOK() {
         Integer actual = getUserHandler.getSuccessStatusCode(null, null);
@@ -62,7 +98,7 @@ class GetUserHandlerTest extends DatabaseAccessor {
     @DisplayName("processInput() throws NotFoundException when path parameter is a string that is not an existing "
         + "username")
     @Test
-    void processInputThrowsNotFoundExceptionWhenPathParameterIsNonExistingUsername() throws ApiGatewayException {
+    void processInputThrowsNotFoundExceptionWhenPathParameterIsNonExistingUsername() {
         requestInfo = createRequestInfoForGetUser(SOME_USERNAME);
         Executable action = () -> getUserHandler.processInput(null, requestInfo, context);
         assertThrows(NotFoundException.class, action);

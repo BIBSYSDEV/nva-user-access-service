@@ -1,4 +1,4 @@
-package no.unit.nva.database.intefaces;
+package no.unit.nva.database.interfaces;
 
 import java.util.Optional;
 import nva.commons.utils.Environment;

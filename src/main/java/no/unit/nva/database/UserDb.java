@@ -13,19 +13,17 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTyped;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import no.unit.nva.database.UserDb.Builder;
-import no.unit.nva.database.intefaces.DynamoEntry;
-import no.unit.nva.database.intefaces.WithCopy;
+import no.unit.nva.database.interfaces.DynamoEntry;
+import no.unit.nva.database.interfaces.WithCopy;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.JacocoGenerated;
 
 @DynamoDBTable(tableName = "OverridenByEnvironmentVariable")
-@DynamoDBTyped
 public class UserDb extends DynamoEntry implements WithCopy<Builder> {
 
     public static final String TYPE = "USER";

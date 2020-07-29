@@ -3,6 +3,7 @@ package no.unit.nva.model;
 import static java.util.Objects.isNull;
 import static nva.commons.utils.attempt.Try.attempt;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,7 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.UserDb;
-import no.unit.nva.database.intefaces.WithCopy;
+import no.unit.nva.database.interfaces.WithCopy;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import nva.commons.utils.JacocoGenerated;
@@ -22,8 +23,10 @@ import nva.commons.utils.attempt.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Validable {
+@JsonTypeName(UserDto.TYPE)
+public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Validable, Typed {
 
+    public static final String TYPE = "User";
     public static final String MISSING_FIELD_ERROR = "Invalid User. Missing obligatory field: ";
     public static final String ERROR_DUE_TO_INVALID_ROLE =
         "Failure while trying to create user with role without role-name";

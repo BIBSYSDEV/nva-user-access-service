@@ -11,6 +11,7 @@ Feature: Users
       | key         | value               |
       | username    | someone@institution |
       | institution | institution         |
+      | type        | User                |
     And the request body also contains a list of roles with the following role-names
       | role-name |
       | RoleA     |
@@ -24,7 +25,7 @@ Feature: Users
     And the authorized client forms a "GET" request
     And the request has the following path parameters:
       | parameter | value               |
-      | user      | someone@institution |
+      | username  | someone@institution |
     When the authorized client sends the request to read the user
     Then a user description is returned
 
@@ -50,6 +51,7 @@ Feature: Users
       | key         | value               |
       | username    | someone@institution |
       | institution | institution         |
+      | type        | User                |
     And the request body also contains a list of roles with the following role-names
       | role-name |
       | RoleB     |
@@ -67,6 +69,7 @@ Feature: Users
       | key         | value               |
       | username    | someone@institution |
       | institution | institution         |
+      | type        | User                |
     And the request body also contains a list of roles with the following role-names
       | role-name |
       | RoleB     |

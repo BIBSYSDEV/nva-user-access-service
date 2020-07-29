@@ -1,4 +1,4 @@
-package no.unit.nva.database.intefaces;
+package no.unit.nva.database.interfaces;
 
 /**
  * Example usage:
