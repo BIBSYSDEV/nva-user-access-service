@@ -32,10 +32,6 @@ public class UserList implements List<UserDto> {
         return new UserList(users);
     }
 
-    public List<UserDto> asList() {
-        return users;
-    }
-
     @Override
     @JacocoGenerated
     public int size() {
