@@ -34,7 +34,7 @@ public class AddUserFt extends ScenarioTest {
         super(scenarioContext);
     }
 
-    @Given("that a user entry with the username {string} does not exist in the database")
+    @Given("that a User with username {string} does not exist in the database")
     public void that_a_user_entry_with_the_username_does_not_exist_in_the_database(String username)
         throws InvalidEntryInternalException {
         UserDto queryObject = UserDto.newBuilder().withUsername(username).build();

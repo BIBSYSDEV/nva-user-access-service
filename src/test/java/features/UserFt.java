@@ -53,7 +53,7 @@ public class UserFt extends ScenarioTest {
         super(scenarioContext);
     }
 
-    @Given("that a user entry with the username {string} exists in the database")
+    @Given("that a User with username {string} exists in the database")
     public void that_a_user_entry_with_the_username_someone_institution_exists_in_the_database(String username)
         throws InvalidEntryInternalException, ConflictException, InvalidInputException {
         UserDto newUser = UserDto.newBuilder().withUsername(username).build();
@@ -124,7 +124,7 @@ public class UserFt extends ScenarioTest {
         assertThat(actualUser, is(equalTo(expectedUser)));
     }
 
-    @Then("a Location header with the updated user URI is included in the response")
+    @Then("a Location header with the user URI is included in the response")
     public void a_Location_header_with_the_updated_user_URI_is_included_in_the_response() throws IOException {
         GatewayResponse<UserDto> response = scenarioContext.getApiGatewayResponse(UserDto.class);
         String locationHeader = response.getHeaders().get(UpdateUserHandler.LOCATION_HEADER);
@@ -140,8 +140,8 @@ public class UserFt extends ScenarioTest {
         assertThat(problem.getDetail(), containsString(UserDto.INVALID_USER_ERROR_MESSAGE));
     }
 
-    @Then("a non-empty list of the users belonging to the institution is returned to the client")
-    public void a_list_of_the_users_belonging_to_the_institution_is_returned_to_the_client() throws IOException {
+    @Then("a non-empty list of the users belonging to the institution is returned")
+    public void a_list_of_the_users_belonging_to_the_institution_is_returned() throws IOException {
         UserList users = extractUserListFromResponse();
         assertThat(users, is(not(empty())));
     }
