@@ -1,6 +1,10 @@
 # Users and Roles service
 
-## All features are described here in the following folder:
+
+## Features
+
+All features are described here: 
+
 `nva-user-access-service/src/test/resources/features/`
 
 
