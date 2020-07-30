@@ -52,7 +52,7 @@ public abstract class DatabaseAccessor implements WithEnvironment {
     public AmazonDynamoDB initializeTestDatabase() {
 
         localDynamo = createLocalDynamoDbMock();
-        String tableName = readTablenNameFronEnvironment();
+        String tableName = readTableNameFromEnvironment();
         CreateTableResult createTableResult = createTable(localDynamo, tableName);
         TableDescription tableDescription = createTableResult.getTableDescription();
         assertEquals(tableName, tableDescription.getTableName());
@@ -86,7 +86,7 @@ public abstract class DatabaseAccessor implements WithEnvironment {
         return DynamoDBEmbedded.create().amazonDynamoDB();
     }
 
-    private String readTablenNameFronEnvironment() {
+    private String readTableNameFromEnvironment() {
         return envWithTableName.readEnv(DatabaseService.USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE);
     }
 
