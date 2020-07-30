@@ -1,6 +1,8 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.isNull;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static nva.commons.utils.attempt.Try.attempt;
 
@@ -14,6 +16,7 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import no.unit.nva.database.interfaces.WithType;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.EmptyInputException;
@@ -28,12 +31,12 @@ import nva.commons.utils.Environment;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.SingletonCollector;
 import nva.commons.utils.attempt.Failure;
+import nva.commons.utils.attempt.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
 
-    public static final String RANGE_KEY_NAME = "PK1B";
     public static final String EMPTY_INPUT_ERROR_MESSAGE = "Expected non-empty input, but input is empty";
     public static final String INVALID_ENTRY_IN_DATABASE_ERROR = "Invalid entry stored in the database:";
     public static final String USER_ALREADY_EXISTS_ERROR_MESSAGE = "User already exists: ";
@@ -45,6 +48,7 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     public static final String GET_ROLE_DEBUG_MESSAGE = "Getting role:";
     public static final String ADD_USER_DEBUG_MESSAGE = "Adding user:";
     public static final String ADD_ROLE_DEBUG_MESSAGE = "Adding role:";
+    public static final String NOT_USED = "NOT_USED";
     private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
     private static final String UPDATE_ROLE_DEBUG_MESSAGE = "Updating role: ";
     private final DynamoDBMapper mapper;
@@ -67,6 +71,16 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     public UserDto getUser(UserDto queryObject) throws InvalidEntryInternalException, NotFoundException {
         return getUserAsOptional(queryObject)
             .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE + queryObject.getUsername()));
+    }
+
+    @Override
+    public List<UserDto> listUsers(String institutionId) throws InvalidEntryInternalException {
+        DynamoDBQueryExpression<UserDb> listUsersQuery = createListUsersQuery(institutionId);
+        PaginatedQueryList<UserDb> users = mapper.query(UserDb.class, listUsersQuery);
+        return users.stream()
+            .map(attempt(UserDto::fromUserDb))
+            .flatMap(Try::stream)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -126,6 +140,15 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
         DynamoDBQueryExpression<UserDb> searchUserRequest = createGetQuery(queryObject.toUserDb());
         List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserRequest);
         return convertQueryResultToOptionalUser(userSearchResult, queryObject);
+    }
+
+    private DynamoDBQueryExpression<UserDb> createListUsersQuery(String institution)
+        throws InvalidEntryInternalException {
+        UserDb queryObject = UserDb.newBuilder().withUsername(NOT_USED).withInstitution(institution).build();
+        return new DynamoDBQueryExpression<UserDb>()
+            .withIndexName(SEARCH_USERS_BY_INSTITUTION_INDEX_NAME)
+            .withHashKeyValues(queryObject)
+            .withConsistentRead(false);
     }
 
     private void checkUserDoesNotAlreadyExist(UserDto user) throws InvalidEntryInternalException, ConflictException {
@@ -193,7 +216,7 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     private static <I extends WithType> DynamoDBQueryExpression<I> createGetQuery(I searchObject) {
         return new DynamoDBQueryExpression<I>()
             .withHashKeyValues(searchObject)
-            .withRangeKeyCondition(RANGE_KEY_NAME, entityTypeAsRangeKey(searchObject));
+            .withRangeKeyCondition(PRIMARY_KEY_RANGE_KEY, entityTypeAsRangeKey(searchObject));
     }
 
     private static <I extends WithType> Condition entityTypeAsRangeKey(I searchObject) {

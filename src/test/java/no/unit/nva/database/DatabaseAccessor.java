@@ -1,6 +1,11 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
+import static no.unit.nva.database.DatabaseIndexDetails.SECONDARY_INDEX_1_HASH_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.SECONDARY_INDEX_1_RANGE_KEY;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,9 +15,12 @@ import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.CreateTableResult;
+import com.amazonaws.services.dynamodbv2.model.GlobalSecondaryIndex;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
 import com.amazonaws.services.dynamodbv2.model.KeyType;
 import com.amazonaws.services.dynamodbv2.model.ListTablesResult;
+import com.amazonaws.services.dynamodbv2.model.Projection;
+import com.amazonaws.services.dynamodbv2.model.ProjectionType;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
@@ -25,10 +33,10 @@ import org.junit.jupiter.api.AfterEach;
 public abstract class DatabaseAccessor implements WithEnvironment {
 
     public static final String USERS_AND_ROLES_TABLE = "UsersAndRolesTable";
-    public static final String HASH_KEY_NAME = "PK1A";
-    public static final String SORT_KEY_NAME = "PK1B";
-    private static final Long CAPACITY_DOES_NOT_MATTER = 1000L;
+
     public static final int SINGLE_TABLE_EXPECTED = 1;
+    private static final Long CAPACITY_DOES_NOT_MATTER = 1000L;
+
     protected final Environment envWithTableName = mockEnvironment(USERS_AND_ROLES_TABLE);
     protected AmazonDynamoDB localDynamo;
 
@@ -59,19 +67,6 @@ public abstract class DatabaseAccessor implements WithEnvironment {
         return localDynamo;
     }
 
-    private void assertThatTableKeySchemaContainsBothKeys(List<KeySchemaElement> tableKeySchema) {
-        assertThat(tableKeySchema.toString(), containsString(HASH_KEY_NAME));
-        assertThat(tableKeySchema.toString(), containsString(SORT_KEY_NAME));
-    }
-
-    private AmazonDynamoDB createLocalDynamoDbMock() {
-        return DynamoDBEmbedded.create().amazonDynamoDB();
-    }
-
-    private String readTablenNameFronEnvironment() {
-        return envWithTableName.readEnv(DatabaseService.USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE);
-    }
-
     /**
      * Closes db.
      */
@@ -80,6 +75,19 @@ public abstract class DatabaseAccessor implements WithEnvironment {
         if (nonNull(localDynamo)) {
             localDynamo.shutdown();
         }
+    }
+
+    private void assertThatTableKeySchemaContainsBothKeys(List<KeySchemaElement> tableKeySchema) {
+        assertThat(tableKeySchema.toString(), containsString(PRIMARY_KEY_HASH_KEY));
+        assertThat(tableKeySchema.toString(), containsString(DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY));
+    }
+
+    private AmazonDynamoDB createLocalDynamoDbMock() {
+        return DynamoDBEmbedded.create().amazonDynamoDB();
+    }
+
+    private String readTablenNameFronEnvironment() {
+        return envWithTableName.readEnv(DatabaseService.USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE);
     }
 
     private static CreateTableResult createTable(AmazonDynamoDB ddb, String tableName) {
@@ -92,22 +100,38 @@ public abstract class DatabaseAccessor implements WithEnvironment {
                 .withTableName(tableName)
                 .withAttributeDefinitions(attributeDefinitions)
                 .withKeySchema(keySchema)
-                .withProvisionedThroughput(provisionedthroughput);
+                .withProvisionedThroughput(provisionedthroughput)
+                .withGlobalSecondaryIndexes(searchByInstitutionSecondaryIndex());
 
         return ddb.createTable(request);
     }
 
+    private static GlobalSecondaryIndex searchByInstitutionSecondaryIndex() {
+        ProvisionedThroughput provisionedthroughput = provisionedThroughputForLocalDatabase();
+
+        return new GlobalSecondaryIndex()
+            .withIndexName(SEARCH_USERS_BY_INSTITUTION_INDEX_NAME)
+            .withKeySchema(
+                new KeySchemaElement(SECONDARY_INDEX_1_HASH_KEY, KeyType.HASH),
+                new KeySchemaElement(SECONDARY_INDEX_1_RANGE_KEY, KeyType.RANGE)
+            )
+            .withProjection(new Projection().withProjectionType(ProjectionType.ALL))
+            .withProvisionedThroughput(provisionedthroughput);
+    }
+
     private static List<KeySchemaElement> defineKeySchema() {
         List<KeySchemaElement> keySchemaElements = new ArrayList<>();
-        keySchemaElements.add(new KeySchemaElement(HASH_KEY_NAME, KeyType.HASH));
-        keySchemaElements.add(new KeySchemaElement(SORT_KEY_NAME, KeyType.RANGE));
+        keySchemaElements.add(new KeySchemaElement(PRIMARY_KEY_HASH_KEY, KeyType.HASH));
+        keySchemaElements.add(new KeySchemaElement(PRIMARY_KEY_RANGE_KEY, KeyType.RANGE));
         return keySchemaElements;
     }
 
     private static List<AttributeDefinition> defineKeyAttributes() {
         List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
-        attributeDefinitions.add(new AttributeDefinition(HASH_KEY_NAME, ScalarAttributeType.S));
-        attributeDefinitions.add(new AttributeDefinition(SORT_KEY_NAME, ScalarAttributeType.S));
+        attributeDefinitions.add(new AttributeDefinition(PRIMARY_KEY_HASH_KEY, ScalarAttributeType.S));
+        attributeDefinitions.add(new AttributeDefinition(PRIMARY_KEY_RANGE_KEY, ScalarAttributeType.S));
+        attributeDefinitions.add(new AttributeDefinition(SECONDARY_INDEX_1_HASH_KEY, ScalarAttributeType.S));
+        attributeDefinitions.add(new AttributeDefinition(SECONDARY_INDEX_1_RANGE_KEY, ScalarAttributeType.S));
         return attributeDefinitions;
     }
 

@@ -1,5 +1,6 @@
 package no.unit.nva.database;
 
+import java.util.List;
 import java.util.Optional;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
@@ -13,6 +14,8 @@ public interface DatabaseService {
     String USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE = "USERS_AND_ROLES_TABLE";
 
     UserDto getUser(UserDto queryObject) throws InvalidEntryInternalException, NotFoundException;
+
+    List<UserDto> listUsers(String institutionId) throws InvalidEntryInternalException;
 
     Optional<UserDto> getUserAsOptional(UserDto queryObject) throws InvalidEntryInternalException;
 

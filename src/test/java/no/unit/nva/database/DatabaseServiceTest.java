@@ -5,6 +5,8 @@ import static no.unit.nva.model.DoesNotHaveNullFields.doesNotHaveNullFields;
 import static no.unit.nva.utils.EntityUtils.createRole;
 import static no.unit.nva.utils.EntityUtils.createUserWithoutUsername;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
@@ -28,10 +30,11 @@ import org.junit.jupiter.api.function.Executable;
 
 public class DatabaseServiceTest extends DatabaseAccessor {
 
-    public static final String SOME_USERNAME = "someusername";
-    public static final String SOME_ROLE = "SomeRole";
-    public static final String SOME_INSTITUTION = "SomeInstitution";
-    public static final String SOME_OTHER_ROLE = "SOME_OTHER_ROLE";
+    private static final String SOME_USERNAME = "someusername";
+    private static final String SOME_OTHER_USERNAME = "someotherusername";
+    private static final String SOME_ROLE = "SomeRole";
+    private static final String SOME_INSTITUTION = "SomeInstitution";
+    private static final String SOME_OTHER_ROLE = "SOME_OTHER_ROLE";
     private static final String SOME_OTHER_INSTITUTION = "Some other institution";
     private DatabaseService db;
 
@@ -216,6 +219,23 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         Executable action = () -> db.updateUser(invalidUser);
         InvalidInputException exception = assertThrows(InvalidInputException.class, action);
         assertThat(exception.getMessage(), containsString(UserDto.INVALID_USER_ERROR_MESSAGE));
+    }
+
+    @Test
+    public void listUsersByInstitutionReturnsAllUsersForSpecifiedInstitution()
+        throws ConflictException, InvalidEntryInternalException, InvalidInputException {
+        UserDto someUser = createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
+        UserDto someOtherUser = createSampleUserAndAddUserToDb(SOME_OTHER_USERNAME, SOME_INSTITUTION, SOME_ROLE);
+        List<UserDto> queryResult = db.listUsers(SOME_INSTITUTION);
+        assertThat(queryResult, containsInAnyOrder(someUser, someOtherUser));
+    }
+
+    @Test
+    public void listUsersByInstitutionReturnsEmptyListWhenThereAreNoUsersForSpecifiedInstitution()
+        throws ConflictException, InvalidEntryInternalException, InvalidInputException {
+        createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
+        List<UserDto> queryResult = db.listUsers(SOME_OTHER_INSTITUTION);
+        assertThat(queryResult, is(empty()));
     }
 
     private UserDto createSampleUserWithoutInstitutionOrRoles(String username) throws InvalidEntryInternalException {
