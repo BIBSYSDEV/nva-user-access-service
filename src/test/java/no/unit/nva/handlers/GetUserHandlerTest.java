@@ -14,14 +14,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-import no.unit.nva.database.DatabaseAccessor;
-import no.unit.nva.database.DatabaseService;
 import no.unit.nva.exceptions.BadRequestException;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
-import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.TypedObjectsDetails;
 import no.unit.nva.model.UserDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -35,14 +32,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-class GetUserHandlerTest extends DatabaseAccessor {
+class GetUserHandlerTest extends HandlerTest {
 
-    public static final String SOME_USERNAME = "sampleUsername";
-    public static final String SOME_ROLE = "SomeRole";
-    public static final String SOME_INSTITUTION = "SomeInstitution";
+
     private static final String BLANK_STRING = " ";
 
-    private DatabaseService databaseService;
     private RequestInfo requestInfo;
     private Context context;
     private GetUserHandler getUserHandler;
@@ -71,7 +65,7 @@ class GetUserHandlerTest extends DatabaseAccessor {
     }
 
     private ByteArrayOutputStream sendGetUserRequestToHandler() throws IOException {
-        requestInfo = createRequestInfoForGetUser(SOME_USERNAME);
+        requestInfo = createRequestInfoForGetUser(DEFAULT_USERNAME);
         InputStream inputStream = new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
             .withPathParameters(requestInfo.getPathParameters())
             .build();
@@ -89,7 +83,7 @@ class GetUserHandlerTest extends DatabaseAccessor {
     @DisplayName("processInput() returns UserDto when path parameter contains the username of an existing user")
     @Test
     void processInputReturnsUserDtoWhenPathParameterContainsTheUsernameOfExistingUser() throws ApiGatewayException {
-        requestInfo = createRequestInfoForGetUser(SOME_USERNAME);
+        requestInfo = createRequestInfoForGetUser(DEFAULT_USERNAME);
         UserDto expected = insertSampleUserToDatabase();
         UserDto actual = getUserHandler.processInput(null, requestInfo, context);
         assertThat(actual, is(equalTo(expected)));
@@ -99,7 +93,7 @@ class GetUserHandlerTest extends DatabaseAccessor {
         + "username")
     @Test
     void processInputThrowsNotFoundExceptionWhenPathParameterIsNonExistingUsername() {
-        requestInfo = createRequestInfoForGetUser(SOME_USERNAME);
+        requestInfo = createRequestInfoForGetUser(DEFAULT_USERNAME);
         Executable action = () -> getUserHandler.processInput(null, requestInfo, context);
         assertThrows(NotFoundException.class, action);
     }
@@ -120,21 +114,7 @@ class GetUserHandlerTest extends DatabaseAccessor {
         assertThrows(BadRequestException.class, action);
     }
 
-    private UserDto insertSampleUserToDatabase()
-        throws InvalidEntryInternalException, ConflictException, InvalidInputException {
-        UserDto sampleUser = createSampleUser();
-        databaseService.addUser(sampleUser);
-        return sampleUser;
-    }
 
-    private UserDto createSampleUser() throws InvalidEntryInternalException {
-        RoleDto someRole = RoleDto.newBuilder().withName(SOME_ROLE).build();
-        return UserDto.newBuilder()
-            .withUsername(SOME_USERNAME)
-            .withRoles(Collections.singletonList(someRole))
-            .withInstitution(SOME_INSTITUTION)
-            .build();
-    }
 
     private RequestInfo createRequestInfoForGetUser(String username) {
         RequestInfo reqInfo = new RequestInfo();

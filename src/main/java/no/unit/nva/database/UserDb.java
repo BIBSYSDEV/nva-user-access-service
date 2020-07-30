@@ -20,11 +20,12 @@ import java.util.Objects;
 import no.unit.nva.database.UserDb.Builder;
 import no.unit.nva.database.interfaces.DynamoEntry;
 import no.unit.nva.database.interfaces.WithCopy;
+import no.unit.nva.database.interfaces.WithType;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.JacocoGenerated;
 
 @DynamoDBTable(tableName = "OverridenByEnvironmentVariable")
-public class UserDb extends DynamoEntry implements WithCopy<Builder> {
+public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
 
     public static final String TYPE = "USER";
     public static final String INVALID_USER_EMPTY_USERNAME = "Invalid user entry: Empty username is not allowed";

@@ -164,6 +164,32 @@ Resources:
                 responses: {}
                 httpMethod: POST
                 type: aws_proxy
+          /institutions/{institution}/users:
+            get:
+              summary: Lists users of specified institution
+              parameters:
+                - in: path
+                  name: institution
+                  schema:
+                    type: string
+                  required: true
+              responses:
+                '200':
+                  description: List of users belonging in the specified institue
+                  content:
+                    application/json:
+                      schema:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+              security:
+                - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListByInstitutionHandler.Arn}/invocations
+                responses: {}
+                httpMethod: POST
+                type: aws_proxy
         components:
           schemas:
             Role:
@@ -360,4 +386,24 @@ Resources:
           Properties:
             Path: /users/{username}
             Method: put
+            RestApiId: !Ref RestApi
+  ListByInstitutionHandler:
+    DependsOn: [ LambdaRole, UserRoleMappings]
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.ListByInstitutionHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /institutions/{institution}/users
+            Method: get
             RestApiId: !Ref RestApi
