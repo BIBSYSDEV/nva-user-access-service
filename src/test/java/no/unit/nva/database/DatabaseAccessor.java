@@ -1,7 +1,11 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
 import static no.unit.nva.database.DatabaseIndexDetails.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
+import static no.unit.nva.database.DatabaseIndexDetails.SECONDARY_INDEX_1_HASH_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.SECONDARY_INDEX_1_RANGE_KEY;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,11 +33,7 @@ import org.junit.jupiter.api.AfterEach;
 public abstract class DatabaseAccessor implements WithEnvironment {
 
     public static final String USERS_AND_ROLES_TABLE = "UsersAndRolesTable";
-    public static final String HASH_KEY_NAME = "PrimaryKeyHashKey";
-    public static final String SORT_KEY_NAME = "PrimaryKeyRangeKey";
 
-    public static final String SECONDARY_INDEX_1_HASH_KEY = "SecondaryIndex1HashKey";
-    public static final String SECONDARY_INDEX_1_RANGE_KEY = "SecondaryIndex1RangeKey";
     public static final int SINGLE_TABLE_EXPECTED = 1;
     private static final Long CAPACITY_DOES_NOT_MATTER = 1000L;
 
@@ -52,7 +52,7 @@ public abstract class DatabaseAccessor implements WithEnvironment {
     public AmazonDynamoDB initializeTestDatabase() {
 
         localDynamo = createLocalDynamoDbMock();
-        String tableName = readTablenNameFronEnvironment();
+        String tableName = readTableNameFromEnvironment();
         CreateTableResult createTableResult = createTable(localDynamo, tableName);
         TableDescription tableDescription = createTableResult.getTableDescription();
         assertEquals(tableName, tableDescription.getTableName());
@@ -78,15 +78,15 @@ public abstract class DatabaseAccessor implements WithEnvironment {
     }
 
     private void assertThatTableKeySchemaContainsBothKeys(List<KeySchemaElement> tableKeySchema) {
-        assertThat(tableKeySchema.toString(), containsString(HASH_KEY_NAME));
-        assertThat(tableKeySchema.toString(), containsString(SORT_KEY_NAME));
+        assertThat(tableKeySchema.toString(), containsString(PRIMARY_KEY_HASH_KEY));
+        assertThat(tableKeySchema.toString(), containsString(DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY));
     }
 
     private AmazonDynamoDB createLocalDynamoDbMock() {
         return DynamoDBEmbedded.create().amazonDynamoDB();
     }
 
-    private String readTablenNameFronEnvironment() {
+    private String readTableNameFromEnvironment() {
         return envWithTableName.readEnv(DatabaseService.USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE);
     }
 
@@ -121,15 +121,15 @@ public abstract class DatabaseAccessor implements WithEnvironment {
 
     private static List<KeySchemaElement> defineKeySchema() {
         List<KeySchemaElement> keySchemaElements = new ArrayList<>();
-        keySchemaElements.add(new KeySchemaElement(HASH_KEY_NAME, KeyType.HASH));
-        keySchemaElements.add(new KeySchemaElement(SORT_KEY_NAME, KeyType.RANGE));
+        keySchemaElements.add(new KeySchemaElement(PRIMARY_KEY_HASH_KEY, KeyType.HASH));
+        keySchemaElements.add(new KeySchemaElement(PRIMARY_KEY_RANGE_KEY, KeyType.RANGE));
         return keySchemaElements;
     }
 
     private static List<AttributeDefinition> defineKeyAttributes() {
         List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
-        attributeDefinitions.add(new AttributeDefinition(HASH_KEY_NAME, ScalarAttributeType.S));
-        attributeDefinitions.add(new AttributeDefinition(SORT_KEY_NAME, ScalarAttributeType.S));
+        attributeDefinitions.add(new AttributeDefinition(PRIMARY_KEY_HASH_KEY, ScalarAttributeType.S));
+        attributeDefinitions.add(new AttributeDefinition(PRIMARY_KEY_RANGE_KEY, ScalarAttributeType.S));
         attributeDefinitions.add(new AttributeDefinition(SECONDARY_INDEX_1_HASH_KEY, ScalarAttributeType.S));
         attributeDefinitions.add(new AttributeDefinition(SECONDARY_INDEX_1_RANGE_KEY, ScalarAttributeType.S));
         return attributeDefinitions;

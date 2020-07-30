@@ -242,9 +242,9 @@ Resources:
       GlobalSecondaryIndexes:
         - IndexName: SearchUsersByInstitution
           KeySchema:
-            - Attributename: SecondaryIndex1HashKey
+            - AttributeName: SecondaryIndex1HashKey
               KeyType: HASH
-            - Attributename: SecondaryIndex1RangeKey
+            - AttributeName: SecondaryIndex1RangeKey
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
