@@ -249,9 +249,7 @@ Resources:
           Projection:
             ProjectionType: ALL
 
-
   LambdaRole:
-    DependsOn: UserRoleMappings
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -275,15 +273,6 @@ Resources:
                   - "logs:CreateLogStream"
                   - "logs:PutLogEvents"
                 Resource: "*"
-              - Effect: Allow
-                Action:
-                  - "dynamodb:BatchGetItem"
-                  - "dynamodb:BatchWriteItem"
-                  - "dynamodb:GetItem"
-                  - "dynamodb:PutItem"
-                  - "dynamodb:Query"
-                  - "dynamodb:UpdateItem"
-                Resource: !GetAtt UserRoleMappings.Arn
 
   AddRoleHandler:
     DependsOn: [ LambdaRole, UserRoleMappings]
@@ -298,6 +287,9 @@ Resources:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
@@ -319,6 +311,9 @@ Resources:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
@@ -339,6 +334,9 @@ Resources:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
@@ -360,6 +358,9 @@ Resources:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
@@ -380,6 +381,9 @@ Resources:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
@@ -400,6 +404,9 @@ Resources:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
