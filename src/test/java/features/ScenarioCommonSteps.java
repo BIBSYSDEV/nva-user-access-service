@@ -2,6 +2,8 @@ package features;
 
 import static features.ScenarioTest.IGNORE_HEADER_ROW;
 import static features.ScenarioTest.createRequestBuilderTypeRef;
+import static features.ScenarioTest.ignoreHeadersRow;
+import static nva.commons.utils.attempt.Try.attempt;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -12,13 +14,22 @@ import io.cucumber.java.After;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import no.unit.nva.database.DatabaseAccessor;
+import no.unit.nva.exceptions.ConflictException;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
+import no.unit.nva.exceptions.InvalidInputException;
+import no.unit.nva.exceptions.NotFoundException;
+import no.unit.nva.model.RoleDto;
+import no.unit.nva.model.UserDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.utils.JsonUtils;
+import nva.commons.utils.attempt.Try;
 import org.apache.http.HttpStatus;
 import org.zalando.problem.Problem;
 
@@ -30,22 +41,14 @@ public class ScenarioCommonSteps extends DatabaseAccessor {
         this.scenarioContext = scenarioContext;
     }
 
-    @Given("a database for users and roles")
+    @Given("a Database for users and roles")
     public void a_database_for_users_and_roles() {
         this.scenarioContext.setDatabaseService(createDatabaseServiceUsingLocalStorage());
     }
 
-    @Given("the authorized client forms a {string} request")
-    public void the_authorized_client_forms_a_request(String httpMethod) {
-        this.scenarioContext.setRequestBuilder(createRequestBuilder());
-        scenarioContext.getRequestBuilder().withHttpMethod(httpMethod.toUpperCase());
-    }
-
-    @Given("the request contains a JSON body with following key-value pairs")
-    public void the_request_contains_a_Json_body_with_following_key_value_pairs(DataTable dataTable)
-        throws JsonProcessingException {
-        DataTable inputData = dataTable.rows(IGNORE_HEADER_ROW);
-        addFieldsToRequestBody(inputData);
+    @Given("an AuthorizedClient that is authorized through Feide")
+    public void an_AuthorizedClient_that_is_authorized_through_Feide() {
+        //DO NOTHING
     }
 
     @Then("a NotFound message is returned")

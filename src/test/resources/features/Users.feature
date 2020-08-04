@@ -1,119 +1,84 @@
 Feature: Users
 
   Background:
-    Given a database for users and roles
-    And an authorized client
+    Given a Database for users and roles
+    And an AuthorizedClient that is authorized through Feide
 
-  Scenario: Authorized client adds a new user
-    Given  that a user entry with the username "someone@institution" does not exist in the database
-    And the authorized client forms a "POST" request
-    And the request contains a JSON body with following key-value pairs
-      | key         | value               |
-      | username    | someone@institution |
-      | institution | institution         |
-      | type        | User                |
-    And the request body also contains a list of roles with the following role-names
-      | role-name |
-      | RoleA     |
-      | RoleB     |
-    When the authorized client sends the request to add a new User
-    Then a user description is returned
-    And the user object contains all the aforementioned information
+    And an ExistingUser with username "existingUser" that exists in the Database
+    And the ExistingUser belongs to the institution "StandardInstitution"
+    And the ExistingUser has the roles:
+      | roles |
+      | RoleA |
+
+    And a NonExistingUser with username "nonExistingUser" that does not exist in the database
+
+    And a non-existing NewUser with username "newUser" that does not yet exist in the database
+    And NewUser is specified that it will have the roles:
+      | roles |
+      | RoleA |
+
+  Scenario: AuthorizedClient adds a new user
+    When the AuthorizedClient sends a request to add the NewUser to the Database
+    Then the NewUser is added to the database
+    And the response object contains the UserDescription of the NewUser
 
   Scenario: Authorized client gets an existing user
-    Given  that a user entry with the username "someone@institution" exists in the database
-    And the authorized client forms a "GET" request
-    And the request has the following path parameters:
-      | parameter | value               |
-      | username  | someone@institution |
-    When the authorized client sends the request to read the user
-    Then a user description is returned
+    When the AuthorizedClient sends a request to read the ExistingUser from the Database
+    Then the response object contains the UserDescription of the ExistingUser
 
   Scenario: Authorized client gets a non-existing user
-    Given that a user entry with the username "someone@institution" does not exist in the database
-    And the authorized client forms a "GET" request
-    And the request has the following path parameters:
-      | parameter | value               |
-      | username  | someone@institution |
-    When the authorized client sends the request to read the user
+    When the AuthorizedClient sends a request to read the NonExistingUser from the Database
     Then a NotFound message is returned
 
   Scenario:  Authorized client updates existing user
-    Given that a user entry with the username "someone@institution" exists in the database
-    And the user entry contains a list of roles with the following role-names
-      | role-name |
-      | RoleA     |
-    And the authorized client forms a "PUT" request
-    And the request has the following path parameters:
-      | parameter | value               |
-      | username  | someone@institution |
-    And the request contains a JSON body with following key-value pairs
-      | key         | value               |
-      | username    | someone@institution |
-      | institution | institution         |
-      | type        | User                |
-    And the request body also contains a list of roles with the following role-names
-      | role-name |
-      | RoleB     |
-    When the authorized client sends the request to update the user
-    Then the user entry is updated asynchronously
-    And a Location header with the updated user URI is included in the response
+    When the AuthorizedClient requests to update the ExistingUser and sets the following roles:
+      | roles |
+      | roleB |
+      | roleC |
+    Then the ExistingUser is updated asynchronously
+    And a Location header with the ExistingUser URI is included in the response
+    And the ExistingUser contains a list of roles with the following role-names:
+      | roles |
+      | roleB |
+      | roleC |
 
-  Scenario:Authorized client attempts to update non-existing user
-    Given that a user entry with the username "someone@institution" does not exist in the database
-    And the authorized client forms a "PUT" request
-    And the request has the following path parameters:
-      | parameter | value               |
-      | username  | someone@institution |
-    And the request contains a JSON body with following key-value pairs
-      | key         | value               |
-      | username    | someone@institution |
-      | institution | institution         |
-      | type        | User                |
-    And the request body also contains a list of roles with the following role-names
-      | role-name |
-      | RoleB     |
-    When the authorized client sends the request to update the user
+  Scenario: Authorized client attempts to update non-existing user
+    When the AuthorizedClient requests to update the NonExistingUser
     Then a NotFound message is returned
 
+
   Scenario:Authorized client attempts to update existing user with malformed request
-    Given that a user entry with the username "someone@institution" exists in the database
-    And the authorized client forms a "PUT" request
-    And the request has the following path parameters:
-      | parameter | value               |
-      | username  | someone@institution |
-    And the request contains a malformed JSON body
-    When the authorized client sends the request to update the user
+    When the AuthorizedClient requests to update the ExistingUser using a malformed body
     Then a BadRequest message is returned containing information about the invalid request
 
 
   Scenario: AuthorizedClient requests list of users of specified institution
-    Given that a user entry with the username "userA@institutionA" exists in the database
-    And the user "userA@institutionA" belongs to "institutionA"
-    And that a user entry with the username "userB@institutionA" exists in the database
-    And the user "userB@institutionA" belongs to "institutionA"
-    And that a user entry with the username "userC@institutionB" exists in the database
-    And the user "userC@institutionB" belongs to "institutionB"
-    And the authorized client forms a "GET" request
-    And the request has the following path parameters:
-      | parameter   | value        |
-      | institution | institutionA |
-    When the authorized client sends the request to list the users of the specified institution
+    Given a UserA with username "userA" that exists in the Database
+    And the UserA belongs to the institution "Institution"
+    And the UserA has the roles:
+      | roles    |
+      | someRole |
+
+    And a UserB with username "userB" that exists in the Database
+    And the UserB belongs to the institution "Institution"
+    And the UserB has the roles:
+      | roles    |
+      | someRole |
+
+    And a UserC with username "userC" that exists in the Database
+    And the UserC belongs to the institution "AnotherInstitution"
+    And the UserC has the roles:
+      | roles    |
+      | someRole |
+
+    When the AuthorizedClient sends the request to list the users of the "Institution"
     Then a non-empty list of the users belonging to the institution is returned to the client
     And the list of users should contain only the following usernames:
-      | usernames          |
-      | userA@institutionA |
-      | userB@institutionA |
+      | usernames |
+      | userA     |
+      | userB     |
 
-  Scenario: AuthorizedClient requests list of users of specified institution but no users exist
-    Given that a user entry with the username "userA@institutionA" exists in the database
-    And the user "userA@institutionA" belongs to "institutionA"
-    And the authorized client forms a "GET" request
-    And the request has the following path parameters:
-      | parameter   | value        |
-      | institution | institutionB |
-    When the authorized client sends the request to list the users of the specified institution
-    Then an empty list of the users belonging to the institution is returned to the client
+
 
 
 

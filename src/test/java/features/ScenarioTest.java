@@ -1,10 +1,12 @@
 package features;
 
+import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import io.cucumber.datatable.DataTable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,8 +42,13 @@ public class ScenarioTest implements WithEnvironment {
         return JsonUtils.objectMapper.convertValue(bodyMap, requestBodyClass);
     }
 
-    protected static <T> Map<String, Object> prepareRequestBody(T requestObject) {
-        return JsonUtils.objectMapper.convertValue(requestObject, createRequestBuilderTypeRef());
+    protected <T> HandlerRequestBuilder<Map<String, Object>> initializeContextRequestBuilder(T entity)
+        throws JsonProcessingException {
+        Map<String, Object> objectMap = objectAsMap(entity);
+        HandlerRequestBuilder<Map<String, Object>> requestBuilder =
+            new HandlerRequestBuilder<Map<String, Object>>(objectMapper).withBody(objectMap);
+        scenarioContext.setRequestBuilder(requestBuilder);
+        return scenarioContext.getRequestBuilder();
     }
 
     protected <I, O> void handlerSendsRequestAndUpdatesResponse(ApiGatewayHandler<I, O> handler) throws IOException {
@@ -64,6 +71,13 @@ public class ScenarioTest implements WithEnvironment {
 
     protected <I> I getResponseBody(Class<I> requestBodyClass) throws IOException {
         return scenarioContext.getResponseBody(requestBodyClass);
+    }
+
+    private static <T> Map<String, Object> objectAsMap(T inputObject) {
+        JavaType javaType = objectMapper.getTypeFactory()
+            .constructParametricType(Map.class, String.class, Object.class);
+        Map<String, Object> userAsMap = objectMapper.convertValue(inputObject, javaType);
+        return userAsMap;
     }
 
     private <I, O> ByteArrayOutputStream invokeHandlerWithRequest(
