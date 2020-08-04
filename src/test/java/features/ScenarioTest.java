@@ -35,20 +35,19 @@ public class ScenarioTest implements WithEnvironment {
         return new TypeReference<>() {};
     }
 
-    protected static <T> T readRequestBody(HandlerRequestBuilder<Map<String, Object>> requestBuilder,
-                                           Class<T> requestBodyClass)
+    protected static <T> T getRequestBody(HandlerRequestBuilder<Map<String, Object>> requestBuilder,
+                                          Class<T> requestBodyClass)
         throws JsonProcessingException {
         Map<String, Object> bodyMap = requestBuilder.getBody(createRequestBuilderTypeRef());
         return JsonUtils.objectMapper.convertValue(bodyMap, requestBodyClass);
     }
 
-    protected <T> HandlerRequestBuilder<Map<String, Object>> initializeContextRequestBuilder(T entity)
+    protected <T> void initializeContextRequestBuilder(T entity)
         throws JsonProcessingException {
         Map<String, Object> objectMap = objectAsMap(entity);
         HandlerRequestBuilder<Map<String, Object>> requestBuilder =
             new HandlerRequestBuilder<Map<String, Object>>(objectMapper).withBody(objectMap);
         scenarioContext.setRequestBuilder(requestBuilder);
-        return scenarioContext.getRequestBuilder();
     }
 
     protected <I, O> void handlerSendsRequestAndUpdatesResponse(ApiGatewayHandler<I, O> handler) throws IOException {
@@ -59,10 +58,6 @@ public class ScenarioTest implements WithEnvironment {
 
     protected HandlerRequestBuilder<Map<String, Object>> getRequestBuilder() {
         return scenarioContext.getRequestBuilder();
-    }
-
-    protected void setRequestBuilder(HandlerRequestBuilder<Map<String, Object>> requestBuilder) {
-        scenarioContext.setRequestBuilder(requestBuilder);
     }
 
     protected DatabaseServiceImpl getDatabaseService() {

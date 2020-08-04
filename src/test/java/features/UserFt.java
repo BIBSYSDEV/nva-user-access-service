@@ -161,11 +161,9 @@ public class UserFt extends ScenarioTest {
         throws InvalidEntryInternalException, InvocationTargetException, NoSuchMethodException, IllegalAccessException,
                IOException {
 
-        UserDto invalidUser = EntityUtils.createUserWithoutUsername();
-        HandlerRequestBuilder<Map<String, Object>> request = initializeContextRequestBuilder(invalidUser);
+        requestBodyContainsInvalidUser();
+        pathParameterPointsToExistingUser(userAlias);
 
-        UserDto existingUser = scenarioContext.getExampleUser(userAlias);
-        request.withPathParameters(pathParameters(existingUser));
         UpdateUserHandler handler = newUpdateUserHandler();
         handlerSendsRequestAndUpdatesResponse(handler);
     }
@@ -182,7 +180,7 @@ public class UserFt extends ScenarioTest {
     @Then("^the (\\w*) is updated asynchronously$")
     public void the_user_entry_is_updated_asynchronously(String userAlias)
         throws JsonProcessingException, InvalidEntryInternalException, NotFoundException {
-        UserDto expectedUser = readRequestBody(getRequestBuilder(), UserDto.class);
+        UserDto expectedUser = getRequestBody(getRequestBuilder(), UserDto.class);
         UserDto queryObject = scenarioContext.getExampleUser(userAlias);
         UserDto actualUser = getUserDirectlyFromDatabase(queryObject);
         assertThat(actualUser, is(equalTo(expectedUser)));
@@ -197,13 +195,7 @@ public class UserFt extends ScenarioTest {
         assertThat(locationHeader, containsString(expectedUser.getUsername()));
     }
 
-    @Then("a BadRequest message is returned containing information about the invalid request")
-    public void a_BadRequest_message_is_returned() throws IOException {
-        GatewayResponse<Problem> response = scenarioContext.getApiGatewayResponse(Problem.class);
-        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_BAD_REQUEST)));
-        Problem problem = response.getBodyObject(Problem.class);
-        assertThat(problem.getDetail(), containsString(UserDto.INVALID_USER_ERROR_MESSAGE));
-    }
+
 
     @Then("a non-empty list of the users belonging to the institution is returned to the client")
     public void a_list_of_the_users_belonging_to_the_institution_is_returned_to_the_client() throws IOException {
@@ -241,6 +233,18 @@ public class UserFt extends ScenarioTest {
     public void the_response_object_contains_the_UserDescription(String userAlias) throws IOException {
         UserDto newUserInResponseBody = scenarioContext.getResponseBody(UserDto.class);
         assertThat(newUserInResponseBody, is(equalTo(scenarioContext.getExampleUser(userAlias))));
+    }
+
+    private void requestBodyContainsInvalidUser()
+        throws InvalidEntryInternalException, NoSuchMethodException, InvocationTargetException, IllegalAccessException,
+               JsonProcessingException {
+        UserDto invalidUser = EntityUtils.createUserWithoutUsername();
+        initializeContextRequestBuilder(invalidUser);
+    }
+
+    private void pathParameterPointsToExistingUser(String userAlias) {
+        UserDto existingUser = scenarioContext.getExampleUser(userAlias);
+        getRequestBuilder().withPathParameters(pathParameters(existingUser));
     }
 
     private List<RoleDto> createRolesFromRoleNames(DataTable dataTable) {

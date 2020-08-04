@@ -18,12 +18,12 @@ public class ScenarioContext {
     private HandlerRequestBuilder<Map<String, Object>> requestBuilder;
     private String requestResponse;
     private DatabaseServiceImpl databaseService;
-    private Map<String, UserDto> exampleUsers;
-    private Map<String, RoleDto> exampleRoles;
+    private final Map<String, UserDto> exampleUsers;
+    private final Map<String, RoleDto> exampleRoles;
 
     public ScenarioContext() {
         this.exampleUsers = new ConcurrentHashMap<>();
-        exampleRoles = new ConcurrentHashMap<>();
+        this.exampleRoles = new ConcurrentHashMap<>();
     }
 
     public void addExampleUser(String userAlias, UserDto existingUser) {
