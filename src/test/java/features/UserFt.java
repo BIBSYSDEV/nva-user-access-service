@@ -104,7 +104,7 @@ public class UserFt extends ScenarioTest {
         scenarioContext.replaceUser(userAlias, userUpdate);
     }
 
-    @Given("^the (\\w*) contains a list of roles with the following role-names:$")
+    @Then("^the (\\w*) contains only the following roles:$")
     public void the_user_entry_contains_a_list_of_roles_with_the_following_role_names(String userAlias,
                                                                                       DataTable dataTable)
         throws InvalidEntryInternalException, NotFoundException {
@@ -135,7 +135,7 @@ public class UserFt extends ScenarioTest {
         handlerSendsRequestAndUpdatesResponse(getUserHandler);
     }
 
-    @When("^the AuthorizedClient requests to update the (\\w*) and sets the following roles:$")
+    @When("^the AuthorizedClient requests to update the (\\w*) setting the following roles:$")
     public void the_AuthorizedClient_requests_to_update_the_ExistingUser_and_set_the_following_roles(
         String userAlias, DataTable roleNames)
         throws InvalidEntryInternalException, NotFoundException, IOException {
@@ -186,7 +186,7 @@ public class UserFt extends ScenarioTest {
         assertThat(actualUser, is(equalTo(expectedUser)));
     }
 
-    @Then("^a Location header with the (\\w*) URI is included in the response$")
+    @Then("^the response has a Location header with (\\w*)'s URI as value$")
     public void a_Location_header_with_the_user_URI_is_included_in_the_response(String userAlias) throws IOException {
         GatewayResponse<UserDto> response = scenarioContext.getApiGatewayResponse(UserDto.class);
         String locationHeader = response.getHeaders().get(UpdateUserHandler.LOCATION_HEADER);
@@ -229,7 +229,7 @@ public class UserFt extends ScenarioTest {
         assertThat(newUserInDatabase, is(equalTo(scenarioContext.getExampleUser(userAlias))));
     }
 
-    @Then("^the response object contains the UserDescription of the (\\w*)$")
+    @Then("^in the response, the object is the UserDescription of the (\\w*)$")
     public void the_response_object_contains_the_UserDescription(String userAlias) throws IOException {
         UserDto newUserInResponseBody = scenarioContext.getResponseBody(UserDto.class);
         assertThat(newUserInResponseBody, is(equalTo(scenarioContext.getExampleUser(userAlias))));
