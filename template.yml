@@ -249,55 +249,20 @@ Resources:
           Projection:
             ProjectionType: ALL
 
-
-  LambdaRole:
-    DependsOn: UserRoleMappings
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-            Action:
-              - 'sts:AssumeRole'
-      Path: /
-      Policies:
-        - PolicyName: LambdaAccessPolicy
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "logs:CreateLogGroup"
-                  - "logs:CreateLogStream"
-                  - "logs:PutLogEvents"
-                Resource: "*"
-              - Effect: Allow
-                Action:
-                  - "dynamodb:BatchGetItem"
-                  - "dynamodb:BatchWriteItem"
-                  - "dynamodb:GetItem"
-                  - "dynamodb:PutItem"
-                  - "dynamodb:Query"
-                  - "dynamodb:UpdateItem"
-                Resource: !GetAtt UserRoleMappings.Arn
-
   AddRoleHandler:
-    DependsOn: [ LambdaRole, UserRoleMappings]
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: no.unit.nva.handlers.AddRoleHandler::handleRequest
       Runtime: java11
       MemorySize: 1408
-      Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
@@ -307,18 +272,19 @@ Resources:
             RestApiId: !Ref RestApi
 
   GetRoleHandler:
-    DependsOn: [ LambdaRole, UserRoleMappings]
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: no.unit.nva.handlers.GetRoleHandler::handleRequest
       Runtime: java11
       MemorySize: 1408
-      Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
@@ -327,18 +293,19 @@ Resources:
             Method: get
             RestApiId: !Ref RestApi
   AddUserHandler:
-    DependsOn: [ LambdaRole, UserRoleMappings]
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: no.unit.nva.handlers.AddUserHandler::handleRequest
       Runtime: java11
       MemorySize: 1408
-      Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
@@ -348,18 +315,19 @@ Resources:
             RestApiId: !Ref RestApi
 
   GetUserHandler:
-    DependsOn: [ LambdaRole, UserRoleMappings]
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: no.unit.nva.handlers.GetUserHandler::handleRequest
       Runtime: java11
       MemorySize: 1408
-      Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
@@ -368,18 +336,19 @@ Resources:
             Method: get
             RestApiId: !Ref RestApi
   UpdateUserHandler:
-    DependsOn: [ LambdaRole, UserRoleMappings]
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: no.unit.nva.handlers.UpdateUserHandler::handleRequest
       Runtime: java11
       MemorySize: 1408
-      Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api
@@ -388,18 +357,19 @@ Resources:
             Method: put
             RestApiId: !Ref RestApi
   ListByInstitutionHandler:
-    DependsOn: [ LambdaRole, UserRoleMappings]
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Handler: no.unit.nva.handlers.ListByInstitutionHandler::handleRequest
       Runtime: java11
       MemorySize: 1408
-      Role: !GetAtt LambdaRole.Arn
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersAndRolesTableName
       Events:
         ApiEvent:
           Type: Api

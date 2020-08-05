@@ -64,7 +64,7 @@ dependencies {
         testImplementation(group: 'io.cucumber', name: 'cucumber-picocontainer', version: '6.1.1') {
             because("Dependency injection in cucumber glue code")
         }
-    }
+   }
 }
 
 task copyNativeDeps(type: Copy) {

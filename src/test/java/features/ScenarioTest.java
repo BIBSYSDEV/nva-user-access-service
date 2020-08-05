@@ -1,10 +1,12 @@
 package features;
 
+import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import io.cucumber.datatable.DataTable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,15 +35,19 @@ public class ScenarioTest implements WithEnvironment {
         return new TypeReference<>() {};
     }
 
-    protected static <T> T readRequestBody(HandlerRequestBuilder<Map<String, Object>> requestBuilder,
-                                           Class<T> requestBodyClass)
+    protected static <T> T getRequestBody(HandlerRequestBuilder<Map<String, Object>> requestBuilder,
+                                          Class<T> requestBodyClass)
         throws JsonProcessingException {
         Map<String, Object> bodyMap = requestBuilder.getBody(createRequestBuilderTypeRef());
         return JsonUtils.objectMapper.convertValue(bodyMap, requestBodyClass);
     }
 
-    protected static <T> Map<String, Object> prepareRequestBody(T requestObject) {
-        return JsonUtils.objectMapper.convertValue(requestObject, createRequestBuilderTypeRef());
+    protected <T> void initializeContextRequestBuilder(T entity)
+        throws JsonProcessingException {
+        Map<String, Object> objectMap = objectAsMap(entity);
+        HandlerRequestBuilder<Map<String, Object>> requestBuilder =
+            new HandlerRequestBuilder<Map<String, Object>>(objectMapper).withBody(objectMap);
+        scenarioContext.setRequestBuilder(requestBuilder);
     }
 
     protected <I, O> void handlerSendsRequestAndUpdatesResponse(ApiGatewayHandler<I, O> handler) throws IOException {
@@ -54,16 +60,19 @@ public class ScenarioTest implements WithEnvironment {
         return scenarioContext.getRequestBuilder();
     }
 
-    protected void setRequestBuilder(HandlerRequestBuilder<Map<String, Object>> requestBuilder) {
-        scenarioContext.setRequestBuilder(requestBuilder);
-    }
-
     protected DatabaseServiceImpl getDatabaseService() {
         return scenarioContext.getDatabaseService();
     }
 
     protected <I> I getResponseBody(Class<I> requestBodyClass) throws IOException {
         return scenarioContext.getResponseBody(requestBodyClass);
+    }
+
+    private static <T> Map<String, Object> objectAsMap(T inputObject) {
+        JavaType javaType = objectMapper.getTypeFactory()
+            .constructParametricType(Map.class, String.class, Object.class);
+        Map<String, Object> userAsMap = objectMapper.convertValue(inputObject, javaType);
+        return userAsMap;
     }
 
     private <I, O> ByteArrayOutputStream invokeHandlerWithRequest(
