@@ -74,7 +74,7 @@ Feature: Users
       | someRole |
 
     When the AuthorizedClient sends the request to list the users of the "Institution"
-    Then a non-empty list of the users belonging to the institution is returned to the client
+    Then a non-empty list of the users belonging to the institution is returned
     And the list of users should contain only the following usernames:
       | usernames |
       | userA     |

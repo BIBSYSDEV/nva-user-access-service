@@ -42,8 +42,6 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.EntityUtils;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.utils.attempt.Try;
-import org.apache.http.HttpStatus;
-import org.zalando.problem.Problem;
 
 public class UserFt extends ScenarioTest {
 
@@ -54,7 +52,6 @@ public class UserFt extends ScenarioTest {
     public UserFt(ScenarioContext scenarioContext) {
         super(scenarioContext);
     }
-
 
     @Given("^a(?:n){0,1} (\\w*) with username \"(.*)\" that exists in the Database$")
     public void a_user_with_username_that_exists_in_the_Database(String userAlias, String username)
@@ -187,7 +184,6 @@ public class UserFt extends ScenarioTest {
         assertThat(actualUser, is(equalTo(expectedUser)));
     }
 
-
     @Then("^a Location header with the (\\w*) URI is included in the response$")
     public void a_Location_header_with_the_user_URI_is_included_in_the_response(String userAlias) throws IOException {
         GatewayResponse<UserDto> response = scenarioContext.getApiGatewayResponse(UserDto.class);
@@ -196,8 +192,6 @@ public class UserFt extends ScenarioTest {
         UserDto expectedUser = scenarioContext.getExampleUser(userAlias);
         assertThat(locationHeader, containsString(expectedUser.getUsername()));
     }
-
-
 
     @Then("a non-empty list of the users belonging to the institution is returned")
     public void a_list_of_the_users_belonging_to_the_institution_is_returned() throws IOException {
