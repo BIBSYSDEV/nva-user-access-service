@@ -84,7 +84,7 @@ public class UpdateUserHandlerTest extends HandlerTest {
 
         UserDto userUpdate = createUserUpdateOnExistingUser();
 
-        String encodedUsername = encodeUsername(userUpdate);
+        String encodedUsername = encodeString(userUpdate.getUsername());
         GatewayResponse<Void> gatewayResponse = sendUpdateRequest(encodedUsername, userUpdate);
         Map<String, String> responseHeaders = gatewayResponse.getHeaders();
 
@@ -185,13 +185,6 @@ public class UpdateUserHandlerTest extends HandlerTest {
 
         Problem problem = response.getBodyObject(Problem.class);
         assertThat(problem.getDetail(), is(equalTo(InvalidOrMissingTypeException.MESSAGE)));
-    }
-
-    private String encodeUsername(UserDto userUpdate) {
-        String encodedUsername = java.net.URLEncoder.encode(userUpdate.getUsername(), StandardCharsets.UTF_8);
-        assertThat(userUpdate.getUsername(), containsString("@"));
-        assertThat(encodedUsername, containsString("%40"));
-        return encodedUsername;
     }
 
     private UserDto anotherUserInDatabase()

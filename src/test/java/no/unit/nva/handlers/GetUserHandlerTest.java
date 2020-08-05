@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import no.unit.nva.exceptions.BadRequestException;
 import no.unit.nva.exceptions.ConflictException;
@@ -34,7 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
 class GetUserHandlerTest extends HandlerTest {
-
 
     private static final String BLANK_STRING = " ";
 
@@ -93,7 +91,9 @@ class GetUserHandlerTest extends HandlerTest {
     @DisplayName("processInput() handles enccoded path parameters")
     @Test
     void processInputReturnsUserDtoWhenPathParameterContainsTheUsernameOfExistingUserEnc() throws ApiGatewayException {
-        requestInfo = createRequestInfoForGetUser(java.net.URLEncoder.encode(DEFAULT_USERNAME, StandardCharsets.UTF_8));
+
+        String encodedUserName = encodeString(DEFAULT_USERNAME);
+        requestInfo = createRequestInfoForGetUser(encodedUserName);
         UserDto expected = insertSampleUserToDatabase();
         UserDto actual = getUserHandler.processInput(null, requestInfo, context);
         assertThat(actual, is(equalTo(expected)));
@@ -123,8 +123,6 @@ class GetUserHandlerTest extends HandlerTest {
         Executable action = () -> getUserHandler.processInput(null, requestInfo, context);
         assertThrows(BadRequestException.class, action);
     }
-
-
 
     private RequestInfo createRequestInfoForGetUser(String username) {
         RequestInfo reqInfo = new RequestInfo();
