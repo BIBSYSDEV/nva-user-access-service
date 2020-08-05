@@ -3,7 +3,6 @@ package no.unit.nva.handlers;
 import static java.util.function.Predicate.not;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
