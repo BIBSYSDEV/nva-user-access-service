@@ -18,7 +18,7 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 
 public class HandlerTest extends DatabaseAccessor {
 
-    public static final String DEFAULT_USERNAME = "sampleUsername";
+    public static final String DEFAULT_USERNAME = "someUsername@inst";
     public static final String DEFAULT_ROLE = "SomeRole";
     public static final String DEFAULT_INSTITUTION = "SomeInstitution";
 

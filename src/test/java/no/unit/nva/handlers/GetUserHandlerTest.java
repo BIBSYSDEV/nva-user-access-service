@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import no.unit.nva.exceptions.BadRequestException;
 import no.unit.nva.exceptions.ConflictException;
@@ -84,6 +85,15 @@ class GetUserHandlerTest extends HandlerTest {
     @Test
     void processInputReturnsUserDtoWhenPathParameterContainsTheUsernameOfExistingUser() throws ApiGatewayException {
         requestInfo = createRequestInfoForGetUser(DEFAULT_USERNAME);
+        UserDto expected = insertSampleUserToDatabase();
+        UserDto actual = getUserHandler.processInput(null, requestInfo, context);
+        assertThat(actual, is(equalTo(expected)));
+    }
+
+    @DisplayName("processInput() handles enccoded path parameters")
+    @Test
+    void processInputReturnsUserDtoWhenPathParameterContainsTheUsernameOfExistingUserEnc() throws ApiGatewayException {
+        requestInfo = createRequestInfoForGetUser(java.net.URLEncoder.encode(DEFAULT_USERNAME, StandardCharsets.UTF_8));
         UserDto expected = insertSampleUserToDatabase();
         UserDto actual = getUserHandler.processInput(null, requestInfo, context);
         assertThat(actual, is(equalTo(expected)));

@@ -3,6 +3,7 @@ package no.unit.nva.handlers;
 import static java.util.function.Predicate.not;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
@@ -51,6 +52,7 @@ public class GetUserHandler extends HandlerAccessingUser<Void, UserDto> {
         return Optional.of(requestInfo)
             .map(RequestInfo::getPathParameters)
             .map(map -> map.get(USERNAME_PATH_PARAMETER))
+            .map(this::decodeUrlPart)
             .filter(not(String::isBlank))
             .orElseThrow(() -> new BadRequestException(EMPTY_USERNAME_PATH_PARAMETER_ERROR));
     }

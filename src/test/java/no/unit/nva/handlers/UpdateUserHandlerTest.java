@@ -18,6 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import no.unit.nva.database.DatabaseServiceImpl;
@@ -62,12 +63,29 @@ public class UpdateUserHandlerTest extends HandlerTest {
     @DisplayName("handleRequest() returns Location header with the URI to updated user when path contains "
         + "an existing user id, and the body contains a valid UserDto and path id is the same as the body id ")
     @Test
-    public void processInputReturnsUpdatedUserWhenPathAndBodyContainTheSameUserIdAndTheIdExistsAndBodyIsValid()
+    public void handleRequestReturnsUpdatedUserWhenPathAndBodyContainTheSameUserIdAndTheIdExistsAndBodyIsValid()
         throws ApiGatewayException, IOException {
 
         UserDto userUpdate = createUserUpdateOnExistingUser();
 
         GatewayResponse<Void> gatewayResponse = sendUpdateRequest(userUpdate.getUsername(), userUpdate);
+        Map<String, String> responseHeaders = gatewayResponse.getHeaders();
+
+        assertThat(responseHeaders, hasKey(LOCATION_HEADER));
+
+        String expectedLocationPath = UpdateUserHandler.USERS_RELATIVE_PATH + userUpdate.getUsername();
+        assertThat(responseHeaders.get(LOCATION_HEADER), is(equalTo(expectedLocationPath)));
+    }
+
+    @DisplayName("handleRequest() can process URL encoded usernames")
+    @Test
+    public void handleRequestCanProcessUrlEncodedUsernames()
+        throws ApiGatewayException, IOException {
+
+        UserDto userUpdate = createUserUpdateOnExistingUser();
+
+        String encodedUsername = encodeUsername(userUpdate);
+        GatewayResponse<Void> gatewayResponse = sendUpdateRequest(encodedUsername, userUpdate);
         Map<String, String> responseHeaders = gatewayResponse.getHeaders();
 
         assertThat(responseHeaders, hasKey(LOCATION_HEADER));
@@ -167,6 +185,13 @@ public class UpdateUserHandlerTest extends HandlerTest {
 
         Problem problem = response.getBodyObject(Problem.class);
         assertThat(problem.getDetail(), is(equalTo(InvalidOrMissingTypeException.MESSAGE)));
+    }
+
+    private String encodeUsername(UserDto userUpdate) {
+        String encodedUsername = java.net.URLEncoder.encode(userUpdate.getUsername(), StandardCharsets.UTF_8);
+        assertThat(userUpdate.getUsername(), containsString("@"));
+        assertThat(encodedUsername, containsString("%40"));
+        return encodedUsername;
     }
 
     private UserDto anotherUserInDatabase()
