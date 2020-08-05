@@ -59,8 +59,8 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: jupiterVersion
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
     gradleLint.ignore {
-         //gradleLint wants this to be testRuntimeOnly, but cucumber fails to run when this is not
-         //set to testImplementation.
+         // gradleLint wants this to be testRuntimeOnly, but cucumber fails to run when this is not
+         // set to testImplementation.
         testImplementation(group: 'io.cucumber', name: 'cucumber-picocontainer', version: '6.1.1') {
             because("Dependency injection in cucumber glue code")
         }
