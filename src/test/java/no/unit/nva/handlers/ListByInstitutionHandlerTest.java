@@ -172,10 +172,6 @@ class ListByInstitutionHandlerTest extends HandlerTest {
         return users;
     }
 
-    private ByteArrayOutputStream outputStream() {
-        return new ByteArrayOutputStream();
-    }
-
     private InputStream createListRequest(String institutionId) throws JsonProcessingException {
         Map<String, String> pathParams = Map.of(INSTITUTION_ID_PATH_PARAMETER, institutionId);
         return new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)

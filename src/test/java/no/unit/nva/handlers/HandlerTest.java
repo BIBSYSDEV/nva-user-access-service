@@ -4,6 +4,7 @@ import static nva.commons.utils.JsonUtils.objectMapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Collections;
 import no.unit.nva.database.DatabaseAccessor;
@@ -58,5 +59,9 @@ public class HandlerTest extends DatabaseAccessor {
         ObjectNode objectWithoutType = objectMapper.convertValue(dtoObject, ObjectNode.class);
         objectWithoutType.remove(TypedObjectsDetails.TYPE_ATTRIBUTE);
         return objectWithoutType;
+    }
+
+    protected ByteArrayOutputStream outputStream() {
+        return new ByteArrayOutputStream();
     }
 }
