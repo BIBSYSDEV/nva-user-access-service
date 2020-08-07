@@ -22,26 +22,13 @@ public class GetUserHandler extends HandlerAccessingUser<Void, UserDto> {
 
     private final DatabaseService databaseService;
 
-    /**
-     * Default constructor.
-     */
     @JacocoGenerated
     public GetUserHandler() {
-        this(defaultLogger());
+        this(new Environment(), new DatabaseServiceImpl());
     }
 
-    @JacocoGenerated
-    protected GetUserHandler(Logger logger) {
-        this(new Environment(), new DatabaseServiceImpl(), logger);
-    }
-
-    public GetUserHandler(Environment environment,
-                          DatabaseService databaseService) {
-        this(environment, databaseService, defaultLogger());
-    }
-
-    protected GetUserHandler(Environment environment, DatabaseService databaseService, Logger logger) {
-        super(Void.class, environment, logger);
+    public GetUserHandler(Environment environment, DatabaseService databaseService) {
+        super(Void.class, environment, defaultLogger());
         this.databaseService = databaseService;
     }
 

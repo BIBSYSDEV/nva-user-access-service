@@ -29,35 +29,42 @@ public class ApiKeyValidation {
     private static final Logger logger = LoggerFactory.getLogger(ApiKeyValidation.class);
     private final Environment environment;
 
-    private AWSSecretsManager secretsManager;
+    private final AWSSecretsManager secretsManager;
+
+    @JacocoGenerated
+    public ApiKeyValidation(Environment environment) {
+        this(setupSecretsClient(environment), environment);
+    }
 
     public ApiKeyValidation(AWSSecretsManager secretsManager, Environment environment) {
         this.secretsManager = secretsManager;
         this.environment = environment;
     }
 
-    public ApiKeyValidation(Environment environment) {
-        this(setupSecretsClient(environment), environment);
-    }
-
-    public void compareKeys(RequestInfo requestInfo) throws ForbiddenException {
+    /**
+     * Checks if key in the {@link RequestInfo} code is the same as the one stored in SecretsManager in AWS.
+     *
+     * @param requestInfo object containing the API key in the Authorization header.
+     * @throws ForbiddenException when the keys do not match.
+     */
+    public void authorizeAccess(RequestInfo requestInfo) throws ForbiddenException {
         String customerApiKey = readAuthorizationValue(requestInfo);
         String secretValue = fetchSecretValue();
         checkKeysAreEqual(secretValue, customerApiKey);
     }
 
-    public String readAuthorizationValue(RequestInfo requestInfo) {
+    private String readAuthorizationValue(RequestInfo requestInfo) {
         return requestInfo.getHeaders().get(AUTHORIZATION_HEADER);
     }
 
-    public void checkKeysAreEqual(String secretValue, String customerApiKey) throws ForbiddenException {
+    private void checkKeysAreEqual(String secretValue, String customerApiKey) throws ForbiddenException {
         if (!secretValue.equals(customerApiKey)) {
             logger.error(WRONG_OR_NO_AUTHORIZATION_KEY);
             throw new ForbiddenException();
         }
     }
 
-    public String fetchApiKeyValue() throws JsonProcessingException {
+    private String fetchApiKeyValue() throws JsonProcessingException {
         GetSecretValueRequest request = new GetSecretValueRequest().withSecretId(fetchSecretName());
         GetSecretValueResult secretValueResult = secretsManager.getSecretValue(request);
 
@@ -68,15 +75,16 @@ public class ApiKeyValidation {
         return secretValue;
     }
 
-    public String fetchSecretName() {
+    private String fetchSecretName() {
         return environment.readEnv(API_KEY_SECRET_NAME_ENV_VARIABLE);
     }
 
-    public IllegalStateException exceptionReadingSecretApiKey(nva.commons.utils.attempt.Failure<String> failure) {
+    private IllegalStateException exceptionReadingSecretApiKey(nva.commons.utils.attempt.Failure<String> failure) {
+        logger.error(ERROR_SETTING_UP_KEY);
         return new IllegalStateException(ERROR_SETTING_UP_KEY, failure.getException());
     }
 
-    public String fetchSecretValue() {
+    private String fetchSecretValue() {
         return attempt(this::fetchApiKeyValue).orElseThrow(this::exceptionReadingSecretApiKey);
     }
 

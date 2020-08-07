@@ -9,28 +9,25 @@ import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.Environment;
 import nva.commons.utils.JacocoGenerated;
 
-public class GetUserHandlerForInternalService extends GetUserHandler {
+public class AddUserHandlerForInternalService extends AddUserHandler {
 
     private final ApiKeyValidation apiKeyValidation;
 
     @JacocoGenerated
-    public GetUserHandlerForInternalService() {
+    public AddUserHandlerForInternalService() {
         super();
         this.apiKeyValidation = new ApiKeyValidation(environment);
     }
 
-    public GetUserHandlerForInternalService(Environment environment,
-                                            DatabaseService databaseService,
-                                            AWSSecretsManager secretsManager
-    ) {
+    public AddUserHandlerForInternalService(Environment environment, DatabaseService databaseService,
+                                            AWSSecretsManager secretsManager) {
         super(environment, databaseService);
         this.apiKeyValidation = new ApiKeyValidation(secretsManager, environment);
     }
 
     @Override
-    protected UserDto processInput(Void input, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
-        apiKeyValidation.authorizeAccess(requestInfo);
+    protected UserDto processInput(UserDto input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        this.apiKeyValidation.authorizeAccess(requestInfo);
         return super.processInput(input, requestInfo, context);
     }
 }

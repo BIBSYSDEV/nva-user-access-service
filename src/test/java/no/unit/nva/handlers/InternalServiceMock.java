@@ -10,7 +10,6 @@ import com.amazonaws.services.secretsmanager.model.GetSecretValueRequest;
 import com.amazonaws.services.secretsmanager.model.GetSecretValueResult;
 import com.amazonaws.services.secretsmanager.model.ResourceNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.database.DatabaseService;
@@ -25,9 +24,9 @@ public class InternalServiceMock implements WithEnvironment {
     public static final String SOME_API_KEY_ID = "SomeKeyId";
     public static final String CORRECT_API_KEY = "SomeKeyValue";
     public static final String WRONG_API_KEY = "SomeOtherKey";
+    private final Environment environment;
+    private final DatabaseService databaseService;
     private AWSSecretsManager secretsManager;
-    private Environment environment;
-    private DatabaseService databaseService;
 
     public InternalServiceMock(DatabaseService databaseService) {
         environment = mockEnvironmentWithApiKeyDetails();
@@ -35,12 +34,16 @@ public class InternalServiceMock implements WithEnvironment {
         this.databaseService = databaseService;
     }
 
-    public GetUserHandlerForInternalService defaultHandler() {
+    public GetUserHandlerForInternalService defaultGetHandler() {
         return new GetUserHandlerForInternalService(environment, databaseService,
             secretsManager);
     }
 
-    public GetUserHandlerForInternalService handlerWithMisconfiguredSecrets() {
+    public AddUserHandlerForInternalService defaultAddHandler() {
+        return new AddUserHandlerForInternalService(environment, databaseService, secretsManager);
+    }
+
+    protected GetUserHandlerForInternalService handlerWithMisconfiguredSecrets() {
         secretsManager = mock(AWSSecretsManager.class);
         when(secretsManager.getSecretValue(any(GetSecretValueRequest.class)))
             .thenThrow(ResourceNotFoundException.class);
@@ -80,13 +83,9 @@ public class InternalServiceMock implements WithEnvironment {
     }
 
     private String writeSecretAsJsonString() throws JsonProcessingException {
-        Map<String, String> secretMap = map(SOME_API_KEY_ID, CORRECT_API_KEY);
+        Map<String, String> secretMap = Map.of(SOME_API_KEY_ID, CORRECT_API_KEY);
         String secretString = objectMapper.writeValueAsString(secretMap);
         return secretString;
-    }
-
-    private Map<String, String> map(String key, String value) {
-        return Collections.singletonMap(key, value);
     }
 
     private Environment mockEnvironmentWithApiKeyDetails() {

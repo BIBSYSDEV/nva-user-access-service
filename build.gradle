@@ -13,7 +13,7 @@ repositories {
 
 }
 
-final def jacksonVersion = "2.11.1"
+final def jacksonVersion = "2.11.2"
 final def jupiterVersion = "5.6.0"
 final def awsSdkVersion = "1.11.833"
 
@@ -22,7 +22,12 @@ dependencies {
     implementation(group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: awsSdkVersion) {
         because("This service communicates with dynamo-db directly")
     }
-    implementation( group: 'com.amazonaws', name: 'aws-java-sdk-secretsmanager', version: awsSdkVersion){
+
+    implementation(group: 'com.amazonaws', name: 'aws-java-sdk-core', version: awsSdkVersion) {
+        because("It is used by our code directly")
+    }
+
+    implementation(group: 'com.amazonaws', name: 'aws-java-sdk-secretsmanager', version: awsSdkVersion) {
         because("we need to read the API key")
     }
     implementation(group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.2.1') {
@@ -35,12 +40,9 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
 
-    runtimeOnly(group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion) {
-        because "it is used only in runtime and in test"
-    }
-    testImplementation(group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion) {
-        because "we use it in tests"
-    }
+    implementation(group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion)
+
+
     testImplementation group: 'com.github.BIBSYSDEV', name: 'nva-testutils', version: '0.1.12'
     testImplementation group: 'com.amazonaws', name: 'DynamoDBLocal', version: '1.12.0'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
@@ -86,7 +88,7 @@ test.doFirst {
 
 test {
     useJUnitPlatform()
-    failFast = true
+    failFast = false
     testLogging {
         events('skipped', 'passed', 'failed')
     }

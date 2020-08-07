@@ -289,7 +289,7 @@
       <property name="minLineCount" value="2"/>
       <property name="allowedAnnotations"
         value="Override,ParameterizedTest,Test,Given,When,Then,BeforeEach"/>
-      <property name="tokens" value="METHOD_DEF, CTOR_DEF, ANNOTATION_FIELD_DEF"/>
+      <property name="tokens" value="METHOD_DEF, ANNOTATION_FIELD_DEF"/>
     </module>
     <module name="MethodName">
       <message key="name.invalidPattern"
