@@ -39,6 +39,12 @@ public class ScenarioCommonSteps extends DatabaseAccessor {
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_NOT_FOUND)));
     }
 
+    @Then("a Forbidden message is returned")
+    public void a_Forbidden_message_is_returned() throws IOException {
+        GatewayResponse<Problem> response = scenarioContext.getApiGatewayResponse(Problem.class);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_FORBIDDEN)));
+    }
+
     @Then("a BadRequest message is returned containing information about the invalid request")
     public void a_BadRequest_message_is_returned() throws IOException {
         GatewayResponse<Problem> response = scenarioContext.getApiGatewayResponse(Problem.class);
