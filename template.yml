@@ -44,6 +44,9 @@ Resources:
           MyLambda:
             FunctionArn: !GetAtt LambdaAuthorizer.Arn
             FunctionPayloadType: REQUEST
+            Identity:
+              Headers:
+                - Authorization
   #
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
