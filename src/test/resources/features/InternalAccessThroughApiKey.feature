@@ -18,7 +18,7 @@ Feature: Provide internal access to authorization services using static API keys
 
   Scenario: Service with valid API key reads existing User details.
     When the InternalService requests to get the ExistingUser using a valid API key
-    Then the response object contains the UserDescription of the ExistingUser
+    Then in the response, the object is the UserDescription of the ExistingUser
 
   Scenario: Service with invalid API key attempts to read User details
     When the InternalService requests to get the ExistingUser using an invalid API key
@@ -30,7 +30,7 @@ Feature: Provide internal access to authorization services using static API keys
 
   Scenario: Service with valid API key adds  new User details.
     When the InternalService requests to add the NewUser using a valid API key
-    Then the response object contains the UserDescription of the NewUser
+    Then in the response, the object is the UserDescription of the NewUser
 
   Scenario: Service with invalid API key attempts to add a new User
     When the InternalService requests to add the NewUser using an invalid API key
