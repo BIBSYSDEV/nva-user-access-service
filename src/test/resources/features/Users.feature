@@ -22,27 +22,26 @@ Feature: Users
   Scenario: AuthorizedClient adds a new user
     When the AuthorizedClient sends a request to add the NewUser to the Database
     Then the NewUser is added to the database
-    And the response object contains the UserDescription of the NewUser
+    Then in the response, the object is the UserDescription of the NewUser
 
   Scenario: Authorized client gets an existing user
     When the AuthorizedClient sends a request to read the ExistingUser from the Database
-    Then the response object contains the UserDescription of the ExistingUser
+    Then in the response, the object is the UserDescription of the ExistingUser
 
   Scenario: Authorized client gets a non-existing user
     When the AuthorizedClient sends a request to read the NonExistingUser from the Database
     Then a NotFound message is returned
 
   Scenario:  Authorized client updates existing user
-    When the AuthorizedClient requests to update the ExistingUser and sets the following roles:
-      | roles |
-      | roleB |
-      | roleC |
+    When the AuthorizedClient requests to update the ExistingUser setting the following roles:
+      | roles           |
+      | roleAfterUpdate |
+
     Then the ExistingUser is updated asynchronously
-    And a Location header with the ExistingUser URI is included in the response
-    And the ExistingUser contains a list of roles with the following role-names:
-      | roles |
-      | roleB |
-      | roleC |
+    And the response has a Location header with ExistingUser's URI as value
+    And the ExistingUser contains only the following roles:
+      | roles           |
+      | roleAfterUpdate |
 
   Scenario: Authorized client attempts to update non-existing user
     When the AuthorizedClient requests to update the NonExistingUser
@@ -57,21 +56,12 @@ Feature: Users
   Scenario: AuthorizedClient requests list of users of specified institution
     Given a UserA with username "userA" that exists in the Database
     And the UserA belongs to the institution "Institution"
-    And the UserA has the roles:
-      | roles    |
-      | someRole |
 
     And a UserB with username "userB" that exists in the Database
     And the UserB belongs to the institution "Institution"
-    And the UserB has the roles:
-      | roles    |
-      | someRole |
 
     And a UserC with username "userC" that exists in the Database
     And the UserC belongs to the institution "AnotherInstitution"
-    And the UserC has the roles:
-      | roles    |
-      | someRole |
 
     When the AuthorizedClient sends the request to list the users of the "Institution"
     Then a non-empty list of the users belonging to the institution is returned

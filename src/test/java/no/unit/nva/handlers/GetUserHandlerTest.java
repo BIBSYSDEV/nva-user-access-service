@@ -34,7 +34,6 @@ import org.junit.jupiter.api.function.Executable;
 
 class GetUserHandlerTest extends HandlerTest {
 
-
     private static final String BLANK_STRING = " ";
 
     private RequestInfo requestInfo;
@@ -89,6 +88,17 @@ class GetUserHandlerTest extends HandlerTest {
         assertThat(actual, is(equalTo(expected)));
     }
 
+    @DisplayName("processInput() handles enccoded path parameters")
+    @Test
+    void processInputReturnsUserDtoWhenPathParameterContainsTheUsernameOfExistingUserEnc() throws ApiGatewayException {
+
+        String encodedUserName = encodeString(DEFAULT_USERNAME);
+        requestInfo = createRequestInfoForGetUser(encodedUserName);
+        UserDto expected = insertSampleUserToDatabase();
+        UserDto actual = getUserHandler.processInput(null, requestInfo, context);
+        assertThat(actual, is(equalTo(expected)));
+    }
+
     @DisplayName("processInput() throws NotFoundException when path parameter is a string that is not an existing "
         + "username")
     @Test
@@ -113,8 +123,6 @@ class GetUserHandlerTest extends HandlerTest {
         Executable action = () -> getUserHandler.processInput(null, requestInfo, context);
         assertThrows(BadRequestException.class, action);
     }
-
-
 
     private RequestInfo createRequestInfoForGetUser(String username) {
         RequestInfo reqInfo = new RequestInfo();

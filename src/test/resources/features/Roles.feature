@@ -13,11 +13,11 @@ Feature: Role features
   Scenario: Authorized client creates Role
     When the AuthorizedClient requests to add the NewRole to the Database
     Then an OK message is returned
-    And a role description is returned
+    And a RoleDescription is returned
 
   Scenario: Authorized client reads Role
     When the AuthorizedClient requests to read the ExistingRole
-    Then a role description is returned
+    Then a RoleDescription is returned
 
   Scenario: Authorized client tries to read non-existent Role
     When the AuthorizedClient requests to read the NonExistingRole
