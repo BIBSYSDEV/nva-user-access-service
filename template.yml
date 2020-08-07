@@ -40,6 +40,7 @@ Resources:
       StageName: Prod
       EndpointConfiguration: REGIONAL
       Auth:
+        DefaultAuthorizer: MyLambda
         Authorizers:
           MyLambda:
             FunctionArn: !GetAtt LambdaAuthorizer.Arn
