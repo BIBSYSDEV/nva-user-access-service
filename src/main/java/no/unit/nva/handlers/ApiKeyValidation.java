@@ -13,6 +13,7 @@ import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.Environment;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.JsonUtils;
+import nva.commons.utils.attempt.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,9 +66,13 @@ public class ApiKeyValidation {
     }
 
     private String fetchApiKeyValue() throws JsonProcessingException {
-        GetSecretValueRequest request = new GetSecretValueRequest().withSecretId(fetchSecretName());
-        GetSecretValueResult secretValueResult = secretsManager.getSecretValue(request);
+        GetSecretValueResult secretValueResult = getSecretFromAws();
 
+        String secretValue = parseSecretJsonString(secretValueResult);
+        return secretValue;
+    }
+
+    private String parseSecretJsonString(GetSecretValueResult secretValueResult) throws JsonProcessingException {
         String secretValueJsonString = secretValueResult.getSecretString();
         ObjectNode apiKeyObject = (ObjectNode) JsonUtils.objectMapper.readTree(secretValueJsonString);
         String jsonKey = environment.readEnv(API_KEY_SECRET_ID_ENV_VARIABLE);
@@ -75,11 +80,17 @@ public class ApiKeyValidation {
         return secretValue;
     }
 
+    private GetSecretValueResult getSecretFromAws() {
+        GetSecretValueRequest request = new GetSecretValueRequest().withSecretId(fetchSecretName());
+        GetSecretValueResult secretValueResult = secretsManager.getSecretValue(request);
+        return secretValueResult;
+    }
+
     private String fetchSecretName() {
         return environment.readEnv(API_KEY_SECRET_NAME_ENV_VARIABLE);
     }
 
-    private IllegalStateException exceptionReadingSecretApiKey(nva.commons.utils.attempt.Failure<String> failure) {
+    private IllegalStateException exceptionReadingSecretApiKey(Failure<String> failure) {
         logger.error(ERROR_SETTING_UP_KEY);
         return new IllegalStateException(ERROR_SETTING_UP_KEY, failure.getException());
     }
