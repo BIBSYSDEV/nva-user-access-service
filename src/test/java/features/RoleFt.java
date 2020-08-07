@@ -52,7 +52,7 @@ public class RoleFt extends ScenarioTest {
 
     @When("^the AuthorizedClient requests to read the (\\w*)$")
     public void the_AuthorizedClient_requests_to_read_the_Role(String roleAlias) throws IOException {
-        initializeContextRequestBuilder(null);
+        initializeContextRequestBuilderWithBody(null);
         RoleDto role = scenarioContext.getExampleRole(roleAlias);
         scenarioContext.getRequestBuilder().withPathParameters(pathParameter(role));
 
@@ -64,7 +64,7 @@ public class RoleFt extends ScenarioTest {
     public void the_AuthorizedClient_requests_to_add_the_NewRole_to_the_Database(String roleAlias)
         throws IOException {
         RoleDto newRole = scenarioContext.getExampleRole(roleAlias);
-        initializeContextRequestBuilder(newRole);
+        initializeContextRequestBuilderWithBody(newRole);
         AddRoleHandler addRoleHandler = new AddRoleHandler(mockEnvironment(), getDatabaseService());
         handlerSendsRequestAndUpdatesResponse(addRoleHandler);
     }

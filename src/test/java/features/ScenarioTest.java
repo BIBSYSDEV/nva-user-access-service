@@ -42,7 +42,7 @@ public class ScenarioTest implements WithEnvironment {
         return JsonUtils.objectMapper.convertValue(bodyMap, requestBodyClass);
     }
 
-    protected <T> void initializeContextRequestBuilder(T entity)
+    protected <T> void initializeContextRequestBuilderWithBody(T entity)
         throws JsonProcessingException {
         Map<String, Object> objectMap = objectAsMap(entity);
         HandlerRequestBuilder<Map<String, Object>> requestBuilder =

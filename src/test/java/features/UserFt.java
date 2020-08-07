@@ -117,7 +117,7 @@ public class UserFt extends ScenarioTest {
     @When("^the AuthorizedClient sends a request to add the (\\w*) to the Database$")
     public void the_AuthorizedClient_sends_a_request_to_add_the_NewUser_to_the_Database(String userAlias)
         throws IOException {
-        initializeContextRequestBuilder(scenarioContext.getExampleUser(userAlias));
+        initializeContextRequestBuilderWithBody(scenarioContext.getExampleUser(userAlias));
         AddUserHandler addUserHandler = new AddUserHandler(mockEnvironment(), getDatabaseService());
         handlerSendsRequestAndUpdatesResponse(addUserHandler);
     }
@@ -127,7 +127,7 @@ public class UserFt extends ScenarioTest {
         throws IOException {
 
         UserDto queryObject = scenarioContext.getExampleUser(userAlias);
-        initializeContextRequestBuilder(null);
+        initializeContextRequestBuilderWithBody(null);
         addPathParameterToRequest(queryObject);
         GetUserHandler getUserHandler = new GetUserHandler(mockEnvironment(), getDatabaseService());
         handlerSendsRequestAndUpdatesResponse(getUserHandler);
@@ -139,7 +139,7 @@ public class UserFt extends ScenarioTest {
         throws InvalidEntryInternalException, NotFoundException, IOException {
 
         UserDto userUpdate = userEntryUpdatedWithNewRoles(userAlias, roleNames);
-        initializeContextRequestBuilder(userUpdate);
+        initializeContextRequestBuilderWithBody(userUpdate);
         addPathParameterToRequest(userUpdate);
         sendUserUpdateRequest();
     }
@@ -149,7 +149,7 @@ public class UserFt extends ScenarioTest {
         throws IOException {
 
         UserDto requestObject = scenarioContext.getExampleUser(userAlias);
-        initializeContextRequestBuilder(requestObject);
+        initializeContextRequestBuilderWithBody(requestObject);
         addPathParameterToRequest(requestObject);
         sendUserUpdateRequest();
     }
@@ -169,7 +169,7 @@ public class UserFt extends ScenarioTest {
     @When("the AuthorizedClient sends the request to list the users of the {string}")
     public void the_AuthorizedClient_sends_the_request_to_list_the_users_of_the(String institution) throws IOException {
 
-        initializeContextRequestBuilder(null);
+        initializeContextRequestBuilderWithBody(null);
         addInstitutionToPathParameters(institution);
         ListByInstitutionHandler handler = new ListByInstitutionHandler(mockEnvironment(), getDatabaseService());
         handlerSendsRequestAndUpdatesResponse(handler);
@@ -235,7 +235,7 @@ public class UserFt extends ScenarioTest {
         throws InvalidEntryInternalException, NoSuchMethodException, InvocationTargetException, IllegalAccessException,
                JsonProcessingException {
         UserDto invalidUser = EntityUtils.createUserWithoutUsername();
-        initializeContextRequestBuilder(invalidUser);
+        initializeContextRequestBuilderWithBody(invalidUser);
     }
 
     private void pathParameterPointsToExistingUser(String userAlias) {

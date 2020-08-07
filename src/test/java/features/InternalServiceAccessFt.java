@@ -5,7 +5,6 @@ import static no.unit.nva.handlers.InternalServiceMock.CORRECT_API_KEY;
 import static no.unit.nva.handlers.InternalServiceMock.WRONG_API_KEY;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import java.io.IOException;
@@ -16,9 +15,7 @@ import no.unit.nva.handlers.ApiKeyValidation;
 import no.unit.nva.handlers.GetUserHandlerForInternalService;
 import no.unit.nva.handlers.InternalServiceMock;
 import no.unit.nva.model.UserDto;
-import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.handlers.ApiGatewayHandler;
-import nva.commons.utils.JsonUtils;
 
 public class InternalServiceAccessFt extends ScenarioTest {
 
@@ -34,109 +31,99 @@ public class InternalServiceAccessFt extends ScenarioTest {
     @When("^the InternalService requests to get the (\\w*) using a valid API key$")
     public void the_InternalService_requests_to_get_the_user_using_a_valid_API_key(String userAlias)
         throws IOException {
-        runGetRequest(createValidGetRequest(userAlias));
+        createValidGetRequest(userAlias);
+        runGetRequest();
     }
 
     @When("^the InternalService requests to get the (\\w*) using an invalid API key$")
     public void the_InternalService_requests_to_get_the_user_using_a_invalid_API_key(String userAlias)
         throws IOException {
-        runGetRequest(createGetRequestWithInvalidApiKey(userAlias));
+        createGetRequestWithInvalidApiKey(userAlias);
+        runGetRequest();
     }
 
     @When("^the InternalService requests to get the (\\w*) without an API key$")
     public void the_InternalService_requests_to_get_the_user_without_an_api_key(String userAlias)
         throws IOException {
-        runGetRequest(createGetRequestWithoutAnApiKey(userAlias));
+        createGetRequestWithoutAnApiKey(userAlias);
+        runGetRequest();
     }
 
     @When("^the InternalService requests to add the (\\w*) using a valid API key$")
     public void the_InternalService_requests_to_add_a_user_using_a_valid_API_key(String userAlias)
         throws IOException {
-        // Write code here that turns the phrase above into concrete actions
-        runAddRequest(crateValidAddRequest(userAlias));
+        crateValidAddRequest(userAlias);
+        runAddRequest();
     }
 
     @When("^the InternalService requests to add the (\\w*) using an invalid API key$")
     public void the_InternalService_requests_to_add_a_user_using_a_invalid_API_key(String userAlias)
         throws IOException {
-        // Write code here that turns the phrase above into concrete actions
-        runAddRequest(crateInValidAddRequest(userAlias));
+        crateAddRequestWithInvalidApiKey(userAlias);
+        runAddRequest();
     }
 
     @When("^the InternalService requests to add the (\\w*) without an API key$")
     public void the_InternalService_requests_to_add_a_user_without_an_api_key(String userAlias)
         throws IOException {
-        // Write code here that turns the phrase above into concrete actions
-        runAddRequest(createAddRequestWithoutApiKey(userAlias));
+        createAddRequestWithoutApiKey(userAlias);
+        runAddRequest();
     }
 
-    private HandlerRequestBuilder<Map<String, Object>> crateValidAddRequest(String userAlias)
+    private void crateValidAddRequest(String userAlias)
         throws JsonProcessingException {
         UserDto newUser = scenarioContext.getExampleUser(userAlias);
-        return createRequest(userAlias, newUser, CORRECT_API_KEY);
+        createRequest(userAlias, newUser, CORRECT_API_KEY);
     }
 
-    private HandlerRequestBuilder<Map<String, Object>> crateInValidAddRequest(String userAlias)
+    private void crateAddRequestWithInvalidApiKey(String userAlias) throws JsonProcessingException {
+        UserDto newUser = scenarioContext.getExampleUser(userAlias);
+        createRequest(userAlias, newUser, WRONG_API_KEY);
+    }
+
+    private void createAddRequestWithoutApiKey(String userAlias)
         throws JsonProcessingException {
         UserDto newUser = scenarioContext.getExampleUser(userAlias);
-        return createRequest(userAlias, newUser, WRONG_API_KEY);
+        createRequest(userAlias, newUser, null);
     }
 
-    private HandlerRequestBuilder<Map<String, Object>> createAddRequestWithoutApiKey(String userAlias)
+    private void createGetRequestWithoutAnApiKey(String userAlias)
         throws JsonProcessingException {
-        UserDto newUser = scenarioContext.getExampleUser(userAlias);
-        return createRequest(userAlias, newUser, null);
+        createRequest(userAlias, null, null);
     }
 
-    private HandlerRequestBuilder<Map<String, Object>> createGetRequestWithoutAnApiKey(String userAlias)
-        throws JsonProcessingException {
-        return createRequest(userAlias, null, null);
+    private void runAddRequest() throws IOException {
+        runRequest(InternalServiceMock::defaultAddHandler);
     }
 
-    private void runAddRequest(HandlerRequestBuilder<Map<String, Object>> requestBuilder) throws IOException {
-        runRequest(requestBuilder, InternalServiceMock::defaultAddHandler);
+    private void runGetRequest() throws IOException {
+        runRequest(InternalServiceMock::defaultGetHandler);
     }
 
-    private void runGetRequest(HandlerRequestBuilder<Map<String, Object>> requestBuilder) throws IOException {
-        runRequest(requestBuilder, InternalServiceMock::defaultGetHandler);
-    }
-
-    private <I, O> void runRequest(HandlerRequestBuilder<Map<String, Object>> requestBuilder,
-                                   Function<InternalServiceMock, ApiGatewayHandler<I, O>> handlerProvider)
+    private <I, O> void runRequest(Function<InternalServiceMock, ApiGatewayHandler<I, O>> handlerProvider)
         throws IOException {
 
         InternalServiceMock internalService = new InternalServiceMock(scenarioContext.getDatabaseService());
-        scenarioContext.setRequestBuilder(requestBuilder);
         handlerSendsRequestAndUpdatesResponse(handlerProvider.apply(internalService));
     }
 
-    private HandlerRequestBuilder<Map<String, Object>> createGetRequestWithInvalidApiKey(String userAlias)
+    private void createGetRequestWithInvalidApiKey(String userAlias)
         throws JsonProcessingException {
-        return createRequest(userAlias, null, WRONG_API_KEY);
+        createRequest(userAlias, null, WRONG_API_KEY);
     }
 
-    private HandlerRequestBuilder<Map<String, Object>> createValidGetRequest(String userAlias)
+    private void createValidGetRequest(String userAlias)
         throws JsonProcessingException {
-        return createRequest(userAlias, null, CORRECT_API_KEY);
+        createRequest(userAlias, null, CORRECT_API_KEY);
     }
 
-    private <T> HandlerRequestBuilder<Map<String, Object>> createRequest(String userAlias, T body, String apiKey)
+    private <T> void createRequest(String userAlias, T body, String apiKey)
         throws JsonProcessingException {
 
-        Map<String, Object> bodyMap = convertObjectToMap(body);
-
-        return new HandlerRequestBuilder<Map<String, Object>>(JsonUtils.objectMapper)
+        initializeContextRequestBuilderWithBody(body);
+        scenarioContext.getRequestBuilder()
             .withHeaders(authorizationHeader(apiKey))
-            .withPathParameters(validPathParameter(userAlias))
-            .withBody(bodyMap);
-    }
-
-    private <T> Map<String, Object> convertObjectToMap(T body) {
-        if (nonNull(body)) {
-            TypeReference<Map<String, Object>> typeReference = new TypeReference<>() {};
-            return JsonUtils.objectMapper.convertValue(body, typeReference);
-        }
-        return null;
+            .withPathParameters(validPathParameter(userAlias));
     }
 
     private Map<String, String> validPathParameter(String userAlias) {
