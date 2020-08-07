@@ -63,6 +63,7 @@ public class UpdateUserHandler extends HandlerAccessingUser<UserDto, Void> {
     private String extractUsernameFromPathParameters(RequestInfo requestInfo) {
         return Optional.ofNullable(requestInfo.getPathParameters())
             .flatMap(pathParams -> Optional.ofNullable(pathParams.get(USERNAME_PATH_PARAMETER)))
+            .map(this::decodeUrlPart)
             .orElseThrow(() -> new RuntimeException(EMPTY_USERNAME_PATH_PARAMETER_ERROR));
     }
 
