@@ -12,6 +12,9 @@ public class AuthPolicy {
     @JsonProperty("Statement")
     private List<StatementElement> statement;
 
+    public AuthPolicy() {
+    }
+
     private AuthPolicy(Builder builder) {
         setVersion(builder.version);
         setStatement(builder.statement);
