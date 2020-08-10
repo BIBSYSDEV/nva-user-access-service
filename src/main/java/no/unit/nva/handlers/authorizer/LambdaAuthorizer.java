@@ -4,9 +4,14 @@ import static java.util.Objects.nonNull;
 import static nva.commons.utils.attempt.Try.attempt;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Collections;
 import nva.commons.exceptions.ApiGatewayException;
+import nva.commons.exceptions.GatewayResponseSerializingException;
 import nva.commons.handlers.ApiGatewayHandler;
+import nva.commons.handlers.GatewayResponse;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.JsonUtils;
 import org.apache.http.HttpStatus;
@@ -69,6 +74,15 @@ public class LambdaAuthorizer extends ApiGatewayHandler<Void, HandlerResponse> {
             .orElse(fail -> "could not serialize response");
         logger.info(responseString);
         return response;
+    }
+
+    @Override
+    protected void writeOutput(Void input, HandlerResponse output)
+        throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream))) {
+            String responseJson = JsonUtils.objectMapper.writeValueAsString(output);
+            writer.write(responseJson);
+        }
     }
 
     @Override
