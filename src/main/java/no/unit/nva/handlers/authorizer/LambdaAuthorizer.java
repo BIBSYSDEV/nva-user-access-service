@@ -55,7 +55,7 @@ public class LambdaAuthorizer extends ApiGatewayHandler<Void, HandlerResponse> {
         }
 
         StatementElement statement = StatementElement.newBuilder()
-            .withResource(resource)
+            .withResource(methodArn)
             .withAction("execute-api:Invoke")
             .withEffect("Allow")
             .build();
