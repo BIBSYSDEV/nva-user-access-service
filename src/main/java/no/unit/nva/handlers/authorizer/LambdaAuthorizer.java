@@ -26,7 +26,7 @@ public class LambdaAuthorizer extends ApiGatewayHandler<Void, HandlerResponse> {
         logger.info(requestInfoStr);
         //String resource= "arn:aws:execute-api:region:account-id:api-id/stage-name/HTTP-VERB/resource-path-specifier"
         StatementElement statement = StatementElement.newBuilder()
-            .withResource("*")
+            .withResource("arn:aws:execute-api:*:*:*")
             .withAction("execute-api:Invoke")
             .withEffect("Allow")
             .build();
