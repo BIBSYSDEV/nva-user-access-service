@@ -12,9 +12,6 @@ import nva.commons.utils.JsonUtils;
 import org.apache.http.HttpStatus;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- */
 public class LambdaAuthorizer extends ApiGatewayHandler<Void, HandlerResponse> {
 
     public static final int API_GATEWAY_SUBSTRING = 5;
