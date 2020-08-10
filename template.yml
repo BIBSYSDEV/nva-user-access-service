@@ -39,16 +39,15 @@ Resources:
     Properties:
       StageName: Prod
       EndpointConfiguration: REGIONAL
-  #      Auth:
-  #        DefaultAuthorizer: MyLambda
-  #        Authorizers:
-  #          MyLambda:
-  #            FunctionArn: !GetAtt LambdaAuthorizer.Arn
-  #            FunctionPayloadType: REQUEST
-  #            Identity:
-  #              Headers:
-  #                - Authorization
-  #
+        Auth:
+          DefaultAuthorizer: MyLambda
+          Authorizers:
+            MyLambda:
+              FunctionArn: !GetAtt LambdaAuthorizer.Arn
+              FunctionPayloadType: REQUEST
+              Identity:
+                Headers:
+                  - Authorization
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
     Properties:
