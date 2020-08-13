@@ -2,17 +2,21 @@ package no.unit.nva.handlers;
 
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.cucumber.java.bs.A;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
@@ -22,6 +26,7 @@ import no.unit.nva.model.RoleDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.exceptions.InvalidOrMissingTypeException;
 import nva.commons.handlers.GatewayResponse;
+import nva.commons.utils.IoUtils;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
 import org.apache.http.HttpStatus;
@@ -49,6 +54,17 @@ public class AddRoleHandlerTest extends HandlerTest {
         DatabaseService service = new DatabaseServiceImpl(initializeTestDatabase(), envWithTableName);
         addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
         sampleRole = sampleRole();
+    }
+
+    @Test
+    public void handleRequestHandlesRequest() throws IOException {
+        InputStream input = IoUtils.inputStreamFromResources(Path.of("input.json"));
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        addRoleHandler.handleRequest(input, output, context);
+
+        GatewayResponse<RoleDto> response = GatewayResponse.fromOutputStream(output);
+        RoleDto roleDto = response.getBodyObject(RoleDto.class);
+        assertThat(roleDto, is(not(nullValue())));
     }
 
     @Test

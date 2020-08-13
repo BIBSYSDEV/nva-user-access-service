@@ -1,117 +1,66 @@
 package no.unit.nva.handlers.authorizer;
 
-import static java.util.Objects.nonNull;
 import static nva.commons.utils.attempt.Try.attempt;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.Collections;
-import nva.commons.exceptions.ApiGatewayException;
-import nva.commons.handlers.ApiGatewayHandler;
-import nva.commons.handlers.RequestInfo;
+import com.amazonaws.services.secretsmanager.AWSSecretsManager;
+import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
+import com.amazonaws.services.secretsmanager.model.GetSecretValueRequest;
+import com.amazonaws.services.secretsmanager.model.GetSecretValueResult;
+import com.fasterxml.jackson.databind.JsonNode;
+import nva.commons.exceptions.ForbiddenException;
+import nva.commons.handlers.authentication.ServiceAuthorizerHandler;
+import nva.commons.utils.Environment;
 import nva.commons.utils.JsonUtils;
-import org.apache.http.HttpStatus;
-import org.slf4j.LoggerFactory;
+import nva.commons.utils.attempt.Failure;
 
-public class LambdaAuthorizer extends ApiGatewayHandler<Void, HandlerResponse> {
+public class LambdaAuthorizer extends ServiceAuthorizerHandler {
 
-    public static final int API_GATEWAY_SUBSTRING = 5;
-    public static final String API_GATEWAY_PATH_DELIMITER = "/";
-    public static final int AWS_ACCOUNT_ID = 4;
-    public static final int REGION = 3;
-    public static final int API_GATEWAY_SUBSTRING_STAGE = 1;
-    private static final int API_GATEWAY_SUBSTRING_API_ID = 0;
-    private static final int API_GATEWAY_SUBSTRING_METHOD = 2;
-    private static final int API_GATEWAY_SUBSTRING_PATH = 3;
+    public static final String DEFAULT_PRINCIPAL_ID = "ServiceAccessingUsersAndRoles";
+    public static final String AWS_SECRET_NAME_ENV_VAR = "AWS_SECRET_NAME";
+    public static final String AWS_SECRET_KEY_ENV_VAR = "AWS_SECRET_KEY";
+    private final AWSSecretsManager awsSecretsManager;
 
     public LambdaAuthorizer() {
-        super(Void.class, LoggerFactory.getLogger(LambdaAuthorizer.class));
+        this(newAwsSecretsManager(), new Environment());
+    }
+
+    public LambdaAuthorizer(AWSSecretsManager awsSecretsManager, Environment environment) {
+        super(environment);
+        this.awsSecretsManager = awsSecretsManager;
     }
 
     @Override
-    protected HandlerResponse processInput(Void input, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
-        String requestInfoStr = attempt(() -> JsonUtils.objectMapper.writeValueAsString(requestInfo))
-            .orElse(fail -> null);
-        logger.info(requestInfoStr);
-        String methodArn = requestInfo.getMethodArn();
-        String[] methodArnModules = methodArn.split(":");
-
-        //"methodArn": "arn:aws:execute-api:eu-west-1:884807050265:2lcqynkwke/Prod/POST/roles",
-        //String resource= "arn:aws:execute-api:region:account-id:api-id/stage-name/HTTP-VERB/resource-path-specifier"
-
-        logger.info("AWS accountId" + extractAccountId(methodArnModules));
-        logger.info("Region:" + extractRegion(methodArnModules));
-        logger.info("RestApiId:" + extractRestApiId(methodArnModules));
-        logger.info("Stage:" + extractStage(methodArnModules));
-        logger.info("Method:" + extractMethod(methodArnModules));
-
-        logger.info("Path:" + extractPath(methodArnModules));
-
-        String path = extractPath(methodArnModules);
-
-        String resource = "/";
-        if (nonNull(path) && !path.isBlank()) {
-            resource = resource.concat(path);
-        }
-
-        StatementElement statement = StatementElement.newBuilder()
-            .withResource(methodArn)
-            .withAction("execute-api:Invoke")
-            .withEffect("Allow")
-            .build();
-        AuthPolicy authPolicy = AuthPolicy.newBuilder().withStatement(Collections.singletonList(statement)).build();
-        HandlerResponse response = HandlerResponse.newBuilder()
-            .withPrincipalId("SomeUser")
-            .withPolicyDocument(authPolicy)
-            .build();
-
-        String responseString = attempt(() -> JsonUtils.objectMapper.writeValueAsString(response))
-            .orElse(fail -> "could not serialize response");
-        logger.info(responseString);
-        return response;
+    protected String principalId() {
+        return DEFAULT_PRINCIPAL_ID;
     }
 
     @Override
-    protected void writeOutput(Void input, HandlerResponse output)
-        throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream))) {
-            String responseJson = JsonUtils.objectMapper.writeValueAsString(output);
-            writer.write(responseJson);
-        }
+    protected String fetchSecret() throws ForbiddenException {
+        final String secretName = environment.readEnv(AWS_SECRET_NAME_ENV_VAR);
+
+        GetSecretValueResult getSecretResult = awsSecretsManager.getSecretValue(
+            new GetSecretValueRequest().withSecretId(secretName));
+        return extractApiKey(getSecretResult);
     }
 
-    @Override
-    protected Integer getSuccessStatusCode(Void input, HandlerResponse output) {
-        return HttpStatus.SC_ACCEPTED;
+    private String extractApiKey(GetSecretValueResult getSecretResult)
+        throws ForbiddenException {
+
+        final String secretKey = environment.readEnv(AWS_SECRET_KEY_ENV_VAR);
+        String secretString = getSecretResult.getSecretString();
+        String secretValue = attempt(() -> JsonUtils.objectMapper.readTree(secretString))
+            .map(secretJson -> secretJson.get(secretKey))
+            .map(JsonNode::textValue)
+            .orElseThrow(this::logErrorAndThrowException);
+        return secretValue;
     }
 
-    private String extractPath(String[] methodArnModules) {
-        return methodArnModules[API_GATEWAY_SUBSTRING].split(API_GATEWAY_PATH_DELIMITER)
-            [API_GATEWAY_SUBSTRING_PATH];
+    private <I> ForbiddenException logErrorAndThrowException(Failure<I> failure) {
+        logger.error(failure.getException().getMessage(), failure.getException());
+        return new ForbiddenException();
     }
 
-    private String extractMethod(String[] methodArnModules) {
-        return methodArnModules[API_GATEWAY_SUBSTRING]
-            .split(API_GATEWAY_PATH_DELIMITER)[API_GATEWAY_SUBSTRING_METHOD];
-    }
-
-    private String extractStage(String[] methodArnModules) {
-        return methodArnModules[API_GATEWAY_SUBSTRING]
-            .split(API_GATEWAY_PATH_DELIMITER)[API_GATEWAY_SUBSTRING_STAGE];
-    }
-
-    private String extractRegion(String[] methodArnModules) {
-        return methodArnModules[REGION];
-    }
-
-    private String extractRestApiId(String[] methodArn) {
-        return methodArn[API_GATEWAY_SUBSTRING].split(API_GATEWAY_PATH_DELIMITER)[API_GATEWAY_SUBSTRING_API_ID];
-    }
-
-    private String extractAccountId(String[] methodArn) {
-        return methodArn[AWS_ACCOUNT_ID];
+    private static AWSSecretsManager newAwsSecretsManager() {
+        return AWSSecretsManagerClientBuilder.defaultClient();
     }
 }

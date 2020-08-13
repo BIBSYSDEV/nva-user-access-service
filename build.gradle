@@ -34,7 +34,7 @@ dependencies {
     implementation(group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.2.1') {
         because("It implements lambda handlers")
     }
-    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: 'b7e75823f'
+    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: '448d93cad7'
     implementation(group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4') {
         because "Because we use the library directly to define loggers in our code"
     }
@@ -186,7 +186,7 @@ task debugCucumber() {
     }
 }
 
-test.dependsOn(cucumber)
+//test.dependsOn(cucumber)
 
 gradleLint {
     rules = ['all-dependency', 'duplicate-dependency-class', 'unused-exclude-by-dep']
