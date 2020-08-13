@@ -16,8 +16,8 @@ import nva.commons.utils.attempt.Failure;
 public class LambdaAuthorizer extends ServiceAuthorizerHandler {
 
     public static final String DEFAULT_PRINCIPAL_ID = "ServiceAccessingUsersAndRoles";
-    public static final String AWS_SECRET_NAME_ENV_VAR = "AWS_SECRET_NAME";
-    public static final String AWS_SECRET_KEY_ENV_VAR = "AWS_SECRET_KEY";
+    public static final String AWS_SECRET_NAME_ENV_VAR = "API_SECRET_NAME";
+    public static final String AWS_SECRET_KEY_ENV_VAR = "API_SECRET_KEY";
     private final AWSSecretsManager awsSecretsManager;
 
     public LambdaAuthorizer() {
