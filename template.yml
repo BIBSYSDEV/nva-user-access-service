@@ -10,6 +10,8 @@ Parameters:
     Type: String
   UsersAndRolesTableName:
     Type: String
+  ApiKeySecretArn:
+    Type: String
 
 
 Globals:
@@ -36,6 +38,13 @@ Resources:
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref UsersAndRolesTableName
+        - Effect: "Allow"
+          Action:
+            - "secretsmanager:GetResourcePolicy"
+            - "secretsmanager:GetSecretValue"
+            - "secretsmanager:DescribeSecret"
+            - "secretsmanager:ListSecretVersionIds"
+          Resource: !Ref ApiKeySecretArn
   RestApi:
     Type: AWS::Serverless::Api
     Properties:
