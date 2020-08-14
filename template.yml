@@ -340,8 +340,10 @@ Resources:
                 type: request
                 authorizerUri:  !Join
                   - ''
-                  - - 'arn:aws:apigateway:region:lambda:'
-                    - '/2015-03-31/functions/'
+                  - - 'arn:aws:apigateway:'
+                    - !Ref AWS::Region
+                    - ':lambda:'
+                    - 'path/2015-03-31/functions/'
                     - !GetAtt LambdaAuthorizer.Arn
                     - '/invocations'
                 identitySource: method.request.header.Authorization
