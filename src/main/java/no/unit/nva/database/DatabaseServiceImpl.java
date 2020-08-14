@@ -138,7 +138,6 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
         logger.debug(
             GET_USER_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(queryObject));
         DynamoDBQueryExpression<UserDb> searchUserRequest = createGetQuery(queryObject.toUserDb());
-        logger.info("Trying to get user:" + queryObject.getUsername());
         List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserRequest);
         return convertQueryResultToOptionalUser(userSearchResult, queryObject);
     }

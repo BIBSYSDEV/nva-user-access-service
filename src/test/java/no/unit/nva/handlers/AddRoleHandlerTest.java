@@ -57,17 +57,6 @@ public class AddRoleHandlerTest extends HandlerTest {
     }
 
     @Test
-    public void handleRequestHandlesRequest() throws IOException {
-        InputStream input = IoUtils.inputStreamFromResources(Path.of("input.json"));
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        addRoleHandler.handleRequest(input, output, context);
-
-        GatewayResponse<RoleDto> response = GatewayResponse.fromOutputStream(output);
-        RoleDto roleDto = response.getBodyObject(RoleDto.class);
-        assertThat(roleDto, is(not(nullValue())));
-    }
-
-    @Test
     public void handleRequestReturnsBadRequestWhenRequestBodyIsEmpty() throws IOException {
         GatewayResponse<RoleDto> response = sendRequest(null);
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.SC_BAD_REQUEST)));
