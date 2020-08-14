@@ -527,8 +527,8 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /service/roles
-            Method: post
+            Path: /service/users/{user}
+            Method: get
             RestApiId: !Ref RestApi
   ServiceUpdateUserHandler:
     Type: AWS::Serverless::Function
@@ -548,8 +548,8 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /service/roles
-            Method: post
+            Path: /service/users/{user}
+            Method: put
             RestApiId: !Ref RestApi
   ServiceAddUserHandler:
     Type: AWS::Serverless::Function
