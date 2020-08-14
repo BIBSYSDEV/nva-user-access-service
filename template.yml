@@ -57,10 +57,13 @@ Resources:
             UserPoolArn: !Ref CognitoAuthorizerArn
           MyLambda:
             FunctionArn: !GetAtt LambdaAuthorizer.Arn
-            FunctionPayloadType: REQUEST
+            FunctionPayloadType: TOKEN
             Identity:
               Headers:
                 - Authorization
+              ReauthorizeEvery: 0
+              # do not cache authorization results
+
 
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
