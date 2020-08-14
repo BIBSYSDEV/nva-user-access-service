@@ -341,16 +341,9 @@ Resources:
               x-amazon-apigateway-authtype: custom
               x-amazon-apigateway-authorizer:
                 type: request
-                authorizerUri:  !Join
-                  - ''
-                  - - 'arn:aws:apigateway:'
-                    - !Ref AWS::Region
-                    - ':lambda:'
-                    - 'path/2015-03-31/functions/'
-                    - !GetAtt LambdaAuthorizer.Arn
-                    - '/invocations'
+                authorizerUri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaAuthorizer.Arn}/invocations
                 identitySource: method.request.header.Authorization
-                authorizerResultTtlInSeconds: 60
 
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
@@ -522,7 +515,6 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UsersAndRolesTableName
-
       Events:
         ApiEvent:
           Type: Api
