@@ -330,10 +330,13 @@ Resources:
               type: apiKey
               name: Authorization
               in: header
-              x-amazon-apigateway-authtype: REQUEST
+              x-amazon-apigateway-authtype: request
               x-amazon-apigateway-authorizer:
-                type: REQUEST
-                authorizerUri:  !GetAtt LambdaAuthorizer.Arn
+                type: request
+                authorizerUri:  !Join
+                  - ''
+                  - - !GetAtt LambdaAuthorizer.Arn
+                    - /invocations
                 identitySource: method.request.header.Authorization
 
   UserRoleMappings:
