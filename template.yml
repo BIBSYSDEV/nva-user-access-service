@@ -59,6 +59,8 @@ Resources:
       Auth:
         DefaultAuthorizer: MyLambda
         Authorizers:
+          CognitoAuth:
+            UserPoolArn: !Ref CognitoAuthorizerArn
           MyLambda:
             FunctionArn: !GetAtt LambdaAuthorizer.Arn
             FunctionPayloadType: REQUEST
