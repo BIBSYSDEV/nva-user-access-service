@@ -1,11 +1,15 @@
 package no.unit.nva.handlers;
 
 import static nva.commons.utils.JsonUtils.objectMapper;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.StringContains.containsString;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.DatabaseService;
@@ -19,9 +23,11 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 
 public class HandlerTest extends DatabaseAccessor {
 
-    public static final String DEFAULT_USERNAME = "sampleUsername";
+    public static final String DEFAULT_USERNAME = "someUsername@inst";
     public static final String DEFAULT_ROLE = "SomeRole";
     public static final String DEFAULT_INSTITUTION = "SomeInstitution";
+    private static final String SPECIAL_CHARACTER = "@";
+    private static final String ENCODED_SPECIAL_CHARACTER = "%40";
 
     protected DatabaseService databaseService;
 
@@ -59,6 +65,13 @@ public class HandlerTest extends DatabaseAccessor {
         ObjectNode objectWithoutType = objectMapper.convertValue(dtoObject, ObjectNode.class);
         objectWithoutType.remove(TypedObjectsDetails.TYPE_ATTRIBUTE);
         return objectWithoutType;
+    }
+
+    protected String encodeString(String inputContainingSpecialCharacter) {
+        assertThat(inputContainingSpecialCharacter, containsString(SPECIAL_CHARACTER));
+        String output = URLEncoder.encode(inputContainingSpecialCharacter, StandardCharsets.UTF_8);
+        assertThat(output, containsString(ENCODED_SPECIAL_CHARACTER));
+        return output;
     }
 
     protected ByteArrayOutputStream outputStream() {

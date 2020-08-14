@@ -76,7 +76,7 @@ public class RoleFt extends ScenarioTest {
         assertThat(statusCode, is(equalTo(HttpStatus.SC_OK)));
     }
 
-    @Then("a role description is returned")
+    @Then("a RoleDescription is returned")
     public void a_role_description_is_returned() throws IOException {
         RoleDto actualRoleDto = getResponseBody();
         assertThat(actualRoleDto, is(notNullValue()));
