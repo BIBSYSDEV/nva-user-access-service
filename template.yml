@@ -61,7 +61,7 @@ Resources:
             Identity:
               Headers:
                 - Authorization
-              ReauthorizeEvery: 0
+              ReauthorizeEvery: 10
               # do not cache authorization results
 
 
