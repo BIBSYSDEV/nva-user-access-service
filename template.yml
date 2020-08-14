@@ -353,131 +353,110 @@ Resources:
             Path: /service/roles
             Method: post
             RestApiId: !Ref RestApi
-#  GetRoleHandler:
-#    Type: AWS::Serverless::Function
-#    Properties:
-#      CodeUri: .
-#      Handler: no.unit.nva.handlers.GetRoleHandler::handleRequest
-#      Runtime: java11
-#      MemorySize: 1408
-#      Environment:
-#        Variables:
-#          ALLOWED_ORIGIN: '*'
-#          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
-#      Policies:
-#        - DynamoDBReadPolicy:
-#            TableName: !Ref UsersAndRolesTableName
-#      Events:
-#        ApiEvent:
-#          Type: Api
-#          Properties:
-#            Path: /roles/{role}
-#            Method: get
-#            RestApiId: !Ref RestApi
-#  AddUserHandler:
-#    Type: AWS::Serverless::Function
-#    Properties:
-#      CodeUri: .
-#      Handler: no.unit.nva.handlers.AddUserHandler::handleRequest
-#      Runtime: java11
-#      MemorySize: 1408
-#      Environment:
-#        Variables:
-#          ALLOWED_ORIGIN: '*'
-#          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
-#      Policies:
-#        - DynamoDBCrudPolicy:
-#            TableName: !Ref UsersAndRolesTableName
-#      Events:
-#        ApiEvent:
-#          Type: Api
-#          Properties:
-#            Path: /users
-#            Method: post
-#            RestApiId: !Ref RestApi
-#
-#  GetUserHandler:
-#    Type: AWS::Serverless::Function
-#    Properties:
-#      CodeUri: .
-#      Handler: no.unit.nva.handlers.GetUserHandler::handleRequest
-#      Runtime: java11
-#      MemorySize: 1408
-#      Environment:
-#        Variables:
-#          ALLOWED_ORIGIN: '*'
-#          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
-#      Policies:
-#        - DynamoDBReadPolicy:
-#            TableName: !Ref UsersAndRolesTableName
-#      Events:
-#        ApiEvent:
-#          Type: Api
-#          Properties:
-#            Path: /users/{username}
-#            Method: get
-#            RestApiId: !Ref RestApi
-#  UpdateUserHandler:
-#    Type: AWS::Serverless::Function
-#    Properties:
-#      CodeUri: .
-#      Handler: no.unit.nva.handlers.UpdateUserHandler::handleRequest
-#      Runtime: java11
-#      MemorySize: 1408
-#      Environment:
-#        Variables:
-#          ALLOWED_ORIGIN: '*'
-#          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
-#      Policies:
-#        - DynamoDBCrudPolicy:
-#            TableName: !Ref UsersAndRolesTableName
-#      Events:
-#        ApiEvent:
-#          Type: Api
-#          Properties:
-#            Path: /users/{username}
-#            Method: put
-#            RestApiId: !Ref RestApi
-#  ListByInstitutionHandler:
-#    Type: AWS::Serverless::Function
-#    Properties:
-#      CodeUri: .
-#      Handler: no.unit.nva.handlers.ListByInstitutionHandler::handleRequest
-#      Runtime: java11
-#      MemorySize: 1408
-#      Environment:
-#        Variables:
-#          ALLOWED_ORIGIN: '*'
-#          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
-#      Policies:
-#        - DynamoDBReadPolicy:
-#            TableName: !Ref UsersAndRolesTableName
-#      Events:
-#        ApiEvent:
-#          Type: Api
-#          Properties:
-#            Path: /institutions/{institution}/users
-#            Method: get
-#            RestApiId: !Ref RestApi
-#  GetUserHandlerForService:
-#    Type: AWS::Serverless::Function
-#    Properties:
-#      CodeUri: .
-#      Handler: no.unit.nva.handlers.GetUserForHandler::handleRequest
-#      Runtime: java11
-#      MemorySize: 1408
-#      Environment:
-#        Variables:
-#          ALLOWED_ORIGIN: '*'
-#          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
-#      Policies:
-#        - DynamoDBReadPolicy:
-#            TableName: !Ref UsersAndRolesTableName
-#      Events:
-#        ApiEvent:
-#          Type: Api
-#          Properties:
-#            Path: /service/users/{user}
-#            Method: get
-#            RestApiId: !Ref RestApi
+  GetRoleHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.GetRoleHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersAndRolesTableName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /roles/{role}
+            Method: get
+            RestApiId: !Ref RestApi
+  AddUserHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.AddUserHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersAndRolesTableName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: post
+            RestApiId: !Ref RestApi
+
+  GetUserHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.GetUserHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersAndRolesTableName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /users/{username}
+            Method: get
+            RestApiId: !Ref RestApi
+  UpdateUserHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.UpdateUserHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersAndRolesTableName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /users/{username}
+            Method: put
+            RestApiId: !Ref RestApi
+  ListByInstitutionHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.ListByInstitutionHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersAndRolesTableName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /institutions/{institution}/users
+            Method: get
+            RestApiId: !Ref RestApi
 
