@@ -23,7 +23,6 @@ Globals:
 
 Resources:
   LambdaAuthorizer:
-    DependsOn: LambdaAuthorizerRole
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
@@ -36,31 +35,6 @@ Resources:
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
           API_SECRET_NAME: "UserCatalogueApiKey"
           API_SECRET_KEY: "ApiKey"
-      Role: !GetAtt LambdaAuthorizerRole.Arn
-  #      Policies:
-  #        - DynamoDBReadPolicy:
-  #            TableName: !Ref UsersAndRolesTableName
-  #        - Effect: "Allow"
-  #          Action:
-  #            - "secretsmanager:GetResourcePolicy"
-  #            - "secretsmanager:GetSecretValue"
-  #            - "secretsmanager:DescribeSecret"
-  #            - "secretsmanager:ListSecretVersionIds"
-  #          Resource: !Ref ApiKeySecretArn
-
-  LambdaAuthorizerRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service:
-                - "lambda.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-      Path: "/"
       Policies:
         - PolicyName: LambdaAuthorizerAccessRights
           PolicyDocument:
@@ -73,6 +47,32 @@ Resources:
                   - "secretsmanager:GetSecretValue"
                   - "secretsmanager:DescribeSecret"
                   - "secretsmanager:ListSecretVersionIds"
+
+  #  LambdaAuthorizerRole:
+  #    Type: AWS::IAM::Role
+  #    Properties:
+  #      AssumeRolePolicyDocument:
+  #        Version: "2012-10-17"
+  #        Statement:
+  #          - Effect: "Allow"
+  #            Principal:
+  #              Service:
+  #                - "lambda.amazonaws.com"
+  #            Action:
+  #              - "sts:AssumeRole"
+  #      Path: "/"
+  #      Policies:
+  #        - PolicyName: LambdaAuthorizerAccessRights
+  #          PolicyDocument:
+  #            Version: "2012-10-17"
+  #            Statement:
+  #              - Effect: "Allow"
+  #                Resource:  !Ref ApiKeySecretArn
+  #                Action:
+  #                  - "secretsmanager:GetResourcePolicy"
+  #                  - "secretsmanager:GetSecretValue"
+  #                  - "secretsmanager:DescribeSecret"
+  #                  - "secretsmanager:ListSecretVersionIds"
   RestApi:
     Type: AWS::Serverless::Api
     Properties:
