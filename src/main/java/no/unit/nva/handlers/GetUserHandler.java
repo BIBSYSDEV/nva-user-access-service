@@ -38,7 +38,9 @@ public class GetUserHandler extends HandlerAccessingUser<Void, UserDto> {
 
         String username = extractValidUserNameOrThrowException(requestInfo);
         UserDto queryObject = UserDto.newBuilder().withUsername(username).build();
-        return databaseService.getUser(queryObject);
+        UserDto result = databaseService.getUser(queryObject);
+        logger.info("Got user: " + result.getUsername());
+        return result;
     }
 
     @Override
