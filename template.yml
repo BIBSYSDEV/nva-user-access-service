@@ -331,7 +331,7 @@ Resources:
                 type: cognito_user_pools
                 providerARNs:
                   - !Ref CognitoAuthorizerArn
-            LambdaAuthorizer:
+            ApiKey:
               type: apiKey
               name: Authorization
               in: header
