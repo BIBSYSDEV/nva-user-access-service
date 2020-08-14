@@ -224,6 +224,30 @@ Resources:
                 responses: {}
                 httpMethod: POST
                 type: aws_proxy
+          /service/users:
+            post:
+              summary: Adds new user
+              security:
+                - ApiKey: []
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/User'
+              responses:
+                '200':
+                  description: Successful creation of role. Returns the generated role
+                  content:
+                    "application/json":
+                      schema:
+                        $ref: '#/components/schemas/User'
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ServiceAddUserHandler.Arn}/invocations
+                responses: {}
+                httpMethod: POST
+                type: aws_proxy
           /service/users/{user}:
             get:
               summary: Get user (service use only)
@@ -508,6 +532,27 @@ Resources:
           Type: Api
           Properties:
             Path: /service/roles
+            Method: post
+            RestApiId: !Ref RestApi
+  ServiceAddUserHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.AddUserHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersAndRolesTableName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /service/users
             Method: post
             RestApiId: !Ref RestApi
 
