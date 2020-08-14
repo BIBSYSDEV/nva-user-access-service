@@ -57,12 +57,11 @@ Resources:
             UserPoolArn: !Ref CognitoAuthorizerArn
           MyLambda:
             FunctionArn: !GetAtt LambdaAuthorizer.Arn
-            FunctionPayloadType: TOKEN
+            FunctionPayloadType: REQUEST
             Identity:
               Headers:
                 - Authorization
-              ReauthorizeEvery: 10
-              # do not cache authorization results
+              ReauthorizeEvery: 300
 
 
   UserRoleMappings:
