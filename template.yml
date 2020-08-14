@@ -45,20 +45,25 @@ Resources:
                 - "secretsmanager:GetSecretValue"
                 - "secretsmanager:DescribeSecret"
                 - "secretsmanager:ListSecretVersionIds"
+  #  AuthorizerApi:
+  #    Type: AWS::Serverless::Api
+  #    Properties:
+  #      StageName: Prod
+  #      EndpointConfiguration: REGIONAL
+  #      Auth:
+  #        DefaultAuthorizer: MyLambda
+  #        Authorizers:
+  #          MyLambda:
+  #            FunctionArn: !GetAtt LambdaAuthorizer.Arn
+  #            FunctionPayloadType: REQUEST
+  #            Identity:
+  #              Headers:
+  #                - Authorization
   RestApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       EndpointConfiguration: REGIONAL
-      #      Auth:
-      #        DefaultAuthorizer: MyLambda
-      #        Authorizers:
-      #          MyLambda:
-      #            FunctionArn: !GetAtt LambdaAuthorizer.Arn
-      #            FunctionPayloadType: REQUEST
-      #            Identity:
-      #              Headers:
-      #                - Authorization
       DefinitionBody:
         openapi: 3.0
         info:
@@ -333,7 +338,12 @@ Resources:
               x-amazon-apigateway-authtype: custom
               x-amazon-apigateway-authorizer:
                 type: request
-                authorizerUri:  !GetAtt LambdaAuthorizer.Arn
+                authorizerUri:  !Join
+                  - ''
+                  - - 'arn:aws:apigateway:region:lambda:'
+                    - '/2015-03-31/functions/'
+                    - !GetAtt LambdaAuthorizer.Arn
+                    - '/invocations'
                 identitySource: method.request.header.Authorization
                 authorizerResultTtlInSeconds: 60
 
@@ -507,6 +517,7 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UsersAndRolesTableName
+
       Events:
         ApiEvent:
           Type: Api
