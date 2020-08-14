@@ -224,9 +224,9 @@ Resources:
                 responses: {}
                 httpMethod: POST
                 type: aws_proxy
-          /service/roles/:
-            post:
-              summary: Posts role (service use only)
+          /service/users/{user}:
+            get:
+              summary: Get user (service use only)
               security:
                 - ApiKey: []
               responses:
@@ -235,10 +235,40 @@ Resources:
                   content:
                     "application/json":
                       schema:
-                        $ref: '#/components/schemas/Role'
+                        $ref: '#/components/schemas/User'
               x-amazon-apigateway-integration:
                 uri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ServiceAddRoleHandler.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ServiceGetUserHandler.Arn}/invocations
+                responses: {}
+                httpMethod: POST
+                type: aws_proxy
+            put:
+              summary: Updates an existing User
+              parameters:
+                - in: path
+                  name: username
+                  schema:
+                    type: string
+                  required: true
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/User'
+              security:
+                - ApiKey: []
+              responses:
+                '202':
+                  description: Successful request for updating the user. User will be eventually updated
+                  headers:
+                    Location:
+                      schema:
+                        type: string
+                      description: Relative path to the user URI
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ServiceUpdateUserHandler.Arn}/invocations
                 responses: {}
                 httpMethod: POST
                 type: aws_proxy
@@ -330,27 +360,6 @@ Resources:
           Type: Api
           Properties:
             Path: /roles
-            Method: post
-            RestApiId: !Ref RestApi
-  ServiceAddRoleHandler:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: .
-      Handler: no.unit.nva.handlers.AddRoleHandler::handleRequest
-      Runtime: java11
-      MemorySize: 1408
-      Environment:
-        Variables:
-          ALLOWED_ORIGIN: '*'
-          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref UsersAndRolesTableName
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /service/roles
             Method: post
             RestApiId: !Ref RestApi
   GetRoleHandler:
@@ -458,5 +467,47 @@ Resources:
           Properties:
             Path: /institutions/{institution}/users
             Method: get
+            RestApiId: !Ref RestApi
+  ServiceGetUserHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.GetUserHnadler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersAndRolesTableName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /service/roles
+            Method: post
+            RestApiId: !Ref RestApi
+  ServiceUpdateUserHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: no.unit.nva.handlers.UpdateUserHandler::handleRequest
+      Runtime: java11
+      MemorySize: 1408
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersAndRolesTableName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /service/roles
+            Method: post
             RestApiId: !Ref RestApi
 
