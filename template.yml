@@ -45,7 +45,6 @@ Resources:
                 - "secretsmanager:GetSecretValue"
                 - "secretsmanager:DescribeSecret"
                 - "secretsmanager:ListSecretVersionIds"
-
   ServiceApi:
     Type: AWS::Serverless::Api
     Properties:
