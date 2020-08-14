@@ -330,11 +330,12 @@ Resources:
               type: apiKey
               name: Authorization
               in: header
-              x-amazon-apigateway-authtype: request
+              x-amazon-apigateway-authtype: custom
               x-amazon-apigateway-authorizer:
                 type: request
                 authorizerUri:  !GetAtt LambdaAuthorizer.Arn
                 identitySource: method.request.header.Authorization
+                authorizerResultTtlInSeconds: 60
 
   UserRoleMappings:
     Type: AWS::DynamoDB::Table
