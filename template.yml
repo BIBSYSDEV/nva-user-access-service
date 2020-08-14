@@ -45,12 +45,6 @@ Resources:
                 - "secretsmanager:GetSecretValue"
                 - "secretsmanager:DescribeSecret"
                 - "secretsmanager:ListSecretVersionIds"
-  #  AuthorizerApi:
-  #    Type: AWS::Serverless::Api
-  #    Properties:
-  #      StageName: Prod
-  #      EndpointConfiguration: REGIONAL
-
   RestApi:
     Type: AWS::Serverless::Api
     Properties:
