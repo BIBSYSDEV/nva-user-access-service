@@ -62,17 +62,17 @@ Resources:
               - "sts:AssumeRole"
       Path: "/"
       Policies:
-        PolicyName: LambdaAuthorizerAccessRights
-        PolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: "Allow"
-              Resource:  !Ref ApiKeySecretArn
-              Action:
-                - "secretsmanager:GetResourcePolicy"
-                - "secretsmanager:GetSecretValue"
-                - "secretsmanager:DescribeSecret"
-                - "secretsmanager:ListSecretVersionIds"
+        - PolicyName: LambdaAuthorizerAccessRights
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Resource:  !Ref ApiKeySecretArn
+                Action:
+                  - "secretsmanager:GetResourcePolicy"
+                  - "secretsmanager:GetSecretValue"
+                  - "secretsmanager:DescribeSecret"
+                  - "secretsmanager:ListSecretVersionIds"
   RestApi:
     Type: AWS::Serverless::Api
     Properties:
