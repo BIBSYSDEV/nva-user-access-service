@@ -159,6 +159,7 @@ class ListByInstitutionHandlerTest extends HandlerTest {
         return output;
     }
 
+
     private void assertThatListsAreEquivalent(UserList expectedUsers, UserList actualUsers) {
         assertThat(actualUsers, containsInAnyOrder(expectedUsers.toArray()));
         assertThat(expectedUsers, containsInAnyOrder(actualUsers.toArray()));
@@ -170,6 +171,10 @@ class ListByInstitutionHandlerTest extends HandlerTest {
         users.add(insertSampleUserToDatabase(DEFAULT_USERNAME, DEFAULT_INSTITUTION));
         users.add(insertSampleUserToDatabase(SOME_OTHER_USERNAME, DEFAULT_INSTITUTION));
         return users;
+    }
+
+    protected ByteArrayOutputStream outputStream() {
+        return new ByteArrayOutputStream();
     }
 
     private InputStream createListRequest(String institutionId) throws JsonProcessingException {

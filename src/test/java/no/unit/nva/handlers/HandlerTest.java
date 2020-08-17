@@ -6,7 +6,6 @@ import static org.hamcrest.core.StringContains.containsString;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -72,9 +71,5 @@ public class HandlerTest extends DatabaseAccessor {
         String output = URLEncoder.encode(inputContainingSpecialCharacter, StandardCharsets.UTF_8);
         assertThat(output, containsString(ENCODED_SPECIAL_CHARACTER));
         return output;
-    }
-
-    protected ByteArrayOutputStream outputStream() {
-        return new ByteArrayOutputStream();
     }
 }
