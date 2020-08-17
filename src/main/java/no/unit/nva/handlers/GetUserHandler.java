@@ -34,7 +34,7 @@ public class GetUserHandler extends HandlerAccessingUser<Void, UserDto> {
 
     @Override
     protected UserDto processInput(Void input, RequestInfo requestInfo, Context context)
-        throws BadRequestException, InvalidEntryInternalException, NotFoundException, ApiGatewayException {
+        throws ApiGatewayException {
 
         String username = extractValidUserNameOrThrowException(requestInfo);
         UserDto queryObject = UserDto.newBuilder().withUsername(username).build();
