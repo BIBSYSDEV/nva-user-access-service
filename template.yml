@@ -65,7 +65,7 @@ Resources:
       DefinitionBody:
         openapi: 3.0
         info:
-          title: Orestis testing-Roles and Users catalogue
+          title: NVA Users service endpoint
           description: Api for updating users and roles
           version: 1.0.0
         paths:
