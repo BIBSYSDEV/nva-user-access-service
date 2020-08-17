@@ -173,7 +173,7 @@ class ListByInstitutionHandlerTest extends HandlerTest {
         return users;
     }
 
-    protected ByteArrayOutputStream outputStream() {
+    private ByteArrayOutputStream outputStream() {
         return new ByteArrayOutputStream();
     }
 
