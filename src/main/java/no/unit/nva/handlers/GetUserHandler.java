@@ -7,8 +7,6 @@ import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.exceptions.BadRequestException;
-import no.unit.nva.exceptions.InvalidEntryInternalException;
-import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.UserDto;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.handlers.RequestInfo;
