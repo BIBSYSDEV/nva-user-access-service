@@ -159,7 +159,6 @@ class ListByInstitutionHandlerTest extends HandlerTest {
         return output;
     }
 
-
     private void assertThatListsAreEquivalent(UserList expectedUsers, UserList actualUsers) {
         assertThat(actualUsers, containsInAnyOrder(expectedUsers.toArray()));
         assertThat(expectedUsers, containsInAnyOrder(actualUsers.toArray()));
