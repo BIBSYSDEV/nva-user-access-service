@@ -51,11 +51,11 @@ Resources:
       StageName: Prod
       EndpointConfiguration: REGIONAL
       Auth:
-        DefaultAuthorizer: MyLambda
+        DefaultAuthorizer: LambdaRequestAuthorizer
         Authorizers:
           CognitoAuth:
             UserPoolArn: !Ref CognitoAuthorizerArn
-          MyLambda:
+          LambdaRequestAuthorizer:
             FunctionArn: !GetAtt LambdaAuthorizer.Arn
             FunctionPayloadType: REQUEST
             Identity:
@@ -181,7 +181,7 @@ Resources:
       DefinitionBody:
         openapi: 3.0
         info:
-          title: Orestis testing-Roles and Users catalogue
+          title: Roles and Users catalogue
           description: Api for updating users and roles
           version: 1.0.0
         paths:
