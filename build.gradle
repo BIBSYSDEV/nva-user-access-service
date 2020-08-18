@@ -34,7 +34,7 @@ dependencies {
     implementation(group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.2.1') {
         because("It implements lambda handlers")
     }
-    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: '6fd16f65492'
+    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: '0.4.3'
     implementation(group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4') {
         because "Because we use the library directly to define loggers in our code"
     }
