@@ -1,6 +1,8 @@
 Feature: Users
 
   Background:
+
+
     Given a Database for users and roles
     And an AuthorizedClient that is authorized through Feide
 
@@ -62,12 +64,11 @@ Feature: Users
     And the UserC belongs to the institution "AnotherInstitution"
 
     When the AuthorizedClient sends the request to list the users of the "Institution"
-    Then a non-empty list of the users belonging to the institution is returned to the client
+    Then a non-empty list of the users belonging to the institution is returned
     And the list of users should contain only the following usernames:
       | usernames |
       | userA     |
       | userB     |
-
 
 
 

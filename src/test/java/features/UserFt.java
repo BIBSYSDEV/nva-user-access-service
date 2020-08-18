@@ -42,8 +42,6 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.EntityUtils;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.utils.attempt.Try;
-import org.apache.http.HttpStatus;
-import org.zalando.problem.Problem;
 
 public class UserFt extends ScenarioTest {
 
@@ -195,10 +193,8 @@ public class UserFt extends ScenarioTest {
         assertThat(locationHeader, containsString(expectedUser.getUsername()));
     }
 
-
-
-    @Then("a non-empty list of the users belonging to the institution is returned to the client")
-    public void a_list_of_the_users_belonging_to_the_institution_is_returned_to_the_client() throws IOException {
+    @Then("a non-empty list of the users belonging to the institution is returned")
+    public void a_list_of_the_users_belonging_to_the_institution_is_returned() throws IOException {
         UserList users = extractUserListFromResponse();
         assertThat(users, is(not(empty())));
     }
