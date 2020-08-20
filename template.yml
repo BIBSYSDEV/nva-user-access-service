@@ -14,9 +14,9 @@ Parameters:
     Type: String
   StageName:
     Type: String
-  InternalApiStatiUrlString:
+  InternalApiBasePath:
     Type: String
-  ExternalApiStatiUrlString:
+  ExternalApiBasePath:
     Type: String
   CustomDomain:
     Type: String
@@ -608,14 +608,14 @@ Resources:
   InternalApiStaticUrl:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
-      BasePath: !Ref InternalApiStatiUrlString
+      BasePath: !Ref InternalApiBasePath
       DomainName: !Ref CustomDomain
       RestApiId: !Ref InternalApi
       Stage: !Ref  StageName
   ExternalApiStaticUrl:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
-      BasePath: !Ref ExternalApiStatiUrlString
+      BasePath: !Ref ExternalApiBasePath
       DomainName: !Ref CustomDomain
       RestApiId: !Ref ExternalApi
       Stage: !Ref StageName
