@@ -12,6 +12,13 @@ Parameters:
     Type: String
   ApiKeySecretArn:
     Type: String
+  StageName:
+    Type: String
+  InternalApiStatiUrlString:
+    Type: String
+  ExternalApiStatiUrlString:
+    Type: String
+
 
 
 Globals:
@@ -48,7 +55,7 @@ Resources:
   InternalApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: Prod
+      StageName: !Ref StageName
       EndpointConfiguration: REGIONAL
       Auth:
         DefaultAuthorizer: LambdaRequestAuthorizer
@@ -596,4 +603,18 @@ Resources:
             Path: /service/users
             Method: post
             RestApiId: !Ref InternalApi
+  InternalApiStaticUrl:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: !Ref InternalApiStatiUrlString
+      DomainName: !Ref CustomDomain
+      RestApiId: !Ref InternalApi
+      Stage: !Ref  StageName
+  ExternalApiStaticUrl:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: !Ref ExternalApiStatiUrlString
+      DomainName: !Ref CustomDomain
+      RestApiId: !Ref ExternalApi
+      Stage: !Ref StageName
 
