@@ -62,7 +62,6 @@ Resources:
       Auth:
         DefaultAuthorizer: LambdaRequestAuthorizer
         Authorizers:
-          DefaultAuthorizer: LambdaRequestAuthorizer
           LambdaRequestAuthorizer:
             FunctionArn: !GetAtt LambdaAuthorizer.Arn
             FunctionPayloadType: REQUEST
