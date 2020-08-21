@@ -62,8 +62,7 @@ Resources:
       Auth:
         DefaultAuthorizer: LambdaRequestAuthorizer
         Authorizers:
-          CognitoAuth:
-            UserPoolArn: !Ref CognitoAuthorizerArn
+          DefaultAuthorizer: LambdaRequestAuthorizer
           LambdaRequestAuthorizer:
             FunctionArn: !GetAtt LambdaAuthorizer.Arn
             FunctionPayloadType: REQUEST
