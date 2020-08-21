@@ -611,12 +611,12 @@ Resources:
       BasePath: !Ref InternalApiBasePath
       DomainName: !Ref CustomDomain
       RestApiId: !Ref InternalApi
-      Stage: !Ref  StageName
+      Stage: !Ref  InternalApi.Stage
   ExternalApiStaticUrl:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
       BasePath: !Ref ExternalApiBasePath
       DomainName: !Ref CustomDomain
       RestApiId: !Ref ExternalApi
-      Stage: !Ref StageName
+      Stage: !Ref ExternalApi.Stage
 
