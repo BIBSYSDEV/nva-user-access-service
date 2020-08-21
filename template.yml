@@ -26,7 +26,7 @@ Parameters:
 Globals:
   Api:
     Cors:
-      AllowMethods: '''PUT, POST, GET, OPTIONS'''
+      AllowMethods: '''POST, PUT, GET,OPTIONS'''
       AllowHeaders: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
       AllowOrigin: '''*'''
 
