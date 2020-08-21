@@ -559,8 +559,6 @@ Resources:
           Type: Api
           Properties:
             Path: /service/users/{username}
-            Auth:
-              Authorizer: NONE
             Method: get
             RestApiId: !Ref InternalApi
   ServiceUpdateUserHandler:
@@ -583,8 +581,6 @@ Resources:
           Properties:
             Path: /service/users/{username}
             Method: put
-            Auth:
-              Authorizer: NONE
             RestApiId: !Ref InternalApi
   ServiceAddUserHandler:
     Type: AWS::Serverless::Function
@@ -606,8 +602,6 @@ Resources:
           Properties:
             Path: /service/users
             Method: post
-            Auth:
-              Authorizer: NONE
             RestApiId: !Ref InternalApi
   InternalApiStaticUrl:
     Type: AWS::ApiGateway::BasePathMapping
