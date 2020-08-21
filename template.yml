@@ -60,7 +60,6 @@ Resources:
       StageName: !Ref StageName
       EndpointConfiguration: REGIONAL
       Auth:
-        DefaultAuthorizer: "None"
         Authorizers:
           LambdaRequestAuthorizer:
             FunctionArn: !GetAtt LambdaAuthorizer.Arn
