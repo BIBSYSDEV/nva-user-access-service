@@ -103,6 +103,12 @@ Resources:
           /service/users/{username}:
             get:
               summary: Get user (service use only)
+              parameters:
+                - in: path
+                  name: username
+                  schema:
+                    type: string
+                  required: true
               security:
                 - ApiKey: []
               responses:
