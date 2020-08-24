@@ -26,9 +26,9 @@ Parameters:
 Globals:
   Api:
     Cors:
-      AllowMethods: "'PUT, POST, GET, OPTIONS'"
-      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-      AllowOrigin: "'*'"
+      AllowMethods: '''POST, PUT, GET,OPTIONS'''
+      AllowHeaders: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+      AllowOrigin: '''*'''
 
 Resources:
   LambdaAuthorizer:
@@ -60,10 +60,7 @@ Resources:
       StageName: !Ref StageName
       EndpointConfiguration: REGIONAL
       Auth:
-        DefaultAuthorizer: LambdaRequestAuthorizer
         Authorizers:
-          CognitoAuth:
-            UserPoolArn: !Ref CognitoAuthorizerArn
           LambdaRequestAuthorizer:
             FunctionArn: !GetAtt LambdaAuthorizer.Arn
             FunctionPayloadType: REQUEST
@@ -72,7 +69,7 @@ Resources:
                 - Authorization
               ReauthorizeEvery: 3600
       DefinitionBody:
-        openapi: 3.0
+        openapi: 3.0.1
         info:
           title: NVA Users internal endpoint
           description: Api for updating users and roles
@@ -105,6 +102,12 @@ Resources:
           /service/users/{username}:
             get:
               summary: Get user (service use only)
+              parameters:
+                - in: path
+                  name: username
+                  schema:
+                    type: string
+                  required: true
               security:
                 - ApiKey: []
               responses:
@@ -187,9 +190,9 @@ Resources:
       StageName: Prod
       EndpointConfiguration: REGIONAL
       DefinitionBody:
-        openapi: 3.0
+        openapi: 3.0.1
         info:
-          title: Roles and Users catalogue
+          title: NVA Roles and Users catalogue
           description: Api for updating users and roles
           version: 1.0.0
         paths:
