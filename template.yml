@@ -362,6 +362,10 @@ Resources:
                   type: string
                 username:
                   type: string
+                givenName:
+                  type: string
+                familyName:
+                  type: string
                 institution:
                   type: string
                 roles:

@@ -35,6 +35,8 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
     private List<RoleDto> roles;
     private String username;
     private String institution;
+    private String givenName;
+    private String familyName;
 
     public UserDto() {
         roles = new ArrayList<>();
@@ -42,6 +44,8 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
 
     private UserDto(Builder builder) {
         setUsername(builder.username);
+        setGivenName(builder.givenName);
+        setFamilyName(builder.familyName);
         setInstitution(builder.institution);
         setRoles(builder.roles);
     }
@@ -58,6 +62,8 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
         UserDto.Builder userDto = new UserDto.Builder();
         userDto
             .withUsername(userDb.getUsername())
+            .withGivenName(userDb.getGivenName())
+            .withFamilyName(userDb.getFamilyName())
             .withRoles(extractRoles(userDb))
             .withInstitution(userDb.getInstitution());
         return userDto.build();
@@ -81,6 +87,8 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
     public UserDb toUserDb() throws InvalidEntryInternalException {
         UserDb.Builder userDb = UserDb.newBuilder()
             .withUsername(username)
+            .withGivenName(givenName)
+            .withFamilyName(familyName)
             .withInstitution(institution)
             .withRoles(createRoleDb());
 
@@ -93,6 +101,22 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
 
     private void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getGivenName() {
+        return givenName;
+    }
+
+    public void setGivenName(String givenName) {
+        this.givenName = givenName;
+    }
+
+    public String getFamilyName() {
+        return familyName;
+    }
+
+    public void setFamilyName(String familyName) {
+        this.familyName = familyName;
     }
 
     public String getInstitution() {
@@ -135,6 +159,8 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
     public UserDto.Builder copy() {
         return new Builder()
             .withUsername(username)
+            .withGivenName(givenName)
+            .withFamilyName(familyName)
             .withInstitution(institution)
             .withRoles(listRoles());
     }
@@ -150,6 +176,8 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
         }
         UserDto userDto = (UserDto) o;
         return Objects.equals(getUsername(), userDto.getUsername())
+            && Objects.equals(getGivenName(), userDto.getGivenName())
+            && Objects.equals(getFamilyName(), userDto.getFamilyName())
             && Objects.equals(getInstitution(), userDto.getInstitution())
             && Objects.equals(getRoles(), userDto.getRoles());
     }
@@ -192,6 +220,8 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
     public static final class Builder {
 
         private String username;
+        private String givenName;
+        private String familyName;
         private String institution;
         private List<RoleDto> roles;
 
@@ -211,6 +241,16 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
 
         public Builder withRoles(List<RoleDto> roles) {
             this.roles = roles;
+            return this;
+        }
+
+        public Builder withGivenName(String givenName) {
+            this.givenName = givenName;
+            return this;
+        }
+
+        public Builder withFamilyName(String familyName) {
+            this.familyName = familyName;
             return this;
         }
 

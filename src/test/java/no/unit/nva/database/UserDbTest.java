@@ -30,6 +30,8 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 public class UserDbTest extends DatabaseAccessor {
 
     public static final String SOME_USERNAME = "someUser";
+    public static final String SOME_GIVEN_NAME = "givenName";
+    public static final String SOME_FAMILY_NAME = "familyName";
     public static final String SOME_INSTITUTION = "SomeInstitution";
     public static final List<RoleDb> SAMPLE_ROLES = createSampleRoles();
 
@@ -108,6 +110,8 @@ public class UserDbTest extends DatabaseAccessor {
     void userDbShouldBeReadFromDatabaseWithoutDataLoss() throws InvalidEntryInternalException {
         UserDb insertedUser = UserDb.newBuilder()
             .withUsername(SOME_USERNAME)
+            .withGivenName(SOME_GIVEN_NAME)
+            .withFamilyName(SOME_FAMILY_NAME)
             .withInstitution(SOME_INSTITUTION)
             .withRoles(SAMPLE_ROLES)
             .build();
@@ -124,6 +128,8 @@ public class UserDbTest extends DatabaseAccessor {
 
         Executable action = () -> UserDb.newBuilder()
             .withUsername(invalidUsername)
+            .withGivenName(SOME_GIVEN_NAME)
+            .withFamilyName(SOME_FAMILY_NAME)
             .withInstitution(SOME_INSTITUTION)
             .withRoles(SAMPLE_ROLES)
             .build();
@@ -136,6 +142,8 @@ public class UserDbTest extends DatabaseAccessor {
     void copyShouldReturnBuilderWithFilledInFields() throws InvalidEntryInternalException {
         UserDb originalUser = UserDb.newBuilder()
             .withUsername(SOME_USERNAME)
+            .withGivenName(SOME_GIVEN_NAME)
+            .withFamilyName(SOME_FAMILY_NAME)
             .withInstitution(SOME_INSTITUTION)
             .withRoles(SAMPLE_ROLES)
             .build();
