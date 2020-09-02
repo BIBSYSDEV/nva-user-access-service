@@ -249,7 +249,8 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         assertThat(queryResult, is(empty()));
     }
 
-    private UserDto createSampleUserWithoutInstitutionOrRoles(String username, String givenName, String familyName) throws InvalidEntryInternalException {
+    private UserDto createSampleUserWithoutInstitutionOrRoles(String username, String givenName, String familyName)
+        throws InvalidEntryInternalException {
         return createSampleUser(username, givenName, familyName, null, null);
     }
 
@@ -264,14 +265,22 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         return existingUser.copy().withRoles(Collections.singletonList(someOtherRole)).build();
     }
 
-    private UserDto createSampleUserAndAddUserToDb(String username, String givenName, String familyName, String institution, String roleName)
+    private UserDto createSampleUserAndAddUserToDb(String username,
+                                                   String givenName,
+                                                   String familyName,
+                                                   String institution,
+                                                   String roleName)
         throws InvalidEntryInternalException, ConflictException, InvalidInputException {
         UserDto userDto = createSampleUser(username, givenName, familyName, institution, roleName);
         db.addUser(userDto);
         return userDto;
     }
 
-    private UserDto createSampleUser(String username, String givenName, String familyName, String institution, String roleName)
+    private UserDto createSampleUser(String username,
+                                     String givenName,
+                                     String familyName,
+                                     String institution,
+                                     String roleName)
         throws InvalidEntryInternalException {
         return UserDto.newBuilder()
             .withRoles(createRoleList(roleName))
