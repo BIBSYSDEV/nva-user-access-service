@@ -32,6 +32,7 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
     public static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey of user should start with \"USER\"";
 
     private String primaryHashKey;
+
     private String username;
     private String institution;
     private List<RoleDb> roles;
@@ -125,7 +126,7 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
     }
 
     /**
-     * Method for using only for DynamoDb mapper. Do not use. Use the builder instead.
+     * Method to be used only by DynamoDb mapper. Do not use. Use the builder instead.
      *
      * @param username the username of the user.
      */
@@ -140,7 +141,7 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
     }
 
     /**
-     * Method for using only for DynamoDb mapper. Do not use. Use the builder instead.
+     * Method to be used only by DynamoDb mapper. Do not use. Use the builder instead.
      *
      * @param givenName the givenName of the user.
      */
@@ -155,7 +156,7 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
     }
 
     /**
-     * Method for using only for DynamoDb mapper. Do not use. Use the builder instead.
+     * Method to be used only by DynamoDb mapper. Do not use. Use the builder instead.
      *
      * @param familyName the familyName of the user.
      */
@@ -170,7 +171,7 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
     }
 
     /**
-     * Method for using only for DynamoDb mapper. Do not use. Use the builder instead.
+     * Method to be used only by DynamoDb mapper. Do not use. Use the builder instead.
      *
      * @param roles the roles.
      */
@@ -185,7 +186,7 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
     }
 
     /**
-     * Method for using only for DynamoDb mapper. Do not use. Use the builder instead.
+     * Method to be used only by DynamoDb mapper. Do not use. Use the builder instead.
      *
      * @param institution the institution.
      */
