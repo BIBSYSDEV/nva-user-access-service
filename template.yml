@@ -5,6 +5,16 @@ Description: >
   The resources for providing a service for listing users and roles.
   It includes a table containing users and roles and lambda functions for accessing the data.
 
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: NvaUsersAndRolesService
+    Description: NVA Users and Roles Service
+    Author: Unit
+    SpdxLicenseId: MIT
+    LicenseUrl: LICENSE
+    Labels: ['${GIT_REPO}', '${CODEBUILD_RESOLVED_SOURCE_VERSION}', '@${BUILD_TIMESTAMP}']
+    # SemanticVersion: is set via SAM command line
+
 Parameters:
   CognitoAuthorizerArn:
     Type: String
@@ -20,8 +30,6 @@ Parameters:
     Type: String
   CustomDomain:
     Type: String
-
-
 
 Globals:
   Api:
@@ -361,10 +369,6 @@ Resources:
                 type:
                   type: string
                 username:
-                  type: string
-                givenName:
-                  type: string
-                familyName:
                   type: string
                 institution:
                   type: string
