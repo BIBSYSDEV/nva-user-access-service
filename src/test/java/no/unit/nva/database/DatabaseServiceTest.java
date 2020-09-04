@@ -32,6 +32,8 @@ public class DatabaseServiceTest extends DatabaseAccessor {
 
     private static final String SOME_USERNAME = "someusername";
     private static final String SOME_OTHER_USERNAME = "someotherusername";
+    private static final String SOME_GIVEN_NAME = "givenName";
+    private static final String SOME_FAMILY_NAME = "familyName";
     private static final String SOME_ROLE = "SomeRole";
     private static final String SOME_INSTITUTION = "SomeInstitution";
     private static final String SOME_OTHER_ROLE = "SOME_OTHER_ROLE";
@@ -142,7 +144,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
     @Test
     public void addUserSavesAUserWithoutInstitution() throws InvalidEntryInternalException, ConflictException,
                                                              InvalidInputException, NotFoundException {
-        UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, null, SOME_ROLE);
+        UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME,null, SOME_ROLE);
         UserDto actualUser = db.getUser(expectedUser);
 
         assertThat(actualUser, is(equalTo(expectedUser)));
@@ -238,7 +240,8 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         assertThat(queryResult, is(empty()));
     }
 
-    private UserDto createSampleUserWithoutInstitutionOrRoles(String username) throws InvalidEntryInternalException {
+    private UserDto createSampleUserWithoutInstitutionOrRoles(String username)
+        throws InvalidEntryInternalException {
         return createSampleUser(username, null, null);
     }
 
@@ -266,6 +269,8 @@ public class DatabaseServiceTest extends DatabaseAccessor {
             .withRoles(createRoleList(roleName))
             .withInstitution(institution)
             .withUsername(username)
+            .withGivenName(SOME_GIVEN_NAME)
+            .withFamilyName(SOME_FAMILY_NAME)
             .build();
     }
 

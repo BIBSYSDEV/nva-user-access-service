@@ -15,6 +15,8 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 public final class EntityUtils {
 
     public static final String SOME_USERNAME = "SomeUsername";
+    private static final String SOME_GIVEN_NAME = "givenName";
+    private static final String SOME_FAMILY_NAME = "familyName";
     public static final String SOME_ROLENAME = "SomeRole";
     public static final String SOME_INSTITUTION = "SomeInstitution";
     public static final String EMPTY_STRING = "";
@@ -111,6 +113,8 @@ public final class EntityUtils {
         RoleDto sampleRole = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
         return UserDto.newBuilder()
             .withUsername(SOME_USERNAME)
+            .withGivenName(SOME_GIVEN_NAME)
+            .withFamilyName(SOME_FAMILY_NAME)
             .withRoles(Collections.singletonList(sampleRole))
             .build();
     }

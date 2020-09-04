@@ -32,9 +32,12 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
     public static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey of user should start with \"USER\"";
 
     private String primaryHashKey;
+
     private String username;
     private String institution;
     private List<RoleDb> roles;
+    private String givenName;
+    private String familyName;
 
     public UserDb() {
         super();
@@ -43,6 +46,8 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
     private UserDb(Builder builder) throws InvalidEntryInternalException {
         super();
         setUsername(builder.username);
+        setGivenName(builder.givenName);
+        setFamilyName(builder.familyName);
         setInstitution(builder.institution);
         setRoles(builder.roles);
         setPrimaryHashKey(builder.primaryHashKey);
@@ -121,12 +126,42 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
     }
 
     /**
-     * Method for using only for DynamoDb mapper. Do not use. Use the builder instead.
+     * Method to be used only by DynamoDb mapper. Do not use. Use the builder instead.
      *
      * @param username the username of the user.
      */
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @JacocoGenerated
+    @DynamoDBAttribute(attributeName = "givenName")
+    public String getGivenName() {
+        return givenName;
+    }
+
+    /**
+     * Method to be used only by DynamoDb mapper. Do not use. Use the builder instead.
+     *
+     * @param givenName the givenName of the user.
+     */
+    public void setGivenName(String givenName) {
+        this.givenName = givenName;
+    }
+
+    @JacocoGenerated
+    @DynamoDBAttribute(attributeName = "familyName")
+    public String getFamilyName() {
+        return familyName;
+    }
+
+    /**
+     * Method to be used only by DynamoDb mapper. Do not use. Use the builder instead.
+     *
+     * @param familyName the familyName of the user.
+     */
+    public void setFamilyName(String familyName) {
+        this.familyName = familyName;
     }
 
     @JacocoGenerated
@@ -136,7 +171,7 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
     }
 
     /**
-     * Method for using only for DynamoDb mapper. Do not use. Use the builder instead.
+     * Method to be used only by DynamoDb mapper. Do not use. Use the builder instead.
      *
      * @param roles the roles.
      */
@@ -151,7 +186,7 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
     }
 
     /**
-     * Method for using only for DynamoDb mapper. Do not use. Use the builder instead.
+     * Method to be used only by DynamoDb mapper. Do not use. Use the builder instead.
      *
      * @param institution the institution.
      */
@@ -163,6 +198,8 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
     public UserDb.Builder copy() {
         return newBuilder()
             .withUsername(this.username)
+            .withGivenName(this.givenName)
+            .withFamilyName(this.familyName)
             .withInstitution(this.institution)
             .withRoles(this.roles);
     }
@@ -182,6 +219,8 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
             && Objects.equals(getSearchByInstitutionHashKey(), userDb.getSearchByInstitutionHashKey())
             && Objects.equals(getSearchByInstitutionRangeKey(), userDb.getSearchByInstitutionRangeKey())
             && Objects.equals(getUsername(), userDb.getUsername())
+            && Objects.equals(getGivenName(), userDb.getGivenName())
+            && Objects.equals(getFamilyName(), userDb.getFamilyName())
             && Objects.equals(getInstitution(), userDb.getInstitution())
             && Objects.equals(getRoles(), userDb.getRoles());
     }
@@ -195,6 +234,8 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
     public static final class Builder {
 
         private String username;
+        private String givenName;
+        private String familyName;
         private String institution;
         private List<RoleDb> roles;
         private String primaryHashKey;
@@ -204,6 +245,16 @@ public class UserDb extends DynamoEntry implements WithCopy<Builder>, WithType {
 
         public Builder withUsername(String username) {
             this.username = username;
+            return this;
+        }
+
+        public Builder withGivenName(String givenName) {
+            this.givenName = givenName;
+            return this;
+        }
+
+        public Builder withFamilyName(String familyName) {
+            this.familyName = familyName;
             return this;
         }
 
