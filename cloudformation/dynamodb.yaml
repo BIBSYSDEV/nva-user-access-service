@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: 'DynamoDB Table for NVA Users and Roles'
+
+Parameters:
+  UsersAndRolesTableName:
+    Type: String
+
+Resources:
+  UserRoleMappings:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref UsersAndRolesTableName
+      AttributeDefinitions:
+        - AttributeName: PrimaryKeyHashKey
+          AttributeType: S
+        - AttributeName: PrimaryKeyRangeKey
+          AttributeType: S
+        - AttributeName: SecondaryIndex1HashKey
+          AttributeType: S
+        - AttributeName: SecondaryIndex1RangeKey
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: PrimaryKeyHashKey
+          KeyType: HASH
+        - AttributeName: PrimaryKeyRangeKey
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: SearchUsersByInstitution
+          KeySchema:
+            - AttributeName: SecondaryIndex1HashKey
+              KeyType: HASH
+            - AttributeName: SecondaryIndex1RangeKey
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
