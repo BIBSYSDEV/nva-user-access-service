@@ -400,34 +400,6 @@ Resources:
                 authorizerUri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaAuthorizer.Arn}/invocations
                 identitySource: method.request.header.Authorization
-  UserRoleMappings:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: !Ref UsersAndRolesTableName
-      AttributeDefinitions:
-        - AttributeName: PrimaryKeyHashKey
-          AttributeType: S
-        - AttributeName: PrimaryKeyRangeKey
-          AttributeType: S
-        - AttributeName: SecondaryIndex1HashKey
-          AttributeType: S
-        - AttributeName: SecondaryIndex1RangeKey
-          AttributeType: S
-      BillingMode: PAY_PER_REQUEST
-      KeySchema:
-        - AttributeName: PrimaryKeyHashKey
-          KeyType: HASH
-        - AttributeName: PrimaryKeyRangeKey
-          KeyType: RANGE
-      GlobalSecondaryIndexes:
-        - IndexName: SearchUsersByInstitution
-          KeySchema:
-            - AttributeName: SecondaryIndex1HashKey
-              KeyType: HASH
-            - AttributeName: SecondaryIndex1RangeKey
-              KeyType: RANGE
-          Projection:
-            ProjectionType: ALL
 
   AddRoleHandler:
     Type: AWS::Serverless::Function
