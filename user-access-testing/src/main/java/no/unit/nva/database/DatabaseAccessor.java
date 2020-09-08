@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import no.unit.nva.database.interfaces.WithEnvironment;
 import nva.commons.utils.Environment;
-
 import org.junit.jupiter.api.AfterEach;
 
 public abstract class DatabaseAccessor implements WithEnvironment {
