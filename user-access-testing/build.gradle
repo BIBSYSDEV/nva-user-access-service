@@ -11,6 +11,8 @@ dependencies {
     implementation group: 'com.github.BIBSYSDEV', name: 'nva-testutils', version: '0.1.13'
 }
 
+configurations.testImplementation.canBeResolved = true
+
 task copyNativeDeps(type: Copy) {
     from(configurations.testImplementation) {
         include "*.dylib"
