@@ -1,0 +1,5 @@
+dependencies {
+    compileOnly project(':user-access-commons')
+
+    testImplementation project(':user-access-commons')
+}
