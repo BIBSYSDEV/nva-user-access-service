@@ -1,4 +1,4 @@
-package no.unit.nva.databases;
+package no.unit.nva.database;
 
 import static nva.commons.utils.attempt.Try.attempt;
 import static org.hamcrest.MatcherAssert.assertThat;

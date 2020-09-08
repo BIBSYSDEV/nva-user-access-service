@@ -1,4 +1,4 @@
-package no.unit.nva.databases;
+package no.unit.nva.database;
 
 import static no.unit.nva.database.DatabaseServiceWithTableNameOverride.createMapperOverridingHardCodedTableName;
 import static no.unit.nva.model.DoesNotHaveNullFields.doesNotHaveNullFields;
@@ -18,9 +18,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import no.unit.nva.database.DatabaseAccessor;
-import no.unit.nva.database.RoleDb;
-import no.unit.nva.database.UserDb;
 import no.unit.nva.database.UserDb.Builder;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.attempt.Try;

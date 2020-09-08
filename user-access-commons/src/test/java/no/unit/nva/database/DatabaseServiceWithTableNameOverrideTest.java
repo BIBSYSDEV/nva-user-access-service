@@ -1,4 +1,4 @@
-package no.unit.nva.databases;
+package no.unit.nva.database;
 
 import static no.unit.nva.database.DatabaseServiceWithTableNameOverride.DYNAMO_DB_CLIENT_NOT_SET_ERROR;
 import static no.unit.nva.database.DatabaseServiceWithTableNameOverride.createMapperOverridingHardCodedTableName;

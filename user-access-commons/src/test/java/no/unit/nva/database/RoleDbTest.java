@@ -1,4 +1,4 @@
-package no.unit.nva.databases;
+package no.unit.nva.database;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

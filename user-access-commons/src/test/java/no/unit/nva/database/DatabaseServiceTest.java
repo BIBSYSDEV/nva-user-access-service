@@ -1,4 +1,4 @@
-package no.unit.nva.databases;
+package no.unit.nva.database;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.model.DoesNotHaveNullFields.doesNotHaveNullFields;
