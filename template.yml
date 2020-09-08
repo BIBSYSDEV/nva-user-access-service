@@ -42,8 +42,10 @@ Resources:
   LambdaAuthorizer:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
+      CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.authorizer.LambdaAuthorizer::handleRequest
+      Layers:
+        - !Ref UserAccessCommonsLayer
       Runtime: java11
       MemorySize: 1408
       Environment:
@@ -401,11 +403,24 @@ Resources:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaAuthorizer.Arn}/invocations
                 identitySource: method.request.header.Authorization
 
+  UserAccessCommonsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: user-access-commons-layer
+      Description: User Access Commons
+      ContentUri: user-access-commons/build/distributions/user-access-commons.zip
+      CompatibleRuntimes:
+        - java11
+      LicenseInfo: 'MIT'
+      RetentionPolicy: Retain
+
   AddRoleHandler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
+      CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.AddRoleHandler::handleRequest
+      Layers:
+        - !Ref UserAccessCommonsLayer
       Runtime: java11
       MemorySize: 1408
       Environment:
@@ -426,8 +441,10 @@ Resources:
   GetRoleHandler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
+      CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.GetRoleHandler::handleRequest
+      Layers:
+        - !Ref UserAccessCommonsLayer
       Runtime: java11
       MemorySize: 1408
       Environment:
@@ -447,8 +464,10 @@ Resources:
   AddUserHandler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
+      CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.AddUserHandler::handleRequest
+      Layers:
+        - !Ref UserAccessCommonsLayer
       Runtime: java11
       MemorySize: 1408
       Environment:
@@ -469,8 +488,10 @@ Resources:
   GetUserHandler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
+      CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.GetUserHandler::handleRequest
+      Layers:
+        - !Ref UserAccessCommonsLayer
       Runtime: java11
       MemorySize: 1408
       Environment:
@@ -490,8 +511,10 @@ Resources:
   UpdateUserHandler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
+      CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.UpdateUserHandler::handleRequest
+      Layers:
+        - !Ref UserAccessCommonsLayer
       Runtime: java11
       MemorySize: 1408
       Environment:
@@ -511,8 +534,10 @@ Resources:
   ListByInstitutionHandler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
+      CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.ListByInstitutionHandler::handleRequest
+      Layers:
+        - !Ref UserAccessCommonsLayer
       Runtime: java11
       MemorySize: 1408
       Environment:
@@ -532,8 +557,10 @@ Resources:
   ServiceGetUserHandler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
+      CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.GetUserHandler::handleRequest
+      Layers:
+        - !Ref UserAccessCommonsLayer
       Runtime: java11
       MemorySize: 1408
       Environment:
@@ -553,8 +580,10 @@ Resources:
   ServiceUpdateUserHandler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
+      CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.UpdateUserHandler::handleRequest
+      Layers:
+        - !Ref UserAccessCommonsLayer
       Runtime: java11
       MemorySize: 1408
       Environment:
@@ -574,8 +603,10 @@ Resources:
   ServiceAddUserHandler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: .
+      CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.AddUserHandler::handleRequest
+      Layers:
+        - !Ref UserAccessCommonsLayer
       Runtime: java11
       MemorySize: 1408
       Environment:

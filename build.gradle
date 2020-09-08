@@ -10,6 +10,7 @@ allprojects {
     apply plugin: 'nebula.lint'
 
     gradleLint {
+        //TODO: fix gradle linting after refactor
         //rules = ['all-dependency', 'duplicate-dependency-class', 'unused-exclude-by-dep']
         rules = ['unused-dependency']
     }

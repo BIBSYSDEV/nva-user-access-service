@@ -29,6 +29,8 @@ dependencies {
     testImplementation project(':user-access-testing')
 }
 
+configurations.testImplementation.canBeResolved = true
+
 task copyNativeDeps(type: Copy) {
     from(configurations.testImplementation) {
         include "*.dylib"
@@ -42,3 +44,22 @@ test.dependsOn copyNativeDeps
 test.doFirst {
     systemProperty "java.library.path", 'build/dynamodb-local'
 }
+
+// Build and package user-access-commons and dependencies for Lambda Layer
+
+configurations.api.canBeResolved = true
+
+task copyDepsForLayer(type: Copy) {
+    from(configurations.api) {
+    }
+    into 'build/libs'
+}
+
+task buildZipForLayer(type: Zip) {
+    from('build/libs') {
+    }
+    into('java/lib')
+}
+
+buildZipForLayer.dependsOn copyDepsForLayer
+build.dependsOn buildZipForLayer
