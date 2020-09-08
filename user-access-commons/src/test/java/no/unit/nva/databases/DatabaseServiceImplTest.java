@@ -1,4 +1,4 @@
-package no.unit.nva.database;
+package no.unit.nva.databases;
 
 import static nva.commons.utils.attempt.Try.attempt;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -12,6 +12,11 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 import java.util.stream.Stream;
+import no.unit.nva.database.DatabaseAccessor;
+import no.unit.nva.database.DatabaseService;
+import no.unit.nva.database.DatabaseServiceImpl;
+import no.unit.nva.database.RoleDb;
+import no.unit.nva.database.UserDb;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;

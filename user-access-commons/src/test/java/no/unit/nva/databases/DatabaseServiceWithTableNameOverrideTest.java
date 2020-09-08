@@ -1,4 +1,4 @@
-package no.unit.nva.database;
+package no.unit.nva.databases;
 
 import static no.unit.nva.database.DatabaseServiceWithTableNameOverride.DYNAMO_DB_CLIENT_NOT_SET_ERROR;
 import static no.unit.nva.database.DatabaseServiceWithTableNameOverride.createMapperOverridingHardCodedTableName;
@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import no.unit.nva.database.DatabaseServiceWithTableNameOverride;
 import no.unit.nva.database.interfaces.WithEnvironment;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;

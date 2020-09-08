@@ -6,9 +6,6 @@ import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
 import static no.unit.nva.database.DatabaseIndexDetails.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
 import static no.unit.nva.database.DatabaseIndexDetails.SECONDARY_INDEX_1_HASH_KEY;
 import static no.unit.nva.database.DatabaseIndexDetails.SECONDARY_INDEX_1_RANGE_KEY;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
@@ -28,7 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 import no.unit.nva.database.interfaces.WithEnvironment;
 import nva.commons.utils.Environment;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 
 public abstract class DatabaseAccessor implements WithEnvironment {
 
@@ -55,15 +55,15 @@ public abstract class DatabaseAccessor implements WithEnvironment {
         String tableName = readTableNameFromEnvironment();
         CreateTableResult createTableResult = createTable(localDynamo, tableName);
         TableDescription tableDescription = createTableResult.getTableDescription();
-        assertEquals(tableName, tableDescription.getTableName());
+        Assertions.assertEquals(tableName, tableDescription.getTableName());
 
         assertThatTableKeySchemaContainsBothKeys(tableDescription.getKeySchema());
 
-        assertEquals("ACTIVE", tableDescription.getTableStatus());
-        assertThat(tableDescription.getTableArn(), containsString(tableName));
+        Assertions.assertEquals("ACTIVE", tableDescription.getTableStatus());
+        MatcherAssert.assertThat(tableDescription.getTableArn(), CoreMatchers.containsString(tableName));
 
         ListTablesResult tables = localDynamo.listTables();
-        assertEquals(SINGLE_TABLE_EXPECTED, tables.getTableNames().size());
+        Assertions.assertEquals(SINGLE_TABLE_EXPECTED, tables.getTableNames().size());
         return localDynamo;
     }
 
@@ -78,8 +78,8 @@ public abstract class DatabaseAccessor implements WithEnvironment {
     }
 
     private void assertThatTableKeySchemaContainsBothKeys(List<KeySchemaElement> tableKeySchema) {
-        assertThat(tableKeySchema.toString(), containsString(PRIMARY_KEY_HASH_KEY));
-        assertThat(tableKeySchema.toString(), containsString(DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY));
+        MatcherAssert.assertThat(tableKeySchema.toString(), CoreMatchers.containsString(PRIMARY_KEY_HASH_KEY));
+        MatcherAssert.assertThat(tableKeySchema.toString(), CoreMatchers.containsString(PRIMARY_KEY_RANGE_KEY));
     }
 
     private AmazonDynamoDB createLocalDynamoDbMock() {

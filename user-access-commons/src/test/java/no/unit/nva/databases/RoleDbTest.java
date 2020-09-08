@@ -1,4 +1,4 @@
-package no.unit.nva.database;
+package no.unit.nva.databases;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -12,6 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import no.unit.nva.database.DatabaseAccessor;
+import no.unit.nva.database.DatabaseServiceWithTableNameOverride;
+import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.RoleDb.Builder;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import org.junit.jupiter.api.BeforeEach;

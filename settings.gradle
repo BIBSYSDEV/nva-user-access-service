@@ -1,3 +1,4 @@
 rootProject.name = 'nva-user-access-management'
 include 'user-access-commons'
+include 'user-access-testing'
 include 'user-access-handlers'

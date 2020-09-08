@@ -1,4 +1,4 @@
-package no.unit.nva.database;
+package no.unit.nva.databases;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.model.DoesNotHaveNullFields.doesNotHaveNullFields;
@@ -17,6 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
+import no.unit.nva.database.DatabaseAccessor;
+import no.unit.nva.database.DatabaseService;
+import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
