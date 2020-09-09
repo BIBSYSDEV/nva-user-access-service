@@ -79,7 +79,7 @@ public abstract class DatabaseAccessor implements WithEnvironment {
 
     private void assertThatTableKeySchemaContainsBothKeys(List<KeySchemaElement> tableKeySchema) {
         assertThat(tableKeySchema.toString(), containsString(PRIMARY_KEY_HASH_KEY));
-        assertThat(tableKeySchema.toString(), containsString(DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY));
+        assertThat(tableKeySchema.toString(), containsString(PRIMARY_KEY_RANGE_KEY));
     }
 
     private AmazonDynamoDB createLocalDynamoDbMock() {
