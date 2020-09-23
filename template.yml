@@ -341,7 +341,7 @@ Resources:
               summary: Lists users of specified institution
               parameters:
                 - in: query
-                  name: institituion
+                  name: institution
                   schema:
                     type: string
                   required: true
