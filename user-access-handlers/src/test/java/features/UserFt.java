@@ -253,7 +253,7 @@ public class UserFt extends ScenarioTest {
     private void addInstitutionToPathParameters(String institution) {
         getRequestBuilder().withPathParameters(
             Collections.singletonMap(
-                ListByInstitutionHandler.INSTITUTION_ID_PATH_PARAMETER,
+                ListByInstitutionHandler.INSTITUTION_ID_QUERY_PARAMETER,
                 institution));
     }
 

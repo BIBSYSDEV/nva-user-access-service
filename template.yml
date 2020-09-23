@@ -336,12 +336,12 @@ Resources:
                 responses: {}
                 httpMethod: POST
                 type: aws_proxy
-          /institutions/{institution}/users:
+          /institutions/users:
             get:
               summary: Lists users of specified institution
               parameters:
-                - in: path
-                  name: institution
+                - in: query
+                  name: institituion
                   schema:
                     type: string
                   required: true
