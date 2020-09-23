@@ -1,6 +1,6 @@
 package no.unit.nva.handlers;
 
-import static no.unit.nva.handlers.ListByInstitutionHandler.INSTITUTION_ID_PATH_PARAMETER;
+import static no.unit.nva.handlers.ListByInstitutionHandler.INSTITUTION_ID_QUERY_PARAMETER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -113,7 +113,7 @@ class ListByInstitutionHandlerTest extends HandlerTest {
 
         Executable action = () -> listByInstitutionHandler.processInput(null, requestInfo, context);
         IllegalStateException exception = assertThrows(IllegalStateException.class, action);
-        assertThat(exception.getMessage(), containsString(ListByInstitutionHandler.MISSING_PATH_PARAMETER_ERROR));
+        assertThat(exception.getMessage(), containsString(ListByInstitutionHandler.MISSING_QUERY_PARAMETER_ERROR));
     }
 
     private void assertThatResponseIsSuccessful(GatewayResponse<UserList> response) {
@@ -177,9 +177,9 @@ class ListByInstitutionHandlerTest extends HandlerTest {
     }
 
     private InputStream createListRequest(String institutionId) throws JsonProcessingException {
-        Map<String, String> pathParams = Map.of(INSTITUTION_ID_PATH_PARAMETER, institutionId);
+        Map<String, String> queryParams = Map.of(INSTITUTION_ID_QUERY_PARAMETER, institutionId);
         return new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
-            .withPathParameters(pathParams)
+            .withQueryParameters(queryParams)
             .build();
     }
 }

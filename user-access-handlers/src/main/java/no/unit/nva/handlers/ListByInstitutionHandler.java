@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
 
 public class ListByInstitutionHandler extends ApiGatewayHandler<Void, UserList> {
 
-    public static final String INSTITUTION_ID_PATH_PARAMETER = "institution";
-    public static final String MISSING_PATH_PARAMETER_ERROR = "Missing institution path parameter. "
+    public static final String INSTITUTION_ID_QUERY_PARAMETER = "institution";
+    public static final String MISSING_QUERY_PARAMETER_ERROR = "Missing institution path parameter. "
         + "Probably error in the Lambda function definition.";
     private final DatabaseService databaseService;
 
@@ -49,9 +49,9 @@ public class ListByInstitutionHandler extends ApiGatewayHandler<Void, UserList> 
 
     private String extractInstitutionIdFromRequest(RequestInfo requestInfo) {
         return Optional.of(requestInfo)
-            .map(RequestInfo::getPathParameters)
-            .map(pathParams -> pathParams.get(INSTITUTION_ID_PATH_PARAMETER))
+            .map(RequestInfo::getQueryParameters)
+            .map(queryParams -> queryParams.get(INSTITUTION_ID_QUERY_PARAMETER))
             .filter(not(String::isBlank))
-            .orElseThrow(() -> new IllegalStateException(MISSING_PATH_PARAMETER_ERROR));
+            .orElseThrow(() -> new IllegalStateException(MISSING_QUERY_PARAMETER_ERROR));
     }
 }
