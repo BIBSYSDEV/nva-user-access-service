@@ -551,8 +551,11 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /institutions/{institution}/users
+            Path: /institutions/users
             Method: get
+            RequestParameters:
+              - method.request.querystring.institution:
+                  Required: true
             RestApiId: !Ref ExternalApi
   ServiceGetUserHandler:
     Type: AWS::Serverless::Function
