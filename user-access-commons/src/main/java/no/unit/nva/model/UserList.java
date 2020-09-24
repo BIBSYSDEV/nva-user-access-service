@@ -12,6 +12,7 @@ public class UserList implements List<UserDto> {
 
     private final List<UserDto> users;
 
+    @JacocoGenerated
     public UserList() {
         this.users = new ArrayList<>();
     }
@@ -188,5 +189,9 @@ public class UserList implements List<UserDto> {
     @JacocoGenerated
     public int hashCode() {
         return Objects.hash(users);
+    }
+
+    public List<UserDto> getWrappedList() {
+        return this.users;
     }
 }
