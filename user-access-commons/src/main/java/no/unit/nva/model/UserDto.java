@@ -37,6 +37,7 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
     private String institution;
     private String givenName;
     private String familyName;
+    private String cristinId;
 
     public UserDto() {
         roles = new ArrayList<>();
@@ -48,6 +49,7 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
         setFamilyName(builder.familyName);
         setInstitution(builder.institution);
         setRoles(builder.roles);
+        setCristinId(builder.cristinId);
     }
 
     /**
@@ -123,6 +125,10 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
         return institution;
     }
 
+    public String getCristinId() {
+        return this.cristinId;
+    }
+
     private void setInstitution(String institution) {
         this.institution = institution;
     }
@@ -133,6 +139,10 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
 
     private void setRoles(List<RoleDto> roles) {
         this.roles = roles;
+    }
+
+    private void setCristinId(String cristinId) {
+        this.cristinId = cristinId;
     }
 
     @Override
@@ -179,6 +189,7 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
             && Objects.equals(getGivenName(), userDto.getGivenName())
             && Objects.equals(getFamilyName(), userDto.getFamilyName())
             && Objects.equals(getInstitution(), userDto.getInstitution())
+            && Objects.equals(getCristinId(), userDto.getCristinId())
             && Objects.equals(getRoles(), userDto.getRoles());
     }
 
@@ -224,6 +235,7 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
         private String familyName;
         private String institution;
         private List<RoleDto> roles;
+        private String cristinId;
 
         private Builder() {
             roles = Collections.emptyList();
@@ -251,6 +263,11 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
 
         public Builder withFamilyName(String familyName) {
             this.familyName = familyName;
+            return this;
+        }
+
+        public Builder withCristinId(String cristinId) {
+            this.cristinId = cristinId;
             return this;
         }
 

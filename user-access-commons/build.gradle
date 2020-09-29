@@ -17,6 +17,10 @@ dependencies {
     api(group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.2.1') {
         because("It implements lambda handlers")
     }
+    api(group: 'com.amazonaws', name: 'aws-java-sdk-cognitoidp', version: awsSdkVersion) {
+        because("User Service needs to update cognitos user pool")
+    }
+
     api group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: '0.5.1'
     api(group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4') {
         because "Because we use the library directly to define loggers in our code"

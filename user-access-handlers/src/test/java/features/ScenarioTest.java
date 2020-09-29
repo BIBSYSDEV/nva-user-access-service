@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.util.Map;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.interfaces.WithEnvironment;
+import no.unit.nva.idp.CognitoUserPoolService;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.handlers.ApiGatewayHandler;
 import nva.commons.utils.JsonUtils;
@@ -62,6 +63,10 @@ public class ScenarioTest implements WithEnvironment {
 
     protected DatabaseServiceImpl getDatabaseService() {
         return scenarioContext.getDatabaseService();
+    }
+
+    protected CognitoUserPoolService getUserPoolService() {
+        return scenarioContext.getUserPoolService();
     }
 
     protected <I> I getResponseBody(Class<I> requestBodyClass) throws IOException {

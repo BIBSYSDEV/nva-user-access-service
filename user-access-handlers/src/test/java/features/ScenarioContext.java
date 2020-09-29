@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.database.DatabaseServiceImpl;
+import no.unit.nva.idp.CognitoUserPoolService;
+import no.unit.nva.idp.UserPoolService;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -20,6 +22,7 @@ public class ScenarioContext {
     private DatabaseServiceImpl databaseService;
     private final Map<String, UserDto> exampleUsers;
     private final Map<String, RoleDto> exampleRoles;
+    private CognitoUserPoolService userPoolService;
 
     public ScenarioContext() {
         this.exampleUsers = new ConcurrentHashMap<>();
@@ -64,6 +67,12 @@ public class ScenarioContext {
     protected void setDatabaseService(DatabaseServiceImpl databaseService) {
         this.databaseService = databaseService;
     }
+
+    protected CognitoUserPoolService getUserPoolService() {
+        return userPoolService;
+    }
+
+    protected void setUserPoolService(CognitoUserPoolService userPoolService) { this.userPoolService = userPoolService; }
 
     protected <T> GatewayResponse<T> getApiGatewayResponse(Class<T> responseBodyClass) throws IOException {
         JavaType typeRef = JsonUtils.objectMapper.getTypeFactory()

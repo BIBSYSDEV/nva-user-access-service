@@ -258,7 +258,7 @@ public class UserFt extends ScenarioTest {
     }
 
     private UpdateUserHandler newUpdateUserHandler() {
-        return new UpdateUserHandler(mockEnvironment(), getDatabaseService());
+        return new UpdateUserHandler(mockEnvironment(), getDatabaseService(), getUserPoolService());
     }
 
     private void sendUserUpdateRequest() throws IOException {

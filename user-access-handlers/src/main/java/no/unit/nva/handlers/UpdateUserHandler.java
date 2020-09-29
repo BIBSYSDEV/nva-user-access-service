@@ -1,5 +1,7 @@
 package no.unit.nva.handlers;
 
+import static no.unit.nva.EnvironmentConfigurationNames.COGNITO_USERPOOL_ID;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Collections;
 import java.util.Map;
@@ -8,6 +10,9 @@ import java.util.function.Supplier;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.exceptions.InvalidInputException;
+import no.unit.nva.idp.CognitoUserPoolService;
+import no.unit.nva.idp.FeideAttributeTypeMapperForNva;
+import no.unit.nva.idp.UserPoolService;
 import no.unit.nva.model.UserDto;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.handlers.RequestInfo;
@@ -24,22 +29,32 @@ public class UpdateUserHandler extends HandlerAccessingUser<UserDto, Void> {
     public static final String INCONSISTENT_USERNAME_IN_PATH_AND_OBJECT_ERROR =
         "Path username is different from input object's user-id";
     private final DatabaseService databaseService;
+    private final UserPoolService userPoolService;
+    private final String cognitoUserPoolId;
 
     @JacocoGenerated
     public UpdateUserHandler() {
         this(new Environment(),
-            new DatabaseServiceImpl());
+            new DatabaseServiceImpl(),
+            new CognitoUserPoolService());
     }
 
-    public UpdateUserHandler(Environment environment, DatabaseService databaseService) {
+    public UpdateUserHandler(Environment environment, DatabaseService databaseService, UserPoolService userPoolService) {
         super(UserDto.class, environment, createLogger());
+        this.cognitoUserPoolId = environment.readEnv(COGNITO_USERPOOL_ID.toString());
         this.databaseService = databaseService;
+        this.userPoolService = userPoolService;
     }
 
     @Override
     protected Void processInput(UserDto input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         validateRequest(input, requestInfo);
         databaseService.updateUser(input);
+        userPoolService.updateUserAttributes(
+            cognitoUserPoolId,
+            input.getUsername(),
+            FeideAttributeTypeMapperForNva.fromUserDto(input));
+
         setAdditionalHeadersSupplier(addLocationHeaderToResponseSupplier(input));
         return null;
     }

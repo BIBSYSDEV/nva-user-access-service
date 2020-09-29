@@ -26,6 +26,7 @@ import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
+import no.unit.nva.idp.CognitoUserPoolService;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.TypedObjectsDetails;
 import no.unit.nva.model.UserDto;
@@ -49,6 +50,7 @@ public class UpdateUserHandlerTest extends HandlerTest {
     public static final String ANOTHER_ROLE = "ANOTHER_ROLE";
     public static final String SOME_OTHER_USERNAME = "SomeOtherUsername";
     private DatabaseServiceImpl databaseService;
+    private CognitoUserPoolService userPoolService;
     private Context context;
 
     private ByteArrayOutputStream output;
@@ -56,6 +58,7 @@ public class UpdateUserHandlerTest extends HandlerTest {
     @BeforeEach
     public void init() {
         databaseService = new DatabaseServiceImpl(initializeTestDatabase(), envWithTableName);
+        userPoolService = mock(CognitoUserPoolService.class);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
     }
@@ -221,7 +224,7 @@ public class UpdateUserHandlerTest extends HandlerTest {
 
     private <I, O> GatewayResponse<O> sendUpdateRequest(String userId, I userUpdate)
         throws IOException {
-        UpdateUserHandler updateUserHandler = new UpdateUserHandler(envWithTableName, databaseService);
+        UpdateUserHandler updateUserHandler = new UpdateUserHandler(envWithTableName, databaseService, userPoolService);
         InputStream input = new HandlerRequestBuilder<I>(objectMapper)
             .withPathParameters(Collections.singletonMap(USERNAME_PATH_PARAMETER, userId))
             .withBody(userUpdate)
@@ -232,7 +235,7 @@ public class UpdateUserHandlerTest extends HandlerTest {
 
     private GatewayResponse<Problem> sendUpdateRequestWithoutPathParameters(UserDto userUpdate)
         throws IOException {
-        UpdateUserHandler updateUserHandler = new UpdateUserHandler(envWithTableName, databaseService);
+        UpdateUserHandler updateUserHandler = new UpdateUserHandler(envWithTableName, databaseService, userPoolService);
         InputStream input = new HandlerRequestBuilder<UserDto>(objectMapper)
             .withBody(userUpdate)
             .build();
