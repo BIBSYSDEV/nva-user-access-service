@@ -108,14 +108,14 @@ subprojects {
                 limit {
                     counter = 'METHOD'
                     value = 'COVEREDRATIO'
-                    minimum = 0.900 //TODO: to be improved after refactor
+                    minimum = 1.000
                 }
             }
             rule {
                 limit {
                     counter = 'CLASS'
                     value = 'COVEREDRATIO'
-                    minimum = 0.900 //TODO: to be improved after refactor
+                    minimum = 1.000
                 }
             }
         }

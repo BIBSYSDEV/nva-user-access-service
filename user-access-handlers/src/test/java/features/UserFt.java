@@ -170,7 +170,7 @@ public class UserFt extends ScenarioTest {
     public void the_AuthorizedClient_sends_the_request_to_list_the_users_of_the(String institution) throws IOException {
 
         initializeContextRequestBuilder(null);
-        addInstitutionToPathParameters(institution);
+        addInstitutionToQueryParameters(institution);
         ListByInstitutionHandler handler = new ListByInstitutionHandler(mockEnvironment(), getDatabaseService());
         handlerSendsRequestAndUpdatesResponse(handler);
     }
@@ -250,10 +250,10 @@ public class UserFt extends ScenarioTest {
             .collect(Collectors.toList());
     }
 
-    private void addInstitutionToPathParameters(String institution) {
-        getRequestBuilder().withPathParameters(
+    private void addInstitutionToQueryParameters(String institution) {
+        getRequestBuilder().withQueryParameters(
             Collections.singletonMap(
-                ListByInstitutionHandler.INSTITUTION_ID_PATH_PARAMETER,
+                ListByInstitutionHandler.INSTITUTION_ID_QUERY_PARAMETER,
                 institution));
     }
 
