@@ -1,23 +1,18 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.isNull;
-import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
+import static java.util.Objects.nonNull;
 import static no.unit.nva.database.DatabaseIndexDetails.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static nva.commons.utils.attempt.Try.attempt;
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
-import com.amazonaws.services.dynamodbv2.model.Condition;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import no.unit.nva.database.interfaces.WithType;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.EmptyInputException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
@@ -29,7 +24,6 @@ import no.unit.nva.model.UserDto;
 import no.unit.nva.model.Validable;
 import nva.commons.utils.Environment;
 import nva.commons.utils.JacocoGenerated;
-import nva.commons.utils.SingletonCollector;
 import nva.commons.utils.attempt.Failure;
 import nva.commons.utils.attempt.Try;
 import org.slf4j.Logger;
@@ -120,26 +114,52 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     @Override
     public RoleDto getRole(RoleDto queryObject) throws NotFoundException, InvalidEntryInternalException {
         return getRoleAsOptional(queryObject)
-            .orElseThrow(() -> new NotFoundException(ROLE_NOT_FOUND_MESSAGE + queryObject.getRoleName()));
+            .orElseThrow(() -> handleRoleNotFound(queryObject));
     }
 
     @Override
     public Optional<RoleDto> getRoleAsOptional(RoleDto queryObject) throws InvalidEntryInternalException {
         logger.debug(GET_ROLE_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(queryObject));
-        RoleDb searchObject = queryObject.toRoleDb();
-        DynamoDBQueryExpression<RoleDb> searchRoleByName = createGetQuery(searchObject);
-
-        PaginatedQueryList<RoleDb> searchRoleByNameResult = mapper.query(RoleDb.class, searchRoleByName);
-        return convertQueryResultToOptionalRole(queryObject, searchRoleByNameResult);
+        return Optional.ofNullable(attemptFetchRole(queryObject));
     }
 
     @Override
     public Optional<UserDto> getUserAsOptional(UserDto queryObject) throws InvalidEntryInternalException {
-        logger.debug(
-            GET_USER_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(queryObject));
-        DynamoDBQueryExpression<UserDb> searchUserRequest = createGetQuery(queryObject.toUserDb());
-        List<UserDb> userSearchResult = mapper.query(UserDb.class, searchUserRequest);
-        return convertQueryResultToOptionalUser(userSearchResult, queryObject);
+        logger.debug(GET_USER_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(queryObject));
+        UserDto searchResult = attemptToFetchObject(queryObject);
+        return Optional.ofNullable(searchResult);
+    }
+
+    private static String convertToStringOrWriteErrorMessage(JsonSerializable queryObject) {
+        return Optional.ofNullable(queryObject).map(JsonSerializable::toString).orElse(EMPTY_INPUT_ERROR_MESSAGE);
+    }
+
+    private NotFoundException handleRoleNotFound(RoleDto queryObject) {
+        logger.debug(ROLE_NOT_FOUND_MESSAGE + queryObject.getRoleName());
+        return new NotFoundException(ROLE_NOT_FOUND_MESSAGE + queryObject.getRoleName());
+    }
+
+    private UserDto attemptToFetchObject(UserDto queryObject) throws InvalidEntryInternalException {
+        UserDb userDb = attempt(queryObject::toUserDb)
+            .map(mapper::load)
+            .orElseThrow(this::handleError);
+        return nonNull(userDb) ? UserDto.fromUserDb(userDb) : null;
+    }
+
+    private RoleDto attemptFetchRole(RoleDto queryObject) throws InvalidEntryInternalException {
+        RoleDb roledb = Try.of(queryObject)
+            .map(RoleDto::toRoleDb)
+            .map(mapper::load)
+            .orElseThrow(this::handleError);
+        return nonNull(roledb) ? RoleDto.fromRoleDb(roledb) : null;
+    }
+
+    private <T> InvalidEntryInternalException handleError(Failure<T> fail) {
+        if (fail.getException() instanceof InvalidEntryInternalException) {
+            return (InvalidEntryInternalException) fail.getException();
+        } else {
+            throw new RuntimeException(fail.getException());
+        }
     }
 
     private DynamoDBQueryExpression<UserDb> createListUsersQuery(String institution)
@@ -176,25 +196,6 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
             .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE + queryObject.getUsername()));
     }
 
-    private Optional<RoleDto> convertQueryResultToOptionalRole(RoleDto queryObject,
-                                                               List<RoleDb> searchRoleByNameResult) {
-        return searchRoleByNameResult
-            .stream()
-            .map(attempt(RoleDto::fromRoleDb))
-            .map(attempt -> attempt.orElseThrow(this::unexpectedException))
-            .collect(SingletonCollector.tryCollect())
-            .toOptional(failure -> logger.debug(ROLE_NOT_FOUND_MESSAGE + queryObject.getRoleName()));
-    }
-
-    private Optional<UserDto> convertQueryResultToOptionalUser(List<UserDb> userSearchResult, UserDto queryObject) {
-        return userSearchResult
-            .stream()
-            .map(attempt(UserDto::fromUserDb))
-            .map(attempt -> attempt.orElseThrow(this::unexpectedException))
-            .collect(SingletonCollector.tryCollect())
-            .toOptional(failure -> logger.debug(USER_NOT_FOUND_MESSAGE + queryObject.getUsername()));
-    }
-
     private void checkRoleDoesNotExist(RoleDto roleDto) throws ConflictException, InvalidEntryInternalException {
         if (roleAlreadyExists(roleDto)) {
             throw new ConflictException(ROLE_ALREADY_EXISTS_ERROR_MESSAGE + roleDto.getRoleName());
@@ -207,26 +208,5 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
 
     private boolean userAlreadyExists(UserDto user) throws InvalidEntryInternalException {
         return this.getUserAsOptional(user).isPresent();
-    }
-
-    private static String convertToStringOrWriteErrorMessage(JsonSerializable queryObject) {
-        return Optional.ofNullable(queryObject).map(JsonSerializable::toString).orElse(EMPTY_INPUT_ERROR_MESSAGE);
-    }
-
-    private static <I extends WithType> DynamoDBQueryExpression<I> createGetQuery(I searchObject) {
-        return new DynamoDBQueryExpression<I>()
-            .withHashKeyValues(searchObject)
-            .withRangeKeyCondition(PRIMARY_KEY_RANGE_KEY, entityTypeAsRangeKey(searchObject));
-    }
-
-    private static <I extends WithType> Condition entityTypeAsRangeKey(I searchObject) {
-        Condition comparisonCondition = new Condition();
-        comparisonCondition.setComparisonOperator(ComparisonOperator.EQ);
-        comparisonCondition.setAttributeValueList(List.of(new AttributeValue(searchObject.getType())));
-        return comparisonCondition;
-    }
-
-    private <I> IllegalStateException unexpectedException(Failure<I> failure) {
-        throw new IllegalStateException(INVALID_ENTRY_IN_DATABASE_ERROR, failure.getException());
     }
 }

@@ -1,8 +1,9 @@
 package no.unit.nva.database.interfaces;
 
 import static java.util.Objects.isNull;
+import no.unit.nva.exceptions.InvalidEntryInternalException;
 
-public abstract class DynamoEntry implements WithType {
+public abstract class DynamoEntryWithRangeKey implements WithType {
 
     @SuppressWarnings("PMD.ConstantsInInterface")
     public static String FIELD_DELIMITER = "#";
@@ -11,10 +12,7 @@ public abstract class DynamoEntry implements WithType {
 
     public abstract String getPrimaryRangeKey();
 
-    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
-    public final void setPrimaryRangeKey(String primaryRangeKey) {
-        // DO NOTHING.
-    }
+    public abstract void setPrimaryRangeKey(String primaryRangeKey) throws InvalidEntryInternalException;
 
     @Override
     public abstract String getType();
@@ -29,7 +27,11 @@ public abstract class DynamoEntry implements WithType {
         // DO NOTHING
     }
 
-    protected boolean primaryKeyHasNotBeenSet() {
+    protected boolean primaryHashKeyHasNotBeenSet() {
         return isNull(getPrimaryHashKey());
+    }
+
+    protected boolean primaryRangeKeyHasNotBeenSet() {
+        return isNull(getPrimaryRangeKey());
     }
 }

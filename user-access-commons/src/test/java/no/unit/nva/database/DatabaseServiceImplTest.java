@@ -7,11 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
-import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
-import java.util.stream.Stream;
+import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
@@ -27,6 +24,7 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
 
     public static final String SOME_INSTITUTION = "someInstitution";
     public static final String SOME_USERNAME = "someUsername";
+    public static final String EXPECTED_EXCEPTION_MESSAGE = "ExpectedExceptionMessage";
 
     private UserDto someUser;
     private DatabaseServiceImpl databaseService;
@@ -39,7 +37,7 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
     }
 
     @Test
-    public void getUserThrowsIllegalStateExceptionWhenItReceivesInvalidUserFromDatabase() {
+    public void getUserThrowsInvalidEntryInternalExceptionWhenItReceivesInvalidUserFromDatabase() {
 
         UserDb userWithoutUsername = new UserDb();
         userWithoutUsername.setInstitution(SOME_INSTITUTION);
@@ -47,21 +45,34 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
         DatabaseService service = mockServiceReceivingInvalidUserDbInstance();
 
         Executable action = () -> service.getUser(someUser);
-        IllegalStateException exception = assertThrows(IllegalStateException.class, action);
+        InvalidEntryInternalException exception = assertThrows(InvalidEntryInternalException.class, action);
 
-        String expectedMessageContent = DatabaseServiceImpl.INVALID_ENTRY_IN_DATABASE_ERROR;
+        String expectedMessageContent = UserDto.MISSING_FIELD_ERROR;
         assertThat(exception.getMessage(), containsString(expectedMessageContent));
     }
 
     @Test
-    public void getRoleThrowsIllegalStateExceptionWhenItReceivesInvalidUserFromDatabase() {
+    public void getRoleExceptionWhenItReceivesInvalidRoleFromDatabase()
+        throws InvalidEntryInternalException {
+
+        DatabaseService serviceThrowingException = mockServiceThrowsExceptionWhenLoadingRole();
+        RoleDto sampleRole = EntityUtils.createRole(EntityUtils.SOME_ROLENAME);
+        Executable action = () -> serviceThrowingException.getRole(sampleRole);
+        RuntimeException exception = assertThrows(RuntimeException.class, action);
+
+        assertThat(exception.getMessage(), containsString(EXPECTED_EXCEPTION_MESSAGE));
+    }
+
+    @Test
+    public void getRoleThrowsInvalidEntryInternalExceptionWhenItReceivesInvalidRoleFromDatabase()
+        throws InvalidEntryInternalException {
 
         DatabaseService service = mockServiceReceivingInvalidRoleDbInstance();
+        RoleDto sampleRole = EntityUtils.createRole(EntityUtils.SOME_ROLENAME);
+        Executable action = () -> service.getRole(sampleRole);
+        InvalidEntryInternalException exception = assertThrows(InvalidEntryInternalException.class, action);
 
-        Executable action = () -> service.getUser(someUser);
-        IllegalStateException exception = assertThrows(IllegalStateException.class, action);
-
-        String expectedMessageContent = DatabaseServiceImpl.INVALID_ENTRY_IN_DATABASE_ERROR;
+        String expectedMessageContent = RoleDto.MISSING_ROLE_NAME_ERROR;
         assertThat(exception.getMessage(), containsString(expectedMessageContent));
     }
 
@@ -74,56 +85,45 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
             StringContains.containsString(DatabaseServiceImpl.ROLE_NOT_FOUND_MESSAGE));
     }
 
-    @Test
-    public void getUserLogsWarningWhenNotFoundExceptionIsThrown() {
-        TestAppender testAppender = LogUtils.getTestingAppender(DatabaseServiceImpl.class);
-        UserDto nonExistingUser = someUser;
-        attempt(() -> databaseService.getUser(nonExistingUser));
-        assertThat(testAppender.getMessages(),
-            StringContains.containsString(DatabaseServiceImpl.USER_NOT_FOUND_MESSAGE));
-    }
 
     private DatabaseService mockServiceReceivingInvalidUserDbInstance() {
         UserDb userWithoutUsername = new UserDb();
-        PaginatedQueryList<UserDb> response = mockResponseFromDynamoMapper(userWithoutUsername);
-        DynamoDBMapper mockMapper = mockDynamoMapperReturningInvalidUser(response);
+        DynamoDBMapper mockMapper = mockDynamoMapperReturningInvalidUser(userWithoutUsername);
         return new DatabaseServiceImpl(mockMapper);
     }
 
     private DatabaseService mockServiceReceivingInvalidRoleDbInstance() {
         RoleDb roleWithoutName = new RoleDb();
-        PaginatedQueryList<RoleDb> response = mockResponseFromDynamoMapper(roleWithoutName);
-        DynamoDBMapper mockMapper = mockDynamoMapperReturningInvalidRole(response);
+
+        DynamoDBMapper mockMapper = mockDynamoMapperReturningInvalidRole(roleWithoutName);
         return new DatabaseServiceImpl(mockMapper);
     }
 
-    @SuppressWarnings("unchecked")
-    private DynamoDBMapper mockDynamoMapperReturningInvalidUser(PaginatedQueryList<UserDb> response) {
+    private DatabaseService mockServiceThrowsExceptionWhenLoadingRole() {
+        DynamoDBMapper mockMapper = mockMapperThrowingException();
+        return new DatabaseServiceImpl(mockMapper);
+    }
+
+    private DynamoDBMapper mockMapperThrowingException() {
         DynamoDBMapper mockMapper = mock(DynamoDBMapper.class);
-        when(mockMapper.query(any(Class.class), any(DynamoDBQueryExpression.class)))
-            .thenReturn(response);
+        when(mockMapper.load(any())).thenAnswer(invocation -> {
+            throw new AmazonDynamoDBException(EXPECTED_EXCEPTION_MESSAGE);
+        });
         return mockMapper;
     }
 
     @SuppressWarnings("unchecked")
-    private DynamoDBMapper mockDynamoMapperReturningInvalidRole(PaginatedQueryList<RoleDb> response) {
+    private DynamoDBMapper mockDynamoMapperReturningInvalidUser(UserDb response) {
         DynamoDBMapper mockMapper = mock(DynamoDBMapper.class);
-        when(mockMapper.query(any(Class.class), any(DynamoDBQueryExpression.class)))
-            .thenReturn(response);
+        when(mockMapper.load(any(UserDb.class))).thenReturn(response);
         return mockMapper;
     }
 
     @SuppressWarnings("unchecked")
-    private PaginatedQueryList<UserDb> mockResponseFromDynamoMapper(UserDb userWithoutUsername) {
-        PaginatedQueryList<UserDb> response = mock(PaginatedQueryList.class);
-        when(response.stream()).thenReturn(Stream.of(userWithoutUsername));
-        return response;
-    }
-
-    @SuppressWarnings("unchecked")
-    private PaginatedQueryList<RoleDb> mockResponseFromDynamoMapper(RoleDb roleWithoutName) {
-        PaginatedQueryList<RoleDb> response = mock(PaginatedQueryList.class);
-        when(response.stream()).thenReturn(Stream.of(roleWithoutName));
-        return response;
+    private DynamoDBMapper mockDynamoMapperReturningInvalidRole(RoleDb response) {
+        DynamoDBMapper mockMapper = mock(DynamoDBMapper.class);
+        when(mockMapper.load(any(RoleDb.class)))
+            .thenReturn(response);
+        return mockMapper;
     }
 }

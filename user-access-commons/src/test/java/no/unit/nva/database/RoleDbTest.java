@@ -10,7 +10,6 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.text.IsEmptyString.emptyString;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import no.unit.nva.database.RoleDb.Builder;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
@@ -77,7 +76,8 @@ public class RoleDbTest extends DatabaseAccessor {
     @Test
     void roleDbRoleNameIsSavedInDatabase() {
         mapper.save(sampleRole);
-        RoleDb retrievedRole = mapper.load(RoleDb.class, sampleRole.getPrimaryHashKey());
+        RoleDb retrievedRole = mapper.load(RoleDb.class, sampleRole.getPrimaryHashKey(),
+            sampleRole.getPrimaryRangeKey());
         assertThat(retrievedRole, is(equalTo(sampleRole)));
     }
 

@@ -3,26 +3,27 @@ package no.unit.nva.database;
 import static java.util.Objects.isNull;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
-
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import java.util.Objects;
-import no.unit.nva.database.interfaces.DynamoEntry;
+import no.unit.nva.database.interfaces.DynamoEntryWithRangeKey;
 import no.unit.nva.database.interfaces.WithCopy;
 import no.unit.nva.database.interfaces.WithType;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.JacocoGenerated;
 
 @DynamoDBTable(tableName = "OverridenByEnvironmentVariable")
-public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder>, WithType {
+public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<RoleDb.Builder>, WithType {
 
-    private static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey should start with \"ROLE\"";
     public static String TYPE = "ROLE";
+    public static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey should start with \"" + TYPE + "\"";
+    public static final String INVALID_PRIMARY_RANGE_KEY = "PrimaryHashKey should start with \"" + TYPE + "\"";
 
     private String primaryHashKey;
     private String name;
+    private String primaryRangeKey;
 
     public RoleDb() {
         super();
@@ -32,6 +33,7 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder>, Wit
         super();
         setName(builder.name);
         setPrimaryHashKey(builder.primaryHashKey);
+        setPrimaryRangeKey(builder.primaryRangeKey);
     }
 
     public static Builder newBuilder() {
@@ -54,7 +56,7 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder>, Wit
      */
     @JacocoGenerated
     public void setPrimaryHashKey(String primaryHashKey) throws InvalidEntryInternalException {
-        if (primaryKeyHasNotBeenSet()) {
+        if (primaryHashKeyHasNotBeenSet()) {
             if (!primaryHashKey.startsWith(TYPE)) {
                 throw new InvalidEntryInternalException(INVALID_PRIMARY_HASH_KEY);
             }
@@ -65,7 +67,17 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder>, Wit
     @DynamoDBRangeKey(attributeName = PRIMARY_KEY_RANGE_KEY)
     @Override
     public String getPrimaryRangeKey() {
-        return getType();
+        return this.primaryRangeKey;
+    }
+
+    @Override
+    public void setPrimaryRangeKey(String primaryRangeKey) throws InvalidEntryInternalException {
+        if (primaryRangeKeyHasNotBeenSet()) {
+            if (!primaryRangeKey.startsWith(TYPE)) {
+                throw new InvalidEntryInternalException(INVALID_PRIMARY_RANGE_KEY);
+            }
+            this.primaryRangeKey = primaryRangeKey;
+        }
     }
 
     @JacocoGenerated
@@ -101,13 +113,15 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder>, Wit
             return false;
         }
         RoleDb roleDb = (RoleDb) o;
-        return getName().equals(roleDb.getName());
+        return Objects.equals(getPrimaryHashKey(), roleDb.getPrimaryHashKey())
+            && Objects.equals(getName(), roleDb.getName())
+            && Objects.equals(getPrimaryRangeKey(), roleDb.getPrimaryRangeKey());
     }
 
     @Override
     @JacocoGenerated
     public int hashCode() {
-        return Objects.hash(getName());
+        return Objects.hash(getPrimaryHashKey(), getName(), getPrimaryRangeKey());
     }
 
     public static final class Builder {
@@ -115,6 +129,7 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder>, Wit
         public static final String EMPTY_ROLE_NAME_ERROR = "Rolename cannot be null or blank";
         private String name;
         private String primaryHashKey;
+        private String primaryRangeKey;
 
         private Builder() {
         }
@@ -126,7 +141,12 @@ public class RoleDb extends DynamoEntry implements WithCopy<RoleDb.Builder>, Wit
 
         public RoleDb build() throws InvalidEntryInternalException {
             this.primaryHashKey = formatPrimaryHashKey();
+            this.primaryRangeKey = formatPrimaryRangeKey();
             return new RoleDb(this);
+        }
+
+        private String formatPrimaryRangeKey() throws InvalidEntryInternalException {
+            return this.formatPrimaryHashKey();
         }
 
         private String formatPrimaryHashKey() throws InvalidEntryInternalException {

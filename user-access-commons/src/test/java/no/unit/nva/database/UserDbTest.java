@@ -13,7 +13,6 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,17 +42,6 @@ public class UserDbTest extends DatabaseAccessor {
         sampleUser.setPrimaryHashKey("SomeOtherHashKey");
         String expectedHashKey = String.join(UserDb.FIELD_DELIMITER, UserDb.TYPE, SOME_USERNAME);
         assertThat(sampleUser.getPrimaryHashKey(), is(equalTo(expectedHashKey)));
-    }
-
-    private static List<RoleDb> createSampleRoles() {
-        return Stream.of("Role1", "Role2")
-            .map(attempt(UserDbTest::newRole))
-            .map(Try::get)
-            .collect(Collectors.toList());
-    }
-
-    private static RoleDb newRole(String str) throws InvalidEntryInternalException {
-        return RoleDb.newBuilder().withName(str).build();
     }
 
     @BeforeEach
@@ -118,7 +106,8 @@ public class UserDbTest extends DatabaseAccessor {
         DynamoDBMapper mapper = clientToLocalDatabase();
         mapper.save(insertedUser);
         assertThat(insertedUser, doesNotHaveNullFields());
-        UserDb savedUser = mapper.load(UserDb.class, insertedUser.getPrimaryHashKey());
+        UserDb savedUser = mapper.load(UserDb.class, insertedUser.getPrimaryHashKey(),
+            insertedUser.getPrimaryRangeKey());
         assertThat(savedUser, is(equalTo(insertedUser)));
     }
 
@@ -159,6 +148,17 @@ public class UserDbTest extends DatabaseAccessor {
         Executable action = () -> userDb.setPrimaryHashKey("SomeKey");
         InvalidEntryInternalException exception = assertThrows(InvalidEntryInternalException.class, action);
         assertThat(exception.getMessage(), containsString(UserDb.INVALID_PRIMARY_HASH_KEY));
+    }
+
+    private static List<RoleDb> createSampleRoles() {
+        return Stream.of("Role1", "Role2")
+            .map(attempt(UserDbTest::newRole))
+            .map(Try::get)
+            .collect(Collectors.toList());
+    }
+
+    private static RoleDb newRole(String str) throws InvalidEntryInternalException {
+        return RoleDb.newBuilder().withName(str).build();
     }
 
     private DynamoDBMapper clientToLocalDatabase() {

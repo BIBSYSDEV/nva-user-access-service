@@ -3,14 +3,16 @@ package no.unit.nva.database.interfaces;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
-class DynamoEntryTest {
+class DynamoEntryWithRangeKeyTest {
 
     public static final String SOME_TYPE = "SomeType";
+    public static final String SOME_INVALID_KEY = "SomeInvalidKey";
 
     @Test
     void setTypeHasNoEffect() throws InvalidEntryInternalException {
@@ -22,10 +24,18 @@ class DynamoEntryTest {
     }
 
     @Test
-    void setPrimaryRangeKey() throws InvalidEntryInternalException {
+    void setPrimaryRangeKeyIsNotActivatedWhenRangeKeyHasBeenSet() throws InvalidEntryInternalException {
         RoleDb roleDb = RoleDb.newBuilder().withName("SomeName").build();
         RoleDb copy = roleDb.copy().build();
-        copy.setPrimaryRangeKey(SOME_TYPE);
+        copy.setPrimaryRangeKey(SOME_INVALID_KEY);
         assertThat(copy, is(equalTo(roleDb)));
+    }
+
+    @Test
+    void setPrimaryRangeKeyThrowsExceptionRangeKeyIsInvalid() {
+        RoleDb roleDb = new RoleDb();
+        Executable action = () -> roleDb.setPrimaryRangeKey(SOME_INVALID_KEY);
+        InvalidEntryInternalException exception = assertThrows(InvalidEntryInternalException.class, action);
+        assertThat(exception.getMessage(), is(equalTo(RoleDb.INVALID_PRIMARY_RANGE_KEY)));
     }
 }
