@@ -134,27 +134,12 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
         return Optional.ofNullable(queryObject).map(JsonSerializable::toString).orElse(EMPTY_INPUT_ERROR_MESSAGE);
     }
 
-    private NotFoundException handleRoleNotFound(RoleDto queryObject) {
+    private static NotFoundException handleRoleNotFound(RoleDto queryObject) {
         logger.debug(ROLE_NOT_FOUND_MESSAGE + queryObject.getRoleName());
         return new NotFoundException(ROLE_NOT_FOUND_MESSAGE + queryObject.getRoleName());
     }
 
-    private UserDto attemptToFetchObject(UserDto queryObject) throws InvalidEntryInternalException {
-        UserDb userDb = attempt(queryObject::toUserDb)
-            .map(mapper::load)
-            .orElseThrow(this::handleError);
-        return nonNull(userDb) ? UserDto.fromUserDb(userDb) : null;
-    }
-
-    private RoleDto attemptFetchRole(RoleDto queryObject) throws InvalidEntryInternalException {
-        RoleDb roledb = Try.of(queryObject)
-            .map(RoleDto::toRoleDb)
-            .map(mapper::load)
-            .orElseThrow(this::handleError);
-        return nonNull(roledb) ? RoleDto.fromRoleDb(roledb) : null;
-    }
-
-    private <T> InvalidEntryInternalException handleError(Failure<T> fail) {
+    private static <T> InvalidEntryInternalException handleError(Failure<T> fail) {
         if (fail.getException() instanceof InvalidEntryInternalException) {
             return (InvalidEntryInternalException) fail.getException();
         } else {
@@ -162,7 +147,7 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
         }
     }
 
-    private DynamoDBQueryExpression<UserDb> createListUsersQuery(String institution)
+    private static DynamoDBQueryExpression<UserDb> createListUsersQuery(String institution)
         throws InvalidEntryInternalException {
         UserDb queryObject = UserDb.newBuilder().withUsername(NOT_USED).withInstitution(institution).build();
         return new DynamoDBQueryExpression<UserDb>()
@@ -171,13 +156,7 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
             .withConsistentRead(false);
     }
 
-    private void checkUserDoesNotAlreadyExist(UserDto user) throws InvalidEntryInternalException, ConflictException {
-        if (userAlreadyExists(user)) {
-            throw new ConflictException(USER_ALREADY_EXISTS_ERROR_MESSAGE + user.getUsername());
-        }
-    }
-
-    private void validate(Validable input) throws InvalidInputException {
+    private static void validate(Validable input) throws InvalidInputException {
         if (isNull(input)) {
             throw new EmptyInputException(EMPTY_INPUT_ERROR_MESSAGE);
         }
@@ -186,8 +165,29 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
         }
     }
 
-    private boolean isInvalid(Validable roleDto) {
+    private static boolean isInvalid(Validable roleDto) {
         return isNull(roleDto) || !roleDto.isValid();
+    }
+
+    private UserDto attemptToFetchObject(UserDto queryObject) throws InvalidEntryInternalException {
+        UserDb userDb = attempt(queryObject::toUserDb)
+            .map(mapper::load)
+            .orElseThrow(DatabaseServiceImpl::handleError);
+        return nonNull(userDb) ? UserDto.fromUserDb(userDb) : null;
+    }
+
+    private RoleDto attemptFetchRole(RoleDto queryObject) throws InvalidEntryInternalException {
+        RoleDb roledb = Try.of(queryObject)
+            .map(RoleDto::toRoleDb)
+            .map(mapper::load)
+            .orElseThrow(DatabaseServiceImpl::handleError);
+        return nonNull(roledb) ? RoleDto.fromRoleDb(roledb) : null;
+    }
+
+    private void checkUserDoesNotAlreadyExist(UserDto user) throws InvalidEntryInternalException, ConflictException {
+        if (userAlreadyExists(user)) {
+            throw new ConflictException(USER_ALREADY_EXISTS_ERROR_MESSAGE + user.getUsername());
+        }
     }
 
     private UserDto getExistingUserOrSendNotFoundError(UserDto queryObject)
