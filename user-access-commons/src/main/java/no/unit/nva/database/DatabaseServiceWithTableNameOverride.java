@@ -7,6 +7,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.TableNameOverride;
+import com.amazonaws.services.dynamodbv2.document.Table;
 import nva.commons.utils.Environment;
 import nva.commons.utils.attempt.Failure;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ public abstract class DatabaseServiceWithTableNameOverride implements DatabaseSe
     public static DynamoDBMapper createMapperOverridingHardCodedTableName(AmazonDynamoDB dynamoDbClient,
                                                                           Environment environment) {
         String tableName = environment.readEnv(USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE);
+        Table table = new Table(dynamoDbClient, tableName);
         attempt(() -> requireNonNull(dynamoDbClient))
             .orElseThrow(DatabaseServiceWithTableNameOverride::logErrorAndThrowException);
         DynamoDBMapperConfig dynamoDbMapperConfig = DynamoDBMapperConfig.builder()

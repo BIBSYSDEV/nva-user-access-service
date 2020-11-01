@@ -1,13 +1,19 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperFieldModel.DynamoDBAttributeType;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTyped;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
+import no.unit.nva.database.RoleDb.Builder;
 import no.unit.nva.database.interfaces.DynamoEntryWithRangeKey;
 import no.unit.nva.database.interfaces.WithCopy;
 import no.unit.nva.database.interfaces.WithType;
@@ -15,7 +21,7 @@ import no.unit.nva.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.JacocoGenerated;
 
 @DynamoDBTable(tableName = "OverridenByEnvironmentVariable")
-public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<RoleDb.Builder>, WithType {
+public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>, WithType {
 
     public static String TYPE = "ROLE";
     public static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey should start with \"" + TYPE + "\"";
@@ -24,20 +30,31 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<RoleDb.B
     private String primaryHashKey;
     private String name;
     private String primaryRangeKey;
+    private Collection<AccessRight> accessRights;
 
     public RoleDb() {
         super();
+        this.accessRights = Collections.emptyList();
     }
 
     private RoleDb(Builder builder) throws InvalidEntryInternalException {
-        super();
-        setName(builder.name);
         setPrimaryHashKey(builder.primaryHashKey);
+        setName(builder.name);
         setPrimaryRangeKey(builder.primaryRangeKey);
+        setAccessRights(builder.accessRights);
     }
 
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    public static Builder newBuilder(RoleDb copy) {
+        Builder builder = new Builder();
+        builder.primaryHashKey = copy.getPrimaryHashKey();
+        builder.name = copy.getName();
+        builder.primaryRangeKey = copy.getPrimaryRangeKey();
+        builder.accessRights = copy.getAccessRights();
+        return builder;
     }
 
     @JacocoGenerated
@@ -98,6 +115,16 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<RoleDb.B
         return TYPE;
     }
 
+    @DynamoDBAttribute(attributeName = "accessRights")
+    @DynamoDBTyped(DynamoDBAttributeType.S)
+    public Collection<AccessRight> getAccessRights() {
+        return this.accessRights;
+    }
+
+    public void setAccessRights(Collection<AccessRight> accessRights) {
+        this.accessRights = accessRights;
+    }
+
     @Override
     public Builder copy() {
         return new Builder().withName(this.name);
@@ -130,8 +157,10 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<RoleDb.B
         private String name;
         private String primaryHashKey;
         private String primaryRangeKey;
+        private Collection<AccessRight> accessRights;
 
         private Builder() {
+            accessRights = Collections.emptyList();
         }
 
         public Builder withName(String val) {
@@ -139,10 +168,25 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<RoleDb.B
             return this;
         }
 
+        public Builder withPrimaryRangeKey(String primaryRangeKey) {
+            this.primaryRangeKey = primaryRangeKey;
+            return this;
+        }
+
+        public Builder withAccessRights(Collection<AccessRight> accessRights) {
+            this.accessRights = nonNull(accessRights) ? accessRights : Collections.emptyList();
+            return this;
+        }
+
         public RoleDb build() throws InvalidEntryInternalException {
             this.primaryHashKey = formatPrimaryHashKey();
             this.primaryRangeKey = formatPrimaryRangeKey();
             return new RoleDb(this);
+        }
+
+        public Builder withPrimaryHashKey(String primaryHashKey) {
+            this.primaryHashKey = primaryHashKey;
+            return this;
         }
 
         private String formatPrimaryRangeKey() throws InvalidEntryInternalException {

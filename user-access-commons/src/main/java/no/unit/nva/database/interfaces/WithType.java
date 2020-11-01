@@ -2,5 +2,13 @@ package no.unit.nva.database.interfaces;
 
 public interface WithType {
 
-    String getType();
+    default String getType() {
+        return this.getClass().getSimpleName();
+    }
+
+    ;
+
+    default void setType(String type) {
+        //Do nothing;
+    }
 }

@@ -32,6 +32,11 @@ public class RoleDbTest extends DatabaseAccessor {
     }
 
     @Test
+    public void roleDbHasListOfAccessRights() {
+        assertThat(sampleRole.getAccessRights(), is(not(nullValue())));
+    }
+
+    @Test
     public void getPrimaryHashKeyReturnsStringContainingTypeRole() {
         assertThat(sampleRole.getPrimaryHashKey(), containsString(RoleDb.TYPE));
     }
