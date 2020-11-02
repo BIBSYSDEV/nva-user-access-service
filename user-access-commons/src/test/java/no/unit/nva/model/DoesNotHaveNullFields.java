@@ -2,7 +2,6 @@ package no.unit.nva.model;
 
 import static java.util.Objects.isNull;
 import static nva.commons.utils.attempt.Try.attempt;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;

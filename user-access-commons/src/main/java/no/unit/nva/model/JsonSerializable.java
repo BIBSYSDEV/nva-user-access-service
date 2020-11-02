@@ -1,7 +1,6 @@
 package no.unit.nva.model;
 
 import static nva.commons.utils.attempt.Try.attempt;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nva.commons.utils.attempt.Failure;
 

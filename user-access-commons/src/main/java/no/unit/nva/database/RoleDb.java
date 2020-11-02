@@ -4,12 +4,8 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperFieldModel.DynamoDBAttributeType;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTyped;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -20,17 +16,20 @@ import no.unit.nva.database.interfaces.WithType;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.JacocoGenerated;
 
-@DynamoDBTable(tableName = "OverridenByEnvironmentVariable")
 public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>, WithType {
 
     public static String TYPE = "ROLE";
     public static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey should start with \"" + TYPE + "\"";
     public static final String INVALID_PRIMARY_RANGE_KEY = "PrimaryHashKey should start with \"" + TYPE + "\"";
 
+    @JsonProperty(PRIMARY_KEY_HASH_KEY)
     private String primaryHashKey;
-    private String name;
+    @JsonProperty(PRIMARY_KEY_RANGE_KEY)
     private String primaryRangeKey;
     private Collection<AccessRight> accessRights;
+
+    @JsonProperty("name")
+    private String name;
 
     public RoleDb() {
         super();
@@ -58,7 +57,6 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     }
 
     @JacocoGenerated
-    @DynamoDBHashKey(attributeName = PRIMARY_KEY_HASH_KEY)
     @Override
     public String getPrimaryHashKey() {
         return this.primaryHashKey;
@@ -72,6 +70,7 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
      * @throws InvalidEntryInternalException when the role is invalid.
      */
     @JacocoGenerated
+    @Override
     public void setPrimaryHashKey(String primaryHashKey) throws InvalidEntryInternalException {
         if (primaryHashKeyHasNotBeenSet()) {
             if (!primaryHashKey.startsWith(TYPE)) {
@@ -81,7 +80,6 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
         }
     }
 
-    @DynamoDBRangeKey(attributeName = PRIMARY_KEY_RANGE_KEY)
     @Override
     public String getPrimaryRangeKey() {
         return this.primaryRangeKey;
@@ -98,7 +96,6 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     }
 
     @JacocoGenerated
-    @DynamoDBAttribute(attributeName = "name")
     public String getName() {
         return name;
     }
@@ -109,14 +106,12 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     }
 
     @JacocoGenerated
-    @DynamoDBAttribute(attributeName = "type")
+    @JsonProperty("type")
     @Override
     public String getType() {
         return TYPE;
     }
 
-    @DynamoDBAttribute(attributeName = "accessRights")
-    @DynamoDBTyped(DynamoDBAttributeType.S)
     public Collection<AccessRight> getAccessRights() {
         return this.accessRights;
     }

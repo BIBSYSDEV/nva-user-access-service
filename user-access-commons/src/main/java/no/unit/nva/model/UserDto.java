@@ -2,7 +2,6 @@ package no.unit.nva.model;
 
 import static java.util.Objects.isNull;
 import static nva.commons.utils.attempt.Try.attempt;
-
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Collection;

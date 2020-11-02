@@ -1,14 +1,13 @@
 package no.unit.nva.database.interfaces;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public interface WithType {
 
-    default String getType() {
-        return this.getClass().getSimpleName();
-    }
-
-    ;
+    @JsonProperty("type")
+    String getType();
 
     default void setType(String type) {
-        //Do nothing;
+        // Do nothing;
     }
 }

@@ -1,5 +1,7 @@
 package no.unit.nva.database;
 
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -10,7 +12,8 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.text.IsEmptyString.emptyString;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.Table;
 import no.unit.nva.database.RoleDb.Builder;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +29,7 @@ public class RoleDbTest extends DatabaseAccessor {
     public static final String SOME_OTHER_RANGE_KEY = "SomeOtherRangeKey";
     public static final String SOME_TYPE = "SomeType";
     private final RoleDb sampleRole = createSampleRole();
-    private DynamoDBMapper mapper;
+    private Table table;
 
     public RoleDbTest() throws InvalidEntryInternalException {
     }
@@ -43,8 +46,7 @@ public class RoleDbTest extends DatabaseAccessor {
 
     @BeforeEach
     void init() {
-        mapper = DatabaseServiceWithTableNameOverride
-            .createMapperOverridingHardCodedTableName(initializeTestDatabase(), envWithTableName);
+        table = DatabaseServiceImpl.createTable(initializeTestDatabase(), envWithTableName);
     }
 
     @Test
@@ -80,9 +82,9 @@ public class RoleDbTest extends DatabaseAccessor {
 
     @Test
     void roleDbRoleNameIsSavedInDatabase() {
-        mapper.save(sampleRole);
-        RoleDb retrievedRole = mapper.load(RoleDb.class, sampleRole.getPrimaryHashKey(),
-            sampleRole.getPrimaryRangeKey());
+        table.putItem(Item.fromJSON(sampleRole.toJsonString()));
+        Item item = fetchRole();
+        RoleDb retrievedRole = RoleDb.fromItem(item, RoleDb.class);
         assertThat(retrievedRole, is(equalTo(sampleRole)));
     }
 
@@ -130,6 +132,11 @@ public class RoleDbTest extends DatabaseAccessor {
         RoleDb copyRole = sampleRole.copy().build();
         assertThat(copyRole, is(equalTo(sampleRole)));
         assertThat(copyRole, is(not(sameInstance(sampleRole))));
+    }
+
+    private Item fetchRole() {
+        return table.getItem(PRIMARY_KEY_HASH_KEY, sampleRole.getPrimaryHashKey(),
+            PRIMARY_KEY_RANGE_KEY, sampleRole.getPrimaryRangeKey());
     }
 
     private RoleDb createSampleRole() throws InvalidEntryInternalException {

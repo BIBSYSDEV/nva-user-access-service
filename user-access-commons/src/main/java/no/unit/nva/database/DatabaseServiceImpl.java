@@ -2,17 +2,26 @@ package no.unit.nva.database;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
 import static no.unit.nva.database.DatabaseIndexDetails.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
+import static no.unit.nva.database.DatabaseIndexDetails.SECONDARY_INDEX_1_HASH_KEY;
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static nva.commons.utils.attempt.Try.attempt;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
-import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
+import com.amazonaws.services.dynamodbv2.document.Index;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.ItemCollection;
+import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import no.unit.nva.database.interfaces.DynamoEntryWithRangeKey;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.EmptyInputException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
@@ -29,10 +38,11 @@ import nva.commons.utils.attempt.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
+public class DatabaseServiceImpl implements DatabaseService {
+
+    public static final String DYNAMO_DB_CLIENT_NOT_SET_ERROR = "DynamoDb client has not been set";
 
     public static final String EMPTY_INPUT_ERROR_MESSAGE = "Expected non-empty input, but input is empty";
-    public static final String INVALID_ENTRY_IN_DATABASE_ERROR = "Invalid entry stored in the database:";
     public static final String USER_ALREADY_EXISTS_ERROR_MESSAGE = "User already exists: ";
     public static final String ROLE_ALREADY_EXISTS_ERROR_MESSAGE = "Role already exists: ";
     public static final String USER_NOT_FOUND_MESSAGE = "Could not find user with username: ";
@@ -42,10 +52,11 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     public static final String GET_ROLE_DEBUG_MESSAGE = "Getting role:";
     public static final String ADD_USER_DEBUG_MESSAGE = "Adding user:";
     public static final String ADD_ROLE_DEBUG_MESSAGE = "Adding role:";
-    public static final String NOT_USED = "NOT_USED";
+
     private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
     private static final String UPDATE_ROLE_DEBUG_MESSAGE = "Updating role: ";
-    private final DynamoDBMapper mapper;
+    private final Table table;
+    private final Index institutionsIndex;
 
     @JacocoGenerated
     public DatabaseServiceImpl() {
@@ -53,12 +64,13 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     }
 
     public DatabaseServiceImpl(AmazonDynamoDB dynamoDbClient, Environment environment) {
-        this(createMapperOverridingHardCodedTableName(dynamoDbClient, environment));
+        this(createTable(dynamoDbClient, environment));
     }
 
-    public DatabaseServiceImpl(DynamoDBMapper mapper) {
+    public DatabaseServiceImpl(Table table) {
         super();
-        this.mapper = mapper;
+        this.table = table;
+        this.institutionsIndex = table.getIndex(SEARCH_USERS_BY_INSTITUTION_INDEX_NAME);
     }
 
     @Override
@@ -68,10 +80,12 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
     }
 
     @Override
-    public List<UserDto> listUsers(String institutionId) throws InvalidEntryInternalException {
-        DynamoDBQueryExpression<UserDb> listUsersQuery = createListUsersQuery(institutionId);
-        PaginatedQueryList<UserDb> users = mapper.query(UserDb.class, listUsersQuery);
-        return users.stream()
+    public List<UserDto> listUsers(String institutionId) {
+        QuerySpec listUsersQuery = createListUsersByInstitutionQuery(institutionId);
+        List<Item> items = toList(institutionsIndex.query(listUsersQuery));
+
+        return items.stream()
+            .map(item -> UserDb.fromItem(item, UserDb.class))
             .map(attempt(UserDto::fromUserDb))
             .flatMap(Try::stream)
             .collect(Collectors.toList());
@@ -83,7 +97,7 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
 
         validate(user);
         checkUserDoesNotAlreadyExist(user);
-        mapper.save(user.toUserDb());
+        table.putItem(user.toUserDb().toItem());
     }
 
     @Override
@@ -94,7 +108,7 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
 
         validate(roleDto);
         checkRoleDoesNotExist(roleDto);
-        mapper.save(roleDto.toRoleDb());
+        table.putItem(roleDto.toRoleDb().toItem());
     }
 
     @Override
@@ -107,7 +121,7 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
         UserDto existingUser = getExistingUserOrSendNotFoundError(queryObject);
 
         if (!existingUser.equals(queryObject)) {
-            mapper.save(queryObject.toUserDb());
+            table.putItem(queryObject.toUserDb().toItem());
         }
     }
 
@@ -130,6 +144,24 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
         return Optional.ofNullable(searchResult);
     }
 
+    protected static Table createTable(AmazonDynamoDB dynamoDbClient, Environment environment) {
+        assertDynamoClientIsNotNull(dynamoDbClient);
+        String tableName = environment.readEnv(USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE);
+        return new Table(dynamoDbClient, tableName);
+    }
+
+    protected static Item fetchItemForTable(Table table, DynamoEntryWithRangeKey requestEntry) {
+        return table.getItem(
+            PRIMARY_KEY_HASH_KEY, requestEntry.getPrimaryHashKey(),
+            PRIMARY_KEY_RANGE_KEY, requestEntry.getPrimaryRangeKey()
+        );
+    }
+
+    private static void assertDynamoClientIsNotNull(AmazonDynamoDB dynamoDbClient) {
+        attempt(() -> requireNonNull(dynamoDbClient))
+            .orElseThrow(DatabaseServiceImpl::logErrorWithDynamoClientAndThrowException);
+    }
+
     private static String convertToStringOrWriteErrorMessage(JsonSerializable queryObject) {
         return Optional.ofNullable(queryObject).map(JsonSerializable::toString).orElse(EMPTY_INPUT_ERROR_MESSAGE);
     }
@@ -147,15 +179,6 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
         }
     }
 
-    private static DynamoDBQueryExpression<UserDb> createListUsersQuery(String institution)
-        throws InvalidEntryInternalException {
-        UserDb queryObject = UserDb.newBuilder().withUsername(NOT_USED).withInstitution(institution).build();
-        return new DynamoDBQueryExpression<UserDb>()
-            .withIndexName(SEARCH_USERS_BY_INSTITUTION_INDEX_NAME)
-            .withHashKeyValues(queryObject)
-            .withConsistentRead(false);
-    }
-
     private static void validate(Validable input) throws InvalidInputException {
         if (isNull(input)) {
             throw new EmptyInputException(EMPTY_INPUT_ERROR_MESSAGE);
@@ -169,17 +192,33 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
         return isNull(roleDto) || !roleDto.isValid();
     }
 
+    private static RuntimeException logErrorWithDynamoClientAndThrowException(Failure<AmazonDynamoDB> failure) {
+        logger.error(DYNAMO_DB_CLIENT_NOT_SET_ERROR);
+        throw new RuntimeException(failure.getException());
+    }
+
+    private QuerySpec createListUsersByInstitutionQuery(String institution) {
+        return new QuerySpec().withHashKey(SECONDARY_INDEX_1_HASH_KEY, institution)
+            .withConsistentRead(false);
+    }
+
     private UserDto attemptToFetchObject(UserDto queryObject) throws InvalidEntryInternalException {
         UserDb userDb = attempt(queryObject::toUserDb)
-            .map(mapper::load)
+            .map(this::fetchItem)
+            .map(item -> UserDb.fromItem(item, UserDb.class))
             .orElseThrow(DatabaseServiceImpl::handleError);
         return nonNull(userDb) ? UserDto.fromUserDb(userDb) : null;
+    }
+
+    private Item fetchItem(DynamoEntryWithRangeKey requestEntry) {
+        return fetchItemForTable(table, requestEntry);
     }
 
     private RoleDto attemptFetchRole(RoleDto queryObject) throws InvalidEntryInternalException {
         RoleDb roledb = Try.of(queryObject)
             .map(RoleDto::toRoleDb)
-            .map(mapper::load)
+            .map(this::fetchItem)
+            .map(item -> RoleDb.fromItem(item, RoleDb.class))
             .orElseThrow(DatabaseServiceImpl::handleError);
         return nonNull(roledb) ? RoleDto.fromRoleDb(roledb) : null;
     }
@@ -208,5 +247,13 @@ public class DatabaseServiceImpl extends DatabaseServiceWithTableNameOverride {
 
     private boolean userAlreadyExists(UserDto user) throws InvalidEntryInternalException {
         return this.getUserAsOptional(user).isPresent();
+    }
+
+    private List<Item> toList(ItemCollection<QueryOutcome> searchResult) {
+        List<Item> items = new ArrayList<>();
+        for (Item item : searchResult) {
+            items.add(item);
+        }
+        return items;
     }
 }
