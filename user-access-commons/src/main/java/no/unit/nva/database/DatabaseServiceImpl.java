@@ -73,12 +73,6 @@ public class DatabaseServiceImpl implements DatabaseService {
         this.institutionsIndex = table.getIndex(SEARCH_USERS_BY_INSTITUTION_INDEX_NAME);
     }
 
-    protected static Table createTable(AmazonDynamoDB dynamoDbClient, Environment environment) {
-        assertDynamoClientIsNotNull(dynamoDbClient);
-        String tableName = environment.readEnv(USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE);
-        return new Table(dynamoDbClient, tableName);
-    }
-
     @Override
     public UserDto getUser(UserDto queryObject) throws InvalidEntryInternalException, NotFoundException {
         return getUserAsOptional(queryObject)
@@ -150,11 +144,17 @@ public class DatabaseServiceImpl implements DatabaseService {
         return Optional.ofNullable(searchResult);
     }
 
-    protected static Item fetchItem(Table table, DynamoEntryWithRangeKey requestEntry) {
-        Item item = table.getItem(PRIMARY_KEY_HASH_KEY, requestEntry.getPrimaryHashKey(),
-            PRIMARY_KEY_RANGE_KEY, requestEntry.getPrimaryRangeKey());
+    protected static Table createTable(AmazonDynamoDB dynamoDbClient, Environment environment) {
+        assertDynamoClientIsNotNull(dynamoDbClient);
+        String tableName = environment.readEnv(USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE);
+        return new Table(dynamoDbClient, tableName);
+    }
 
-        return item;
+    protected static Item fetchItem(Table table, DynamoEntryWithRangeKey requestEntry) {
+        return table.getItem(
+            PRIMARY_KEY_HASH_KEY, requestEntry.getPrimaryHashKey(),
+            PRIMARY_KEY_RANGE_KEY, requestEntry.getPrimaryRangeKey()
+        );
     }
 
     private static void assertDynamoClientIsNotNull(AmazonDynamoDB dynamoDbClient) {
