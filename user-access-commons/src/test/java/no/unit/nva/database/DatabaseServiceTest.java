@@ -94,7 +94,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         RoleDto illegalRole = createIllegalRole();
         Executable illegalAction = () -> db.addRole(illegalRole);
         InvalidInputException exception = assertThrows(InvalidInputException.class, illegalAction);
-        assertThat(exception.getMessage(), containsString(RoleDto.INVALID_ROLE_ERROR_MESSAGE));
+        assertThat(exception.getMessage(), containsString(RoleDto.MISSING_ROLE_NAME_ERROR));
     }
 
     @DisplayName("addRole() throws ConflictException when trying to save user with existing username")

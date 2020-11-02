@@ -1,28 +1,32 @@
 package no.unit.nva.database;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperFieldModel.DynamoDBAttributeType;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTyped;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-import no.unit.nva.exceptions.InvalidAccessRightException.InvalidAccessRightException;
+import no.unit.nva.exceptions.InvalidAccessRightException;
 
-@DynamoDBTyped(DynamoDBAttributeType.S)
 public enum AccessRight {
 
-    APPROVE_DOI_REQUEST;
+    APPROVE_DOI_REQUEST,
+    REJECT_DOI_REQUEST;
 
     private static final Map<String, AccessRight> index = createIndex();
 
+    /**
+     * Creates an AccessRight instance from a string (case insensitive).
+     *
+     * @param accessRight string representation of access right
+     * @return an AccessRight instance.
+     */
     @JsonCreator
     public static AccessRight fromString(String accessRight) {
 
-        String stringValue = accessRight.toLowerCase(Locale.getDefault());
-        if (index.containsKey(stringValue)) {
-            return index.get(accessRight);
+        String lowerCased = accessRight.toLowerCase(Locale.getDefault());
+        if (index.containsKey(lowerCased)) {
+            return index.get(lowerCased);
         } else {
             throw new InvalidAccessRightException(accessRight);
         }

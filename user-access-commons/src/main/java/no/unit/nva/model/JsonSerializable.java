@@ -2,9 +2,14 @@ package no.unit.nva.model;
 
 import static nva.commons.utils.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nva.commons.utils.JsonUtils;
 import nva.commons.utils.attempt.Failure;
 
 public interface JsonSerializable {
+
+    default String toJsonString() {
+        return toJsonString(JsonUtils.objectMapper);
+    }
 
     /**
      * a JSON representation of the object.

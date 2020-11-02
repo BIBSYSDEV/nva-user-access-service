@@ -119,7 +119,6 @@ public class DatabaseServiceImpl implements DatabaseService {
 
         validate(queryObject);
         UserDto existingUser = getExistingUserOrSendNotFoundError(queryObject);
-
         if (!existingUser.equals(queryObject)) {
             table.putItem(queryObject.toUserDb().toItem());
         }

@@ -1,12 +1,13 @@
 package no.unit.nva.utils;
 
 import static nva.commons.utils.JsonUtils.objectMapper;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.List;
+import no.unit.nva.database.AccessRight;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
@@ -15,11 +16,13 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 public final class EntityUtils {
 
     public static final String SOME_USERNAME = "SomeUsername";
-    private static final String SOME_GIVEN_NAME = "givenName";
-    private static final String SOME_FAMILY_NAME = "familyName";
     public static final String SOME_ROLENAME = "SomeRole";
     public static final String SOME_INSTITUTION = "SomeInstitution";
     public static final String EMPTY_STRING = "";
+    public static final List<AccessRight> SAMPLE_ACCESS_RIGHTS =
+        Collections.singletonList(AccessRight.APPROVE_DOI_REQUEST);
+    private static final String SOME_GIVEN_NAME = "givenName";
+    private static final String SOME_FAMILY_NAME = "familyName";
 
     /**
      * Creates a request for adding a user without a username. To be used with {@code handleRequest()} method.
@@ -120,6 +123,6 @@ public final class EntityUtils {
     }
 
     public static RoleDto createRole(String someRole) throws InvalidEntryInternalException {
-        return RoleDto.newBuilder().withName(someRole).build();
+        return RoleDto.newBuilder().withName(someRole).withAccessRights(SAMPLE_ACCESS_RIGHTS).build();
     }
 }

@@ -9,6 +9,10 @@ public class InvalidEntryInternalException extends ApiGatewayException {
         super(message);
     }
 
+    public InvalidEntryInternalException(Exception exception) {
+        super(exception);
+    }
+
     @Override
     protected Integer statusCode() {
         return HttpStatus.SC_INTERNAL_SERVER_ERROR;

@@ -4,10 +4,9 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import no.unit.nva.database.RoleDb.Builder;
 import no.unit.nva.database.interfaces.DynamoEntryWithRangeKey;
@@ -26,7 +25,8 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     private String primaryHashKey;
     @JsonProperty(PRIMARY_KEY_RANGE_KEY)
     private String primaryRangeKey;
-    private Collection<AccessRight> accessRights;
+    @JsonProperty("accessRights")
+    private List<AccessRight> accessRights;
 
     @JsonProperty("name")
     private String name;
@@ -37,6 +37,7 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     }
 
     private RoleDb(Builder builder) throws InvalidEntryInternalException {
+        super();
         setPrimaryHashKey(builder.primaryHashKey);
         setName(builder.name);
         setPrimaryRangeKey(builder.primaryRangeKey);
@@ -45,15 +46,6 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
 
     public static Builder newBuilder() {
         return new Builder();
-    }
-
-    public static Builder newBuilder(RoleDb copy) {
-        Builder builder = new Builder();
-        builder.primaryHashKey = copy.getPrimaryHashKey();
-        builder.name = copy.getName();
-        builder.primaryRangeKey = copy.getPrimaryRangeKey();
-        builder.accessRights = copy.getAccessRights();
-        return builder;
     }
 
     @JacocoGenerated
@@ -112,17 +104,25 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
         return TYPE;
     }
 
-    public Collection<AccessRight> getAccessRights() {
+    public List<AccessRight> getAccessRights() {
         return this.accessRights;
     }
 
-    public void setAccessRights(Collection<AccessRight> accessRights) {
+    public void setAccessRights(List<AccessRight> accessRights) {
         this.accessRights = accessRights;
     }
 
     @Override
     public Builder copy() {
-        return new Builder().withName(this.name);
+        return new Builder()
+            .withName(this.getName())
+            .withAccessRights(this.getAccessRights());
+    }
+
+    @JacocoGenerated
+    @Override
+    public String toString() {
+        return this.toJsonString();
     }
 
     @Override
@@ -136,14 +136,15 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
         }
         RoleDb roleDb = (RoleDb) o;
         return Objects.equals(getPrimaryHashKey(), roleDb.getPrimaryHashKey())
-            && Objects.equals(getName(), roleDb.getName())
-            && Objects.equals(getPrimaryRangeKey(), roleDb.getPrimaryRangeKey());
+            && Objects.equals(getPrimaryRangeKey(), roleDb.getPrimaryRangeKey())
+            && Objects.equals(getAccessRights(), roleDb.getAccessRights())
+            && Objects.equals(getName(), roleDb.getName());
     }
 
     @Override
     @JacocoGenerated
     public int hashCode() {
-        return Objects.hash(getPrimaryHashKey(), getName(), getPrimaryRangeKey());
+        return Objects.hash(getPrimaryHashKey(), getPrimaryRangeKey(), getAccessRights(), getName());
     }
 
     public static final class Builder {
@@ -152,7 +153,7 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
         private String name;
         private String primaryHashKey;
         private String primaryRangeKey;
-        private Collection<AccessRight> accessRights;
+        private List<AccessRight> accessRights;
 
         private Builder() {
             accessRights = Collections.emptyList();
@@ -163,12 +164,7 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
             return this;
         }
 
-        public Builder withPrimaryRangeKey(String primaryRangeKey) {
-            this.primaryRangeKey = primaryRangeKey;
-            return this;
-        }
-
-        public Builder withAccessRights(Collection<AccessRight> accessRights) {
+        public Builder withAccessRights(List<AccessRight> accessRights) {
             this.accessRights = nonNull(accessRights) ? accessRights : Collections.emptyList();
             return this;
         }
@@ -177,11 +173,6 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
             this.primaryHashKey = formatPrimaryHashKey();
             this.primaryRangeKey = formatPrimaryRangeKey();
             return new RoleDb(this);
-        }
-
-        public Builder withPrimaryHashKey(String primaryHashKey) {
-            this.primaryHashKey = primaryHashKey;
-            return this;
         }
 
         private String formatPrimaryRangeKey() throws InvalidEntryInternalException {
