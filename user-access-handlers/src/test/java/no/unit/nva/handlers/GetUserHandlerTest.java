@@ -7,7 +7,6 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.ByteArrayOutputStream;
@@ -63,16 +62,6 @@ class GetUserHandlerTest extends HandlerTest {
         assertThat(type, is(equalTo(UserDto.TYPE)));
     }
 
-    private ByteArrayOutputStream sendGetUserRequestToHandler() throws IOException {
-        requestInfo = createRequestInfoForGetUser(DEFAULT_USERNAME);
-        InputStream inputStream = new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
-            .withPathParameters(requestInfo.getPathParameters())
-            .build();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        getUserHandler.handleRequest(inputStream, outputStream, context);
-        return outputStream;
-    }
-
     @Test
     void getSuccessStatusCodeReturnsOK() {
         Integer actual = getUserHandler.getSuccessStatusCode(null, null);
@@ -103,6 +92,7 @@ class GetUserHandlerTest extends HandlerTest {
         + "username")
     @Test
     void processInputThrowsNotFoundExceptionWhenPathParameterIsNonExistingUsername() {
+
         requestInfo = createRequestInfoForGetUser(DEFAULT_USERNAME);
         Executable action = () -> getUserHandler.processInput(null, requestInfo, context);
         assertThrows(NotFoundException.class, action);
@@ -122,6 +112,16 @@ class GetUserHandlerTest extends HandlerTest {
         requestInfo = createRequestInfoForGetUser(null);
         Executable action = () -> getUserHandler.processInput(null, requestInfo, context);
         assertThrows(BadRequestException.class, action);
+    }
+
+    private ByteArrayOutputStream sendGetUserRequestToHandler() throws IOException {
+        requestInfo = createRequestInfoForGetUser(DEFAULT_USERNAME);
+        InputStream inputStream = new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
+            .withPathParameters(requestInfo.getPathParameters())
+            .build();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        getUserHandler.handleRequest(inputStream, outputStream, context);
+        return outputStream;
     }
 
     private RequestInfo createRequestInfoForGetUser(String username) {

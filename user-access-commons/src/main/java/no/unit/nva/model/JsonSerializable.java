@@ -19,6 +19,6 @@ public interface JsonSerializable {
     }
 
     private RuntimeException newUnexpectedException(Failure<String> fail) {
-        throw new RuntimeException(fail.getException());
+        return new RuntimeException(fail.getException());
     }
 }

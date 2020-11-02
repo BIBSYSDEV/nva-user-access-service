@@ -195,7 +195,7 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
     private static List<RoleDto> extractRoles(UserDb userDb) {
         return Optional.ofNullable(userDb)
             .stream()
-            .flatMap(userDb1 -> userDb1.getRoles().stream())
+            .flatMap(user -> user.getRoles().stream())
             .map(attempt(RoleDto::fromRoleDb))
             .map(attempt -> attempt.orElseThrow(UserDto::unexpectedException))
             .collect(Collectors.toList());
@@ -204,7 +204,7 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
     /*This exception should not happen as a RoleDb should always convert to a RoleDto */
     private static <T> IllegalStateException unexpectedException(Failure<T> failure) {
         logger.error(ERROR_DUE_TO_INVALID_ROLE);
-        throw new IllegalStateException(failure.getException());
+        return new IllegalStateException(failure.getException());
     }
 
     private List<RoleDb> createRoleDb() {
