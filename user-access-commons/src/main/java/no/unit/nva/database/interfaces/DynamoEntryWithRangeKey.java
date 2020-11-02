@@ -20,6 +20,14 @@ public abstract class DynamoEntryWithRangeKey implements WithType {
     @SuppressWarnings("PMD.ConstantsInInterface")
     public static String FIELD_DELIMITER = "#";
 
+    /**
+     * Generated DynamoEntry from an {@link Item}.
+     *
+     * @param item       the item.
+     * @param entryClass the class of the object.
+     * @param <E>        the type of the object
+     * @return an instance of class {@code E}
+     */
     public static <E extends DynamoEntryWithRangeKey> E fromItem(Item item, Class<E> entryClass) {
         if (nonNull(item)) {
             JavaType javaType = fetchJavaType(entryClass);
@@ -31,13 +39,32 @@ public abstract class DynamoEntryWithRangeKey implements WithType {
     @JsonProperty(PRIMARY_KEY_HASH_KEY)
     public abstract String getPrimaryHashKey();
 
+    /**
+     * Setter of the primary hash key. This method is supposed to be used only by when deserializing an item using Json
+     * serializer.
+     *
+     * @param primaryRangeKey the primary hash key.
+     * @throws InvalidEntryInternalException when the serialization in invalid.
+     */
     public abstract void setPrimaryHashKey(String primaryRangeKey) throws InvalidEntryInternalException;
 
     @JsonProperty(PRIMARY_KEY_RANGE_KEY)
     public abstract String getPrimaryRangeKey();
 
+    /**
+     * Setter of the primary range key. This method is supposed to be used only by when deserializing an item using Json
+     * serializer.
+     *
+     * @param primaryRangeKey the primary range key.
+     * @throws InvalidEntryInternalException when the serialization in invalid.
+     */
     public abstract void setPrimaryRangeKey(String primaryRangeKey) throws InvalidEntryInternalException;
 
+    /**
+     * A Json representation of the entity.
+     *
+     * @return a Json string
+     */
     public String toJsonString() {
         try {
             return JsonUtils.objectMapper.writeValueAsString(this);

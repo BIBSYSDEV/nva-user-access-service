@@ -82,7 +82,6 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<RoleDb.B
     }
 
     @JacocoGenerated
-
     public String getName() {
         return name;
     }
@@ -90,6 +89,13 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<RoleDb.B
     @JacocoGenerated
     public void setName(String name) {
         this.name = name;
+    }
+
+    @JacocoGenerated
+    @JsonProperty("type")
+    @Override
+    public String getType() {
+        return TYPE;
     }
 
     @Override

@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public interface WithType {
 
     @JsonProperty("type")
-    default String getType() {
-        return this.getClass().getSimpleName();
-    }
+    String getType();
 
     default void setType(String type) {
         //

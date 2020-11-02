@@ -21,7 +21,7 @@ import nva.commons.utils.JacocoGenerated;
 
 public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>, WithType {
 
-    public static final String TYPE = UserDb.class.getSimpleName();
+    public static final String TYPE = "USER";
     public static final String INVALID_USER_EMPTY_USERNAME = "Invalid user entry: Empty username is not allowed";
     public static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey of user should start with \"USER\"";
     private static final String INVALID_PRIMARY_RANGE_KEY = "PrimaryRangeKey of user should start wih \"USER\"";
@@ -200,6 +200,13 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
      */
     public void setInstitution(String institution) {
         this.institution = institution;
+    }
+
+    @JacocoGenerated
+    @JsonProperty("type")
+    @Override
+    public String getType() {
+        return TYPE;
     }
 
     @Override

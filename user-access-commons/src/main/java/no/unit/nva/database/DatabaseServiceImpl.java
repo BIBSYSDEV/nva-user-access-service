@@ -150,7 +150,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         return new Table(dynamoDbClient, tableName);
     }
 
-    protected static Item fetchItem(Table table, DynamoEntryWithRangeKey requestEntry) {
+    protected static Item fetchItemForTable(Table table, DynamoEntryWithRangeKey requestEntry) {
         return table.getItem(
             PRIMARY_KEY_HASH_KEY, requestEntry.getPrimaryHashKey(),
             PRIMARY_KEY_RANGE_KEY, requestEntry.getPrimaryRangeKey()
@@ -197,14 +197,6 @@ public class DatabaseServiceImpl implements DatabaseService {
         throw new RuntimeException(failure.getException());
     }
 
-    private List<Item> toList(ItemCollection<QueryOutcome> searchResult) {
-        List<Item> items = new ArrayList<>();
-        for (Item item : searchResult) {
-            items.add(item);
-        }
-        return items;
-    }
-
     private QuerySpec createListUsersByInstitutionQuery(String institution) {
         return new QuerySpec().withHashKey(SECONDARY_INDEX_1_HASH_KEY, institution)
             .withConsistentRead(false);
@@ -219,7 +211,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     private Item fetchItem(DynamoEntryWithRangeKey requestEntry) {
-        return fetchItem(table, requestEntry);
+        return fetchItemForTable(table, requestEntry);
     }
 
     private RoleDto attemptFetchRole(RoleDto queryObject) throws InvalidEntryInternalException {
@@ -255,5 +247,13 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     private boolean userAlreadyExists(UserDto user) throws InvalidEntryInternalException {
         return this.getUserAsOptional(user).isPresent();
+    }
+
+    private List<Item> toList(ItemCollection<QueryOutcome> searchResult) {
+        List<Item> items = new ArrayList<>();
+        for (Item item : searchResult) {
+            items.add(item);
+        }
+        return items;
     }
 }
