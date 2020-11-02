@@ -4,15 +4,9 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
-import static no.unit.nva.database.DatabaseIndexDetails.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
 import static no.unit.nva.database.DatabaseIndexDetails.SECONDARY_INDEX_1_HASH_KEY;
 import static no.unit.nva.database.DatabaseIndexDetails.SECONDARY_INDEX_1_RANGE_KEY;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexHashKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexRangeKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,21 +19,27 @@ import no.unit.nva.database.interfaces.WithType;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.JacocoGenerated;
 
-@DynamoDBTable(tableName = "OverridenByEnvironmentVariable")
 public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>, WithType {
 
-    public static final String TYPE = "USER";
+    public static final String TYPE = UserDb.class.getSimpleName();
     public static final String INVALID_USER_EMPTY_USERNAME = "Invalid user entry: Empty username is not allowed";
     public static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey of user should start with \"USER\"";
     private static final String INVALID_PRIMARY_RANGE_KEY = "PrimaryRangeKey of user should start wih \"USER\"";
 
+    @JsonProperty(PRIMARY_KEY_HASH_KEY)
     private String primaryHashKey;
+    @JsonProperty(PRIMARY_KEY_RANGE_KEY)
     private String primaryRangeKey;
 
+    @JsonProperty("username")
     private String username;
+    @JsonProperty("institution")
     private String institution;
+    @JsonProperty("roles")
     private List<RoleDb> roles;
+    @JsonProperty("givenName")
     private String givenName;
+    @JsonProperty("familyName")
     private String familyName;
 
     public UserDb() {
@@ -62,7 +62,6 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     }
 
     @JacocoGenerated
-    @DynamoDBHashKey(attributeName = PRIMARY_KEY_HASH_KEY)
     @Override
     public String getPrimaryHashKey() {
         return this.primaryHashKey;
@@ -76,6 +75,7 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
      * @param primaryHashKeyKey the primaryKey
      * @throws InvalidEntryInternalException when the primary key is invalid.
      */
+    @Override
     public void setPrimaryHashKey(String primaryHashKeyKey) throws InvalidEntryInternalException {
         if (primaryHashKeyHasNotBeenSet()) {
             if (!primaryHashKeyKey.startsWith(TYPE)) {
@@ -86,7 +86,6 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     }
 
     @JacocoGenerated
-    @DynamoDBRangeKey(attributeName = PRIMARY_KEY_RANGE_KEY)
     @Override
     public String getPrimaryRangeKey() {
         return this.primaryRangeKey;
@@ -112,8 +111,7 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     }
 
     @JacocoGenerated
-    @DynamoDBIndexHashKey(attributeName = SECONDARY_INDEX_1_HASH_KEY,
-        globalSecondaryIndexName = SEARCH_USERS_BY_INSTITUTION_INDEX_NAME)
+    @JsonProperty(SECONDARY_INDEX_1_HASH_KEY)
     public String getSearchByInstitutionHashKey() {
         return this.getInstitution();
     }
@@ -124,8 +122,7 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     }
 
     @JacocoGenerated
-    @DynamoDBIndexRangeKey(attributeName = SECONDARY_INDEX_1_RANGE_KEY, globalSecondaryIndexName =
-        SEARCH_USERS_BY_INSTITUTION_INDEX_NAME)
+    @JsonProperty(SECONDARY_INDEX_1_RANGE_KEY)
     public String getSearchByInstitutionRangeKey() {
         return this.getUsername();
     }
@@ -136,14 +133,6 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     }
 
     @JacocoGenerated
-    @DynamoDBAttribute(attributeName = "type")
-    @Override
-    public String getType() {
-        return TYPE;
-    }
-
-    @JacocoGenerated
-    @DynamoDBAttribute(attributeName = "username")
     public String getUsername() {
         return username;
     }
@@ -158,7 +147,6 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     }
 
     @JacocoGenerated
-    @DynamoDBAttribute(attributeName = "givenName")
     public String getGivenName() {
         return givenName;
     }
@@ -173,7 +161,6 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     }
 
     @JacocoGenerated
-    @DynamoDBAttribute(attributeName = "familyName")
     public String getFamilyName() {
         return familyName;
     }
@@ -188,7 +175,6 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     }
 
     @JacocoGenerated
-    @DynamoDBAttribute(attributeName = "roles")
     public List<RoleDb> getRoles() {
         return nonNull(roles) ? roles : Collections.emptyList();
     }
@@ -203,7 +189,6 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     }
 
     @JacocoGenerated
-    @DynamoDBAttribute(attributeName = "institution")
     public String getInstitution() {
         return institution;
     }

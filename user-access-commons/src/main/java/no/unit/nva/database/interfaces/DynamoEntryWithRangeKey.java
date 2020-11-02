@@ -1,30 +1,54 @@
 package no.unit.nva.database.interfaces;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
+import nva.commons.utils.JsonUtils;
 
 public abstract class DynamoEntryWithRangeKey implements WithType {
 
+    public static final TypeFactory TYPE_FACTORY = JsonUtils.objectMapper.getTypeFactory();
+    private static final Map<String, JavaType> JAVA_TYPES = new ConcurrentHashMap<>();
     @SuppressWarnings("PMD.ConstantsInInterface")
     public static String FIELD_DELIMITER = "#";
 
+    public static <E extends DynamoEntryWithRangeKey> E fromItem(Item item, Class<E> entryClass) {
+        if (nonNull(item)) {
+            JavaType javaType = fetchJavaType(entryClass);
+            return JsonUtils.objectMapper.convertValue(item.asMap(), javaType);
+        }
+        return null;
+    }
+
+    @JsonProperty(PRIMARY_KEY_HASH_KEY)
     public abstract String getPrimaryHashKey();
 
+    public abstract void setPrimaryHashKey(String primaryRangeKey) throws InvalidEntryInternalException;
+
+    @JsonProperty(PRIMARY_KEY_RANGE_KEY)
     public abstract String getPrimaryRangeKey();
 
     public abstract void setPrimaryRangeKey(String primaryRangeKey) throws InvalidEntryInternalException;
 
-    @Override
-    public abstract String getType();
+    public String toJsonString() {
+        try {
+            return JsonUtils.objectMapper.writeValueAsString(this);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    /**
-     * Do not use. Intented only for use from DynamoDB. This method has no effect as the type is always ROLE.
-     *
-     * @param type ignored parameter.
-     */
-    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
-    public final void setType(String type) {
-        // DO NOTHING
+    public Item toItem() {
+        String jsonString = this.toJsonString();
+        return Item.fromJSON(jsonString);
     }
 
     protected boolean primaryHashKeyHasNotBeenSet() {
@@ -33,5 +57,15 @@ public abstract class DynamoEntryWithRangeKey implements WithType {
 
     protected boolean primaryRangeKeyHasNotBeenSet() {
         return isNull(getPrimaryRangeKey());
+    }
+
+    private static <E> JavaType fetchJavaType(Class<E> entryClass) {
+        return JAVA_TYPES.getOrDefault(entryClass.getName(), constructNewJavaType(entryClass));
+    }
+
+    private static <E> JavaType constructNewJavaType(Class<E> entryClass) {
+        JavaType javaType = TYPE_FACTORY.constructType(entryClass);
+        JAVA_TYPES.put(entryClass.getName(), javaType);
+        return javaType;
     }
 }
