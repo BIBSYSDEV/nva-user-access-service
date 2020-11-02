@@ -73,11 +73,9 @@ public class DatabaseServiceImpl implements DatabaseService {
         this.institutionsIndex = table.getIndex(SEARCH_USERS_BY_INSTITUTION_INDEX_NAME);
     }
 
-    public static Table createTable(AmazonDynamoDB dynamoDbClient, Environment environment) {
+    protected static Table createTable(AmazonDynamoDB dynamoDbClient, Environment environment) {
+        assertDynamoClientIsNotNull(dynamoDbClient);
         String tableName = environment.readEnv(USERS_AND_ROLES_TABLE_NAME_ENV_VARIABLE);
-        attempt(() -> requireNonNull(dynamoDbClient))
-            .orElseThrow(DatabaseServiceImpl::logErrorAndThrowException);
-
         return new Table(dynamoDbClient, tableName);
     }
 
@@ -159,6 +157,11 @@ public class DatabaseServiceImpl implements DatabaseService {
         return item;
     }
 
+    private static void assertDynamoClientIsNotNull(AmazonDynamoDB dynamoDbClient) {
+        attempt(() -> requireNonNull(dynamoDbClient))
+            .orElseThrow(DatabaseServiceImpl::logErrorWithDynamoClientAndThrowException);
+    }
+
     private static String convertToStringOrWriteErrorMessage(JsonSerializable queryObject) {
         return Optional.ofNullable(queryObject).map(JsonSerializable::toString).orElse(EMPTY_INPUT_ERROR_MESSAGE);
     }
@@ -189,7 +192,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         return isNull(roleDto) || !roleDto.isValid();
     }
 
-    private static RuntimeException logErrorAndThrowException(Failure<AmazonDynamoDB> failure) {
+    private static RuntimeException logErrorWithDynamoClientAndThrowException(Failure<AmazonDynamoDB> failure) {
         logger.error(DYNAMO_DB_CLIENT_NOT_SET_ERROR);
         throw new RuntimeException(failure.getException());
     }

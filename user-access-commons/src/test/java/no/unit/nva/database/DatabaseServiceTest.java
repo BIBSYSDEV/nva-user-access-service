@@ -27,7 +27,6 @@ import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
