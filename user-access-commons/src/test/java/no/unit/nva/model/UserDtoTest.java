@@ -1,5 +1,7 @@
 package no.unit.nva.model;
 
+import static no.unit.nva.database.AccessRight.APPROVE_DOI_REQUEST;
+import static no.unit.nva.database.AccessRight.REJECT_DOI_REQUEST;
 import static no.unit.nva.hamcrest.DoesNotHaveNullOrEmptyFields.doesNotHaveNullOrEmptyFields;
 import static no.unit.nva.model.UserDto.ERROR_DUE_TO_INVALID_ROLE;
 import static no.unit.nva.utils.EntityUtils.SOME_ROLENAME;
@@ -7,6 +9,7 @@ import static no.unit.nva.utils.EntityUtils.SOME_USERNAME;
 import static no.unit.nva.utils.EntityUtils.createUserWithRoleWithoutInstitution;
 import static no.unit.nva.utils.EntityUtils.createUserWithRolesAndInstitution;
 import static nva.commons.utils.JsonUtils.objectMapper;
+import static nva.commons.utils.attempt.Try.attempt;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -23,12 +26,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import no.unit.nva.database.AccessRight;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.UserDb;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.model.UserDto.Builder;
+import no.unit.nva.utils.EntityUtils;
+import nva.commons.utils.attempt.Try;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
 import org.junit.jupiter.api.DisplayName;
@@ -42,6 +52,7 @@ public class UserDtoTest extends DtoTest {
 
     public static final List<RoleDto> sampleRoles = createSampleRoles();
     public static final String SOME_INSTITUTION = "someInstitution";
+    public static final String SOME_OTHER_ROLENAME = "SomeOtherRolename";
     protected static final String USER_TYPE_LITERAL = "User";
 
     @ParameterizedTest(name = "isValid() returns false when username is \"{0}\"")
@@ -95,12 +106,40 @@ public class UserDtoTest extends DtoTest {
     }
 
     @Test
+    public void getAccessRightsReturnsAccessRightsWithoutDuplicates()
+        throws InvalidEntryInternalException {
+        final UserDto user = EntityUtils.createUserWithRoleWithoutInstitution();
+        final Set<AccessRight> expectedAccessRights = new HashSet<>(user.getAccessRights());
+
+        var newRoles = duplicateRoles(user);
+        var newUser = user.copy().withRoles(newRoles).build();
+
+        HashSet<AccessRight> actualAccessRights = new HashSet<>(newUser.getAccessRights());
+        assertThat(actualAccessRights, is(equalTo(expectedAccessRights)));
+    }
+
+    @Test
+    public void getAccessRightsReturnsAllAccessRightsContainedInTheUsersRoles()
+        throws InvalidEntryInternalException {
+        final AccessRight firstRoleAccessRight = APPROVE_DOI_REQUEST;
+        final AccessRight secondRoleAccessRight = REJECT_DOI_REQUEST;
+        RoleDto firstRole = sampleRole(firstRoleAccessRight, SOME_ROLENAME);
+        RoleDto secondRole = sampleRole(secondRoleAccessRight, SOME_OTHER_ROLENAME);
+
+        List<RoleDto> roles = List.of(firstRole, secondRole);
+        UserDto user = UserDto.newBuilder().withUsername(SOME_USERNAME).withRoles(roles).build();
+
+        Set<AccessRight> expectedAccessRights = Set.of(firstRoleAccessRight, secondRoleAccessRight);
+        assertThat(user.getAccessRights(), is(equalTo(expectedAccessRights)));
+    }
+
+    @Test
     void userDtoHasAConstructorWithoutArgs() {
         new UserDto();
     }
 
     @Test
-    void userDtoShouldHaveABuilder() {
+    void userDtoHasABuilder() {
         Builder builder = UserDto.newBuilder();
         assertNotNull(builder);
     }
@@ -205,16 +244,35 @@ public class UserDtoTest extends DtoTest {
         assertThat(deserializedObject, is(not(sameInstance(initialUser))));
     }
 
-    private UserDto convertToUserDbAndBack(UserDto userDto) throws InvalidEntryInternalException {
-        UserDb userDb = userDto.toUserDb();
-        return UserDto.fromUserDb(userDb);
-    }
-
     private static List<RoleDto> createSampleRoles() {
         try {
-            return Collections.singletonList(RoleDto.newBuilder().withName(SOME_ROLENAME).build());
+            return Collections.singletonList(EntityUtils.createRole(SOME_ROLENAME));
         } catch (InvalidEntryInternalException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private RoleDto sampleRole(AccessRight approveDoiRequest, String someRolename)
+        throws InvalidEntryInternalException {
+        List<AccessRight> firstRoleAccessRights = Collections.singletonList(approveDoiRequest);
+        return RoleDto.newBuilder()
+            .withName(someRolename)
+            .withAccessRights(firstRoleAccessRights)
+            .build();
+    }
+
+    private List<RoleDto> duplicateRoles(UserDto user) throws InvalidEntryInternalException {
+        List<RoleDto> duplicateRoles = user.getRoles().stream()
+            .map(attempt(r -> r.copy().withName(r.getRoleName() + "_copy").build()))
+            .flatMap(Try::stream)
+            .collect(Collectors.toList());
+        ArrayList<RoleDto> newRoles = new ArrayList<>(user.getRoles());
+        newRoles.addAll(duplicateRoles);
+        return newRoles;
+    }
+
+    private UserDto convertToUserDbAndBack(UserDto userDto) throws InvalidEntryInternalException {
+        UserDb userDb = userDto.toUserDb();
+        return UserDto.fromUserDb(userDb);
     }
 }

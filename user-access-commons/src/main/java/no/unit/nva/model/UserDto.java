@@ -2,6 +2,7 @@ package no.unit.nva.model;
 
 import static java.util.Objects.isNull;
 import static nva.commons.utils.attempt.Try.attempt;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,7 +10,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import no.unit.nva.database.AccessRight;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.UserDb;
 import no.unit.nva.database.interfaces.WithCopy;
@@ -75,6 +78,17 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
      */
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    @JsonProperty("accessRights")
+    public Set<AccessRight> getAccessRights() {
+        return roles.stream()
+            .flatMap(role -> role.getAccessRights().stream())
+            .collect(Collectors.toSet());
+    }
+
+    public void setAccessRights(List<AccessRight> accessRights) {
+        //Do nothing
     }
 
     /**
@@ -187,10 +201,6 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
         return Objects.hash(getUsername(), getInstitution(), getRoles());
     }
 
-    private List<RoleDto> listRoles() {
-        return new ArrayList<>(Optional.ofNullable(roles).orElse(Collections.emptyList()));
-    }
-
     private static List<RoleDto> extractRoles(UserDb userDb) {
         return Optional.ofNullable(userDb)
             .stream()
@@ -204,6 +214,10 @@ public class UserDto implements WithCopy<UserDto.Builder>, JsonSerializable, Val
     private static <T> IllegalStateException unexpectedException(Failure<T> failure) {
         logger.error(ERROR_DUE_TO_INVALID_ROLE);
         return new IllegalStateException(failure.getException());
+    }
+
+    private List<RoleDto> listRoles() {
+        return new ArrayList<>(Optional.ofNullable(roles).orElse(Collections.emptyList()));
     }
 
     private List<RoleDb> createRoleDb() {

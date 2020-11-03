@@ -113,7 +113,7 @@ public final class EntityUtils {
      */
     public static UserDto createUserWithRoleWithoutInstitution()
         throws InvalidEntryInternalException {
-        RoleDto sampleRole = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
+        RoleDto sampleRole = createRole(SOME_ROLENAME);
         return UserDto.newBuilder()
             .withUsername(SOME_USERNAME)
             .withGivenName(SOME_GIVEN_NAME)
