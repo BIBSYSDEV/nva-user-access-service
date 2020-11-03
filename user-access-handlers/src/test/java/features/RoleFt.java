@@ -31,7 +31,7 @@ public class RoleFt extends ScenarioTest {
         super(scenarioContext);
     }
 
-    @Given("^an (\\w*) with role-name \"(\\w*)\" that exists in the Database$")
+    @Given("^an{0,1} (\\w*) with role-name \"(\\w*)\" that exists in the Database$")
     public void an_ExistingRole_with_role_name(String roleAlias, String roleName)
         throws ConflictException, InvalidEntryInternalException, InvalidInputException {
         RoleDto roleDto = addRoleToExampleRoles(roleAlias, roleName);

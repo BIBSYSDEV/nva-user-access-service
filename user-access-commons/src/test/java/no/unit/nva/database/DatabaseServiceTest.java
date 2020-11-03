@@ -148,7 +148,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
     @Test
     public void addUserSavesAUserWithoutInstitution() throws InvalidEntryInternalException, ConflictException,
                                                              InvalidInputException, NotFoundException {
-        UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME,null, SOME_ROLE);
+        UserDto expectedUser = createSampleUserAndAddUserToDb(SOME_USERNAME, null, SOME_ROLE);
         UserDto actualUser = db.getUser(expectedUser);
 
         assertThat(actualUser, is(equalTo(expectedUser)));
@@ -274,14 +274,27 @@ public class DatabaseServiceTest extends DatabaseAccessor {
 
     private UserDto cloneAndChangeRole(UserDto existingUser) throws InvalidEntryInternalException {
         RoleDto someOtherRole = createRole(SOME_OTHER_ROLE);
+        addRoleToDb(someOtherRole);
         return existingUser.copy().withRoles(Collections.singletonList(someOtherRole)).build();
     }
 
     private UserDto createSampleUserAndAddUserToDb(String username, String institution, String roleName)
         throws InvalidEntryInternalException, ConflictException, InvalidInputException {
         UserDto userDto = createSampleUser(username, institution, roleName);
+        List<RoleDto> roles = userDto.getRoles();
+        roles.stream().forEach(this::addRoleToDb);
         db.addUser(userDto);
         return userDto;
+    }
+
+    private void addRoleToDb(RoleDto role) {
+        try {
+            db.addRole(role);
+        } catch (InvalidInputException | InvalidEntryInternalException e) {
+            throw new RuntimeException(e);
+        } catch (ConflictException e) {
+            System.out.println("Role exists:" + role.toString());
+        }
     }
 
     private UserDto createSampleUser(String username, String institution, String roleName)
