@@ -1,5 +1,6 @@
 package no.unit.nva.database;
 
+import static no.unit.nva.database.RoleService.ROLE_NOT_FOUND_MESSAGE;
 import static nva.commons.utils.attempt.Try.attempt;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -79,11 +80,11 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
 
     @Test
     public void getRoleLogsWarningWhenNotFoundExceptionIsThrown() throws InvalidEntryInternalException {
-        TestAppender testAppender = LogUtils.getTestingAppender(DatabaseServiceImpl.class);
+        TestAppender testAppender = LogUtils.getTestingAppender(RoleService.class);
         RoleDto nonExistingRole = EntityUtils.createRole(EntityUtils.SOME_ROLENAME);
         attempt(() -> databaseService.getRole(nonExistingRole));
         assertThat(testAppender.getMessages(),
-            StringContains.containsString(DatabaseServiceImpl.ROLE_NOT_FOUND_MESSAGE));
+            StringContains.containsString(ROLE_NOT_FOUND_MESSAGE));
     }
 
 

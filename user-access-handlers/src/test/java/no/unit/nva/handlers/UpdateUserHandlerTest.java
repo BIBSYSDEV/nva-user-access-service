@@ -1,6 +1,6 @@
 package no.unit.nva.handlers;
 
-import static no.unit.nva.database.DatabaseServiceImpl.USER_NOT_FOUND_MESSAGE;
+import static no.unit.nva.database.UserService.USER_NOT_FOUND_MESSAGE;
 import static no.unit.nva.handlers.UpdateUserHandler.INCONSISTENT_USERNAME_IN_PATH_AND_OBJECT_ERROR;
 import static no.unit.nva.handlers.UpdateUserHandler.LOCATION_HEADER;
 import static no.unit.nva.handlers.UpdateUserHandler.USERNAME_PATH_PARAMETER;

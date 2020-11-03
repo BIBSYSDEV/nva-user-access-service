@@ -1,7 +1,6 @@
 package no.unit.nva.database;
 
 import java.util.List;
-import java.util.Optional;
 import no.unit.nva.exceptions.ConflictException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.exceptions.InvalidInputException;
@@ -17,8 +16,6 @@ public interface DatabaseService {
 
     List<UserDto> listUsers(String institutionId) throws InvalidEntryInternalException;
 
-    Optional<UserDto> getUserAsOptional(UserDto queryObject) throws InvalidEntryInternalException;
-
     void addUser(UserDto user) throws InvalidEntryInternalException, ConflictException, InvalidInputException;
 
     void addRole(RoleDto roleDto)
@@ -28,6 +25,4 @@ public interface DatabaseService {
         throws InvalidEntryInternalException, NotFoundException, InvalidInputException;
 
     RoleDto getRole(RoleDto input) throws InvalidEntryInternalException, NotFoundException;
-
-    Optional<RoleDto> getRoleAsOptional(RoleDto input) throws InvalidEntryInternalException;
 }

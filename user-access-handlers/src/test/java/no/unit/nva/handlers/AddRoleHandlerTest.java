@@ -7,17 +7,17 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
+import no.unit.nva.database.RoleService;
 import no.unit.nva.exceptions.DataSyncException;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
+import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.exceptions.InvalidOrMissingTypeException;
@@ -94,7 +94,7 @@ public class AddRoleHandlerTest extends HandlerTest {
     public void handleRequestReturnsInternalServerErrorWhenDatabaseFailsToSaveTheData()
         throws InvalidEntryInternalException, IOException {
         RoleDto actualRole = sampleRole();
-        DatabaseService service = databaseServiceReturningEmpty();
+        DatabaseService service = databaseReturningNotFound();
         addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
 
         GatewayResponse<Problem> response = sendRequest(actualRole);
@@ -162,9 +162,10 @@ public class AddRoleHandlerTest extends HandlerTest {
 
     private AddRoleHandler addRoleHandlerThrowsUnexpectedException() {
         DatabaseService databaseServiceThrowingException = new DatabaseServiceImpl(localDynamo, envWithTableName) {
+
             @Override
-            public Optional<RoleDto> getRoleAsOptional(RoleDto queryObject) {
-                return Optional.empty();
+            public RoleDto getRole(RoleDto queryObject) throws NotFoundException {
+                throw new NotFoundException(RoleService.ROLE_NOT_FOUND_MESSAGE);
             }
         };
 
@@ -176,21 +177,21 @@ public class AddRoleHandlerTest extends HandlerTest {
             private int counter = 0;
 
             @Override
-            public Optional<RoleDto> getRoleAsOptional(RoleDto queryObject) throws InvalidEntryInternalException {
+            public RoleDto getRole(RoleDto queryObject) throws InvalidEntryInternalException, NotFoundException {
                 if (counter == 0) {
                     counter++;
-                    return Optional.empty();
+                    throw new NotFoundException(RoleService.ROLE_NOT_FOUND_MESSAGE);
                 }
-                return super.getRoleAsOptional(queryObject);
+                return super.getRole(queryObject);
             }
         };
     }
 
-    private DatabaseServiceImpl databaseServiceReturningEmpty() {
+    private DatabaseServiceImpl databaseReturningNotFound() {
         return new DatabaseServiceImpl(localDynamo, envWithTableName) {
             @Override
-            public Optional<RoleDto> getRoleAsOptional(RoleDto queryObject) {
-                return Optional.empty();
+            public RoleDto getRole(RoleDto queryObject) throws NotFoundException {
+                throw new NotFoundException(RoleService.ROLE_NOT_FOUND_MESSAGE);
             }
         };
     }
