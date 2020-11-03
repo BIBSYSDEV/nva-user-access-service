@@ -1,6 +1,6 @@
 package no.unit.nva.database;
 
-import static no.unit.nva.database.DatabaseServiceWithTableNameOverride.createMapperOverridingHardCodedTableName;
+import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
 import static no.unit.nva.model.DoesNotHaveNullFields.doesNotHaveNullFields;
 import static nva.commons.utils.attempt.Try.attempt;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -13,7 +13,8 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.Table;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -90,8 +91,8 @@ public class UserDbTest extends DatabaseAccessor {
 
     @Test
     void userDbShouldBeWriteableToDatabase() {
-        DynamoDBMapper mapper = createMapperOverridingHardCodedTableName(initializeTestDatabase(), envWithTableName);
-        assertDoesNotThrow(() -> mapper.save(sampleUser));
+        Table table = DatabaseServiceImpl.createTable(initializeTestDatabase(), envWithTableName);
+        assertDoesNotThrow(() -> table.putItem(sampleUser.toItem()));
     }
 
     @Test
@@ -103,11 +104,12 @@ public class UserDbTest extends DatabaseAccessor {
             .withInstitution(SOME_INSTITUTION)
             .withRoles(SAMPLE_ROLES)
             .build();
-        DynamoDBMapper mapper = clientToLocalDatabase();
-        mapper.save(insertedUser);
+        Table table = clientToLocalDatabase();
+        table.putItem(insertedUser.toItem());
         assertThat(insertedUser, doesNotHaveNullFields());
-        UserDb savedUser = mapper.load(UserDb.class, insertedUser.getPrimaryHashKey(),
-            insertedUser.getPrimaryRangeKey());
+        Item item = table.getItem(DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY, insertedUser.getPrimaryHashKey(),
+            PRIMARY_KEY_RANGE_KEY, insertedUser.getPrimaryRangeKey());
+        UserDb savedUser = UserDb.fromItem(item, UserDb.class);
         assertThat(savedUser, is(equalTo(insertedUser)));
     }
 
@@ -161,7 +163,7 @@ public class UserDbTest extends DatabaseAccessor {
         return RoleDb.newBuilder().withName(str).build();
     }
 
-    private DynamoDBMapper clientToLocalDatabase() {
-        return createMapperOverridingHardCodedTableName(initializeTestDatabase(), envWithTableName);
+    private Table clientToLocalDatabase() {
+        return DatabaseServiceImpl.createTable(initializeTestDatabase(), envWithTableName);
     }
 }

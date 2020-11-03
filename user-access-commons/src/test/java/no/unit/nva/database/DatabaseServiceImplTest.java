@@ -4,11 +4,12 @@ import static nva.commons.utils.attempt.Try.attempt;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
+import no.unit.nva.database.interfaces.DynamoEntryWithRangeKey;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
@@ -88,42 +89,33 @@ public class DatabaseServiceImplTest extends DatabaseAccessor {
 
     private DatabaseService mockServiceReceivingInvalidUserDbInstance() {
         UserDb userWithoutUsername = new UserDb();
-        DynamoDBMapper mockMapper = mockDynamoMapperReturningInvalidUser(userWithoutUsername);
-        return new DatabaseServiceImpl(mockMapper);
+        Table table = mockTableReturningInvalidEntry(userWithoutUsername);
+        return new DatabaseServiceImpl(table);
     }
 
     private DatabaseService mockServiceReceivingInvalidRoleDbInstance() {
         RoleDb roleWithoutName = new RoleDb();
 
-        DynamoDBMapper mockMapper = mockDynamoMapperReturningInvalidRole(roleWithoutName);
-        return new DatabaseServiceImpl(mockMapper);
+        Table table = mockTableReturningInvalidEntry(roleWithoutName);
+        return new DatabaseServiceImpl(table);
     }
 
     private DatabaseService mockServiceThrowsExceptionWhenLoadingRole() {
-        DynamoDBMapper mockMapper = mockMapperThrowingException();
+        Table mockMapper = mockMapperThrowingException();
         return new DatabaseServiceImpl(mockMapper);
     }
 
-    private DynamoDBMapper mockMapperThrowingException() {
-        DynamoDBMapper mockMapper = mock(DynamoDBMapper.class);
-        when(mockMapper.load(any())).thenAnswer(invocation -> {
+    private Table mockMapperThrowingException() {
+        Table table = mock(Table.class);
+        when(table.getItem(anyString(), anyString(), anyString(), anyString())).thenAnswer(invocation -> {
             throw new AmazonDynamoDBException(EXPECTED_EXCEPTION_MESSAGE);
         });
-        return mockMapper;
+        return table;
     }
 
-    @SuppressWarnings("unchecked")
-    private DynamoDBMapper mockDynamoMapperReturningInvalidUser(UserDb response) {
-        DynamoDBMapper mockMapper = mock(DynamoDBMapper.class);
-        when(mockMapper.load(any(UserDb.class))).thenReturn(response);
-        return mockMapper;
-    }
-
-    @SuppressWarnings("unchecked")
-    private DynamoDBMapper mockDynamoMapperReturningInvalidRole(RoleDb response) {
-        DynamoDBMapper mockMapper = mock(DynamoDBMapper.class);
-        when(mockMapper.load(any(RoleDb.class)))
-            .thenReturn(response);
+    private Table mockTableReturningInvalidEntry(DynamoEntryWithRangeKey response) {
+        Table mockMapper = mock(Table.class);
+        when(mockMapper.getItem(anyString(), anyString(), anyString(), anyString())).thenReturn(response.toItem());
         return mockMapper;
     }
 }

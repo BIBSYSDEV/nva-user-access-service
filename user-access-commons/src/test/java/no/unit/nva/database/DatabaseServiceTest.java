@@ -1,6 +1,8 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.database.DatabaseServiceImpl.DYNAMO_DB_CLIENT_NOT_SET_ERROR;
+import static no.unit.nva.database.DatabaseServiceImpl.createTable;
 import static no.unit.nva.model.DoesNotHaveNullFields.doesNotHaveNullFields;
 import static no.unit.nva.utils.EntityUtils.createRole;
 import static no.unit.nva.utils.EntityUtils.createUserWithoutUsername;
@@ -9,11 +11,11 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsSame.sameInstance;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +25,8 @@ import no.unit.nva.exceptions.InvalidInputException;
 import no.unit.nva.exceptions.NotFoundException;
 import no.unit.nva.model.RoleDto;
 import no.unit.nva.model.UserDto;
+import nva.commons.utils.log.LogUtils;
+import nva.commons.utils.log.TestAppender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -238,6 +242,23 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
         List<UserDto> queryResult = db.listUsers(SOME_OTHER_INSTITUTION);
         assertThat(queryResult, is(empty()));
+    }
+
+    @Test
+    void createTableThrowsExceptionWhenDynamoClientIsNull() {
+        Executable action =
+            () -> createTable(null, mockEnvironment());
+        RuntimeException exception = assertThrows(RuntimeException.class, action);
+        assertThat(exception.getCause(), instanceOf(NullPointerException.class));
+    }
+
+    @Test
+    void createMapperOverridingHardCodedTableNameLogsErrorSayingThatMapperIsNull() {
+        TestAppender appender = LogUtils.getTestingAppender(DatabaseServiceImpl.class);
+        Executable action =
+            () -> createTable(null, mockEnvironment());
+        assertThrows(RuntimeException.class, action);
+        assertThat(appender.getMessages(), containsString(DYNAMO_DB_CLIENT_NOT_SET_ERROR));
     }
 
     private UserDto createSampleUserWithoutInstitutionOrRoles(String username)
