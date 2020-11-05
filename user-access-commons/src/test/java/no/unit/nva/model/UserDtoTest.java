@@ -254,7 +254,7 @@ public class UserDtoTest extends DtoTest {
 
     private RoleDto sampleRole(AccessRight approveDoiRequest, String someRolename)
         throws InvalidEntryInternalException {
-        List<AccessRight> firstRoleAccessRights = Collections.singletonList(approveDoiRequest);
+        var firstRoleAccessRights = Collections.singleton(approveDoiRequest);
         return RoleDto.newBuilder()
             .withName(someRolename)
             .withAccessRights(firstRoleAccessRights)
