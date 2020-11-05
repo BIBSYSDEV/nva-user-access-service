@@ -39,6 +39,8 @@ import nva.commons.utils.attempt.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+//TODO break it up in modules. Coming in next PR.
 @SuppressWarnings("PMD.GodClass")
 public class DatabaseServiceImpl implements DatabaseService {
 
@@ -114,17 +116,22 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public void updateUser(UserDto queryObject)
+    public void updateUser(UserDto updateObject)
         throws InvalidEntryInternalException, InvalidInputException, NotFoundException {
 
-        logger.debug(UPDATE_USER_DEBUG_MESSAGE + queryObject.toJsonString(objectMapper));
-        validate(queryObject);
-        UserDto existingUser = getExistingUserOrSendNotFoundError(queryObject);
+        logger.debug(UPDATE_USER_DEBUG_MESSAGE + updateObject.toJsonString(objectMapper));
+        validate(updateObject);
+        UserDto existingUser = getExistingUserOrSendNotFoundError(updateObject);
+        UserDb updateObjectWithSyncedRoles = checkRoleDetailsAreInSync(updateObject);
+        if (userHasChanged(existingUser, updateObjectWithSyncedRoles)) {
+            updateTable(updateObjectWithSyncedRoles);
+        }
+    }
+
+    private UserDb checkRoleDetailsAreInSync(UserDto queryObject) throws InvalidEntryInternalException {
         UserDb desiredUpdate = queryObject.toUserDb();
         UserDb desiredUpdateWithSyncedRoles = userWithSyncedRoles(desiredUpdate);
-        if (userHasChanged(existingUser, desiredUpdateWithSyncedRoles)) {
-            updateTable(desiredUpdateWithSyncedRoles);
-        }
+        return desiredUpdateWithSyncedRoles;
     }
 
     @Override
@@ -202,6 +209,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static RuntimeException logErrorWithDynamoClientAndThrowException(Failure<AmazonDynamoDB> failure) {
         logger.error(DYNAMO_DB_CLIENT_NOT_SET_ERROR);
         return new RuntimeException(failure.getException());
+
     }
 
     private boolean userHasChanged(UserDto existingUser, UserDb desiredUpdateWithSyncedRoles)

@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import no.unit.nva.database.RoleDb.Builder;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +61,7 @@ public class RoleDbTest extends DatabaseAccessor {
     @Test
     public void equalsReturnsFalseWhenAccessRightListIsDifferent() throws InvalidEntryInternalException {
 
-        List<AccessRight> differentAccessRights = Collections.singletonList(AccessRight.REJECT_DOI_REQUEST);
+        Set<AccessRight> differentAccessRights = Collections.singleton(AccessRight.REJECT_DOI_REQUEST);
         assertThat(sampleRole.getAccessRights().containsAll(differentAccessRights), is(equalTo(false)));
         RoleDb differentRole = sampleRole.copy().withAccessRights(differentAccessRights).build();
 
@@ -75,7 +75,7 @@ public class RoleDbTest extends DatabaseAccessor {
 
     @Test
     public void roleDbWithAccessRightsIsSavedInDatabase() throws InvalidEntryInternalException {
-        List<AccessRight> accessRights = List.of(AccessRight.APPROVE_DOI_REQUEST, AccessRight.REJECT_DOI_REQUEST);
+        var accessRights = Set.of(AccessRight.APPROVE_DOI_REQUEST, AccessRight.REJECT_DOI_REQUEST);
         RoleDb roleWithAccessRights = sampleRole.copy().withAccessRights(accessRights).build();
         table.putItem(roleWithAccessRights.toItem());
 
@@ -180,7 +180,7 @@ public class RoleDbTest extends DatabaseAccessor {
     }
 
     private RoleDb createSampleRole() throws InvalidEntryInternalException {
-        List<AccessRight> accessRights = Collections.singletonList(AccessRight.APPROVE_DOI_REQUEST);
+        Set<AccessRight> accessRights = Collections.singleton(AccessRight.APPROVE_DOI_REQUEST);
         return RoleDb.newBuilder()
             .withName(SOME_ROLE_NAME)
             .withAccessRights(accessRights)

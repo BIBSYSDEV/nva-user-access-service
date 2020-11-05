@@ -5,8 +5,8 @@ import static nva.commons.utils.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import no.unit.nva.database.AccessRight;
 import no.unit.nva.database.RoleDb;
 import no.unit.nva.database.interfaces.WithCopy;
@@ -24,10 +24,10 @@ public class RoleDto implements WithCopy<Builder>, JsonSerializable, Validable, 
     @JsonProperty("rolename")
     private String roleName;
     @JsonProperty("accessRights")
-    private List<AccessRight> accessRights;
+    private Set<AccessRight> accessRights;
 
     public RoleDto() {
-        accessRights = Collections.emptyList();
+        accessRights = Collections.emptySet();
     }
 
     private RoleDto(Builder builder) throws InvalidEntryInternalException {
@@ -74,11 +74,11 @@ public class RoleDto implements WithCopy<Builder>, JsonSerializable, Validable, 
         this.roleName = roleName;
     }
 
-    public List<AccessRight> getAccessRights() {
+    public Set<AccessRight> getAccessRights() {
         return accessRights;
     }
 
-    public void setAccessRights(List<AccessRight> accessRights) {
+    public void setAccessRights(Set<AccessRight> accessRights) {
         this.accessRights = accessRights;
     }
 
@@ -124,10 +124,10 @@ public class RoleDto implements WithCopy<Builder>, JsonSerializable, Validable, 
     public static final class Builder {
 
         private String roleName;
-        private List<AccessRight> accessRights;
+        private Set<AccessRight> accessRights;
 
         private Builder() {
-            this.accessRights = Collections.emptyList();
+            this.accessRights = Collections.emptySet();
         }
 
         public Builder withName(String roleName) {
@@ -135,7 +135,7 @@ public class RoleDto implements WithCopy<Builder>, JsonSerializable, Validable, 
             return this;
         }
 
-        public Builder withAccessRights(List<AccessRight> accessRights) {
+        public Builder withAccessRights(Set<AccessRight> accessRights) {
             this.accessRights = accessRights;
             return this;
         }
