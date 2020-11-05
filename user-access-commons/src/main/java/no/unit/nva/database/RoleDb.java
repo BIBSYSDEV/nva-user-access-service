@@ -1,19 +1,21 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
+import no.unit.nva.database.RoleDb.Builder;
 import no.unit.nva.database.interfaces.DynamoEntryWithRangeKey;
 import no.unit.nva.database.interfaces.WithCopy;
 import no.unit.nva.database.interfaces.WithType;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.JacocoGenerated;
 
-@DynamoDBTable(tableName = "OverridenByEnvironmentVariable")
-public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<RoleDb.Builder>, WithType {
+public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>, WithType {
 
     public static String TYPE = "ROLE";
     public static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey should start with \"" + TYPE + "\"";
@@ -23,19 +25,23 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<RoleDb.B
     private String primaryHashKey;
     @JsonProperty(PRIMARY_KEY_RANGE_KEY)
     private String primaryRangeKey;
+    @JsonProperty("accessRights")
+    private Set<AccessRight> accessRights;
 
     @JsonProperty("name")
     private String name;
 
     public RoleDb() {
         super();
+        this.accessRights = Collections.emptySet();
     }
 
     private RoleDb(Builder builder) throws InvalidEntryInternalException {
         super();
-        setName(builder.name);
         setPrimaryHashKey(builder.primaryHashKey);
+        setName(builder.name);
         setPrimaryRangeKey(builder.primaryRangeKey);
+        setAccessRights(builder.accessRights);
     }
 
     public static Builder newBuilder() {
@@ -98,9 +104,25 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<RoleDb.B
         return TYPE;
     }
 
+    public Set<AccessRight> getAccessRights() {
+        return this.accessRights;
+    }
+
+    public void setAccessRights(Set<AccessRight> accessRights) {
+        this.accessRights = accessRights;
+    }
+
     @Override
     public Builder copy() {
-        return new Builder().withName(this.name);
+        return new Builder()
+            .withName(this.getName())
+            .withAccessRights(this.getAccessRights());
+    }
+
+    @JacocoGenerated
+    @Override
+    public String toString() {
+        return this.toJsonString();
     }
 
     @Override
@@ -114,14 +136,15 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<RoleDb.B
         }
         RoleDb roleDb = (RoleDb) o;
         return Objects.equals(getPrimaryHashKey(), roleDb.getPrimaryHashKey())
-            && Objects.equals(getName(), roleDb.getName())
-            && Objects.equals(getPrimaryRangeKey(), roleDb.getPrimaryRangeKey());
+            && Objects.equals(getPrimaryRangeKey(), roleDb.getPrimaryRangeKey())
+            && Objects.equals(getAccessRights(), roleDb.getAccessRights())
+            && Objects.equals(getName(), roleDb.getName());
     }
 
     @Override
     @JacocoGenerated
     public int hashCode() {
-        return Objects.hash(getPrimaryHashKey(), getName(), getPrimaryRangeKey());
+        return Objects.hash(getPrimaryHashKey(), getPrimaryRangeKey(), getAccessRights(), getName());
     }
 
     public static final class Builder {
@@ -130,12 +153,19 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<RoleDb.B
         private String name;
         private String primaryHashKey;
         private String primaryRangeKey;
+        private Set<AccessRight> accessRights;
 
         private Builder() {
+            accessRights = Collections.emptySet();
         }
 
         public Builder withName(String val) {
             name = val;
+            return this;
+        }
+
+        public Builder withAccessRights(Set<AccessRight> accessRights) {
+            this.accessRights = nonNull(accessRights) ? accessRights : Collections.emptySet();
             return this;
         }
 

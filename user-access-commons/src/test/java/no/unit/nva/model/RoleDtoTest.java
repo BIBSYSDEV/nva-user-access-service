@@ -1,6 +1,7 @@
 package no.unit.nva.model;
 
 import static no.unit.nva.hamcrest.DoesNotHaveNullOrEmptyFields.doesNotHaveNullOrEmptyFields;
+import static no.unit.nva.utils.EntityUtils.SAMPLE_ACCESS_RIGHTS;
 import static no.unit.nva.utils.EntityUtils.SOME_ROLENAME;
 import static no.unit.nva.utils.EntityUtils.createRole;
 import static nva.commons.utils.JsonUtils.objectMapper;
@@ -18,6 +19,9 @@ import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Collections;
+import no.unit.nva.database.AccessRight;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.model.RoleDto.Builder;
 import org.hamcrest.core.IsSame;
@@ -34,6 +38,7 @@ public class RoleDtoTest extends DtoTest {
     public static final String SOME_ROLE_NAME = "someRoleName";
     protected static final String ROLE_TYPE_LITERAL = "Role";
 
+
     @Test
     public void roleDtoShouldHaveABuilder() {
         Builder builder = RoleDto.newBuilder();
@@ -44,6 +49,16 @@ public class RoleDtoTest extends DtoTest {
     public void builderShouldAllowSettingRoleName() throws InvalidEntryInternalException {
         RoleDto role = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
         assertThat(role.getRoleName(), is(equalTo(SOME_ROLE_NAME)));
+    }
+
+    @Test
+    public void builderAllowsSettingAccessRights() throws InvalidEntryInternalException {
+        RoleDto sampleRole = RoleDto.newBuilder()
+            .withName(SOME_ROLE_NAME)
+            .withAccessRights(SAMPLE_ACCESS_RIGHTS)
+            .build();
+
+        assertThat(sampleRole.getAccessRights(), is(equalTo(SAMPLE_ACCESS_RIGHTS)));
     }
 
     @ParameterizedTest(name = "builder should throw exception when rolename is:\"{0}\"")
@@ -62,7 +77,11 @@ public class RoleDtoTest extends DtoTest {
 
     @Test
     public void copyReturnsABuilderWithAllFieldsOfOriginalObjectPreserved() throws InvalidEntryInternalException {
-        RoleDto original = RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
+        RoleDto original = RoleDto
+            .newBuilder()
+            .withName(SOME_ROLE_NAME)
+            .withAccessRights(SAMPLE_ACCESS_RIGHTS)
+            .build();
         RoleDto copy = original.copy().build();
         assertThat(original, doesNotHaveNullOrEmptyFields());
         assertThat(copy, is(not(sameInstance(original))));

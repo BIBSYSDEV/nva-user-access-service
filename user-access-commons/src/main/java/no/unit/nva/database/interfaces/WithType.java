@@ -8,6 +8,6 @@ public interface WithType {
     String getType();
 
     default void setType(String type) {
-        //
+        // Do nothing;
     }
 }

@@ -2,6 +2,7 @@ package no.unit.nva.database;
 
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
+import static no.unit.nva.hamcrest.DoesNotHaveNullOrEmptyFields.doesNotHaveNullOrEmptyFields;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -14,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import java.util.Collections;
+import java.util.Set;
 import no.unit.nva.database.RoleDb.Builder;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +40,48 @@ public class RoleDbTest extends DatabaseAccessor {
     @Test
     public void getPrimaryHashKeyReturnsStringContainingTypeRole() {
         assertThat(sampleRole.getPrimaryHashKey(), containsString(RoleDb.TYPE));
+    }
+
+    @Test
+    public void equalsComparesAllFields() throws InvalidEntryInternalException {
+        RoleDb left = sampleRole;
+        RoleDb right = sampleRole.copy().build();
+        assertThat(sampleRole, doesNotHaveNullOrEmptyFields());
+        assertThat(left, is(equalTo(right)));
+    }
+
+    @Test
+    public void equalsReturnsFalseWhenNameIsDifferent() throws InvalidEntryInternalException {
+        RoleDb left = sampleRole;
+        RoleDb right = sampleRole.copy().withName("SomeOtherName").build();
+
+        assertThat(left, is(not(equalTo(right))));
+    }
+
+    @Test
+    public void equalsReturnsFalseWhenAccessRightListIsDifferent() throws InvalidEntryInternalException {
+
+        Set<AccessRight> differentAccessRights = Collections.singleton(AccessRight.REJECT_DOI_REQUEST);
+        assertThat(sampleRole.getAccessRights().containsAll(differentAccessRights), is(equalTo(false)));
+        RoleDb differentRole = sampleRole.copy().withAccessRights(differentAccessRights).build();
+
+        assertThat(sampleRole, is(not(equalTo(differentRole))));
+    }
+
+    @Test
+    public void roleDbHasListOfAccessRights() {
+        assertThat(sampleRole.getAccessRights(), is(not(nullValue())));
+    }
+
+    @Test
+    public void roleDbWithAccessRightsIsSavedInDatabase() throws InvalidEntryInternalException {
+        var accessRights = Set.of(AccessRight.APPROVE_DOI_REQUEST, AccessRight.REJECT_DOI_REQUEST);
+        RoleDb roleWithAccessRights = sampleRole.copy().withAccessRights(accessRights).build();
+        table.putItem(roleWithAccessRights.toItem());
+
+        Item savedRoleItem = fetchRole(roleWithAccessRights);
+        RoleDb savedRole = RoleDb.fromItem(savedRoleItem, RoleDb.class);
+        assertThat(savedRole, is(equalTo(roleWithAccessRights)));
     }
 
     @BeforeEach
@@ -78,7 +123,7 @@ public class RoleDbTest extends DatabaseAccessor {
     @Test
     void roleDbRoleNameIsSavedInDatabase() {
         table.putItem(Item.fromJSON(sampleRole.toJsonString()));
-        Item item = fetchRole();
+        Item item = fetchRole(sampleRole);
         RoleDb retrievedRole = RoleDb.fromItem(item, RoleDb.class);
         assertThat(retrievedRole, is(equalTo(sampleRole)));
     }
@@ -129,12 +174,16 @@ public class RoleDbTest extends DatabaseAccessor {
         assertThat(copyRole, is(not(sameInstance(sampleRole))));
     }
 
-    private Item fetchRole() {
-        return table.getItem(PRIMARY_KEY_HASH_KEY, sampleRole.getPrimaryHashKey(),
-            PRIMARY_KEY_RANGE_KEY, sampleRole.getPrimaryRangeKey());
+    private Item fetchRole(RoleDb role) {
+        return table.getItem(PRIMARY_KEY_HASH_KEY, role.getPrimaryHashKey(),
+            PRIMARY_KEY_RANGE_KEY, role.getPrimaryRangeKey());
     }
 
     private RoleDb createSampleRole() throws InvalidEntryInternalException {
-        return RoleDb.newBuilder().withName(SOME_ROLE_NAME).build();
+        Set<AccessRight> accessRights = Collections.singleton(AccessRight.APPROVE_DOI_REQUEST);
+        return RoleDb.newBuilder()
+            .withName(SOME_ROLE_NAME)
+            .withAccessRights(accessRights)
+            .build();
     }
 }

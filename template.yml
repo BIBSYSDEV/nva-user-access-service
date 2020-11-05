@@ -164,13 +164,21 @@ Resources:
                 httpMethod: POST
                 type: aws_proxy
         components:
-          schemas:
+          AccessRight:
+            type: string
+            enum:
+              - APPROVE_DOI_REQUEST
+              - REJECT_DOI_REQUEST
             Role:
               properties:
                 type:
                   type: string
                 rolename:
                   type: string
+                accessRight:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccessRight'
             User:
               properties:
                 type:
@@ -187,6 +195,10 @@ Resources:
                   type: array
                   items:
                     $ref: '#/components/schemas/Role'
+                accessRight:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccessRight'
           securitySchemes:
             ApiKey:
               type: apiKey
@@ -363,18 +375,30 @@ Resources:
                 httpMethod: POST
                 type: aws_proxy
         components:
-          schemas:
+          AccessRight:
+            type: string
+            enum:
+              - APPROVE_DOI_REQUEST
+              - REJECT_DOI_REQUEST
             Role:
               properties:
                 type:
                   type: string
                 rolename:
                   type: string
+                accessRight:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccessRight'
             User:
               properties:
                 type:
                   type: string
                 username:
+                  type: string
+                givenName:
+                  type: string
+                familyName:
                   type: string
                 institution:
                   type: string
@@ -382,6 +406,10 @@ Resources:
                   type: array
                   items:
                     $ref: '#/components/schemas/Role'
+                accessRight:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccessRight'
           securitySchemes:
             CognitoUserPool:
               type: apiKey
