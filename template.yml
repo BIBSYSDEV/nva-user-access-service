@@ -167,8 +167,8 @@ Resources:
           AccessRight:
             type: string
             enum:
-              - approve_doi_request
-              - reject_doi_request
+              - APPROVE_DOI_REQUEST
+              - REJECT_DOI_REQUEST
             Role:
               properties:
                 type:
@@ -378,8 +378,8 @@ Resources:
           AccessRight:
             type: string
             enum:
-              - approve_doi_request
-              - reject_doi_request
+              - APPROVE_DOI_REQUEST
+              - REJECT_DOI_REQUEST
             Role:
               properties:
                 type:
