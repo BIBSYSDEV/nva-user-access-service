@@ -93,24 +93,30 @@ public class UserService extends DatabaseSubService {
     /**
      * Update an existing user.
      *
-     * @param queryObject the updated user information.
+     * @param updateObject the updated user information.
      * @throws InvalidEntryInternalException when a user with same username exists and the entry in the database is
      *                                       invalid.
      * @throws InvalidInputException         when the input entry is invalid.
      * @throws NotFoundException             when there is no user with the same username in the database.
      */
-    public void updateUser(UserDto queryObject)
+    public void updateUser(UserDto updateObject)
         throws InvalidEntryInternalException, InvalidInputException, NotFoundException {
 
-        logger.debug(UPDATE_USER_DEBUG_MESSAGE + queryObject.toJsonString(objectMapper));
-        validate(queryObject);
-        UserDto existingUser = getExistingUserOrSendNotFoundError(queryObject);
-        UserDb desiredUpdate = queryObject.toUserDb();
-        UserDb desiredUpdateWithSyncedRoles = userWithSyncedRoles(desiredUpdate);
-        if (userHasChanged(existingUser, desiredUpdateWithSyncedRoles)) {
-            updateTable(desiredUpdateWithSyncedRoles);
+        logger.debug(UPDATE_USER_DEBUG_MESSAGE + updateObject.toJsonString(objectMapper));
+        validate(updateObject);
+        UserDto existingUser = getExistingUserOrSendNotFoundError(updateObject);
+        UserDb updatedObjectWithSyncedRoles = checkRoleDetailsAreInSync(updateObject);
+        if (userHasChanged(existingUser, updatedObjectWithSyncedRoles)) {
+            updateTable(updatedObjectWithSyncedRoles);
         }
     }
+
+    private UserDb checkRoleDetailsAreInSync(UserDto updateObject) throws InvalidEntryInternalException {
+        UserDb desiredUpdate = updateObject.toUserDb();
+        UserDb desiredUpdateWithSyncedRoles = userWithSyncedRoles(desiredUpdate);
+        return desiredUpdateWithSyncedRoles;
+    }
+
 
     private Optional<UserDto> getUserAsOptional(UserDto queryObject) throws InvalidEntryInternalException {
         logger.debug(GET_USER_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(queryObject));

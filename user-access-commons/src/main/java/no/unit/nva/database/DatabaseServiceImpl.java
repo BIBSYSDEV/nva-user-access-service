@@ -18,6 +18,8 @@ import nva.commons.utils.attempt.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+@SuppressWarnings("PMD.GodClass")
 public class DatabaseServiceImpl implements DatabaseService {
 
     public static final String DYNAMO_DB_CLIENT_NOT_SET_ERROR = "DynamoDb client has not been set";
@@ -57,6 +59,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         this.userService.addUser(user);
     }
 
+
     @Override
     public void addRole(RoleDto roleDto)
         throws ConflictException, InvalidInputException, InvalidEntryInternalException {
@@ -88,5 +91,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static RuntimeException logErrorWithDynamoClientAndThrowException(Failure<AmazonDynamoDB> failure) {
         logger.error(DYNAMO_DB_CLIENT_NOT_SET_ERROR);
         return new RuntimeException(failure.getException());
+
     }
+
 }

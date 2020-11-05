@@ -8,6 +8,7 @@ import static no.unit.nva.database.RoleService.ROLE_NOT_FOUND_MESSAGE;
 import static no.unit.nva.database.UserService.USER_ALREADY_EXISTS_ERROR_MESSAGE;
 import static no.unit.nva.database.UserService.USER_NOT_FOUND_MESSAGE;
 import static no.unit.nva.model.DoesNotHaveNullFields.doesNotHaveNullFields;
+import static no.unit.nva.utils.EntityUtils.SOME_ROLENAME;
 import static no.unit.nva.utils.EntityUtils.createRole;
 import static no.unit.nva.utils.EntityUtils.createUserWithoutUsername;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,6 +39,7 @@ import org.junit.jupiter.api.function.Executable;
 
 public class DatabaseServiceTest extends DatabaseAccessor {
 
+    public static final String SOME_GIVEN_NAME1 = "SomeGivenName";
     private static final String SOME_USERNAME = "someusername";
     private static final String SOME_OTHER_USERNAME = "someotherusername";
     private static final String SOME_GIVEN_NAME = "givenName";
@@ -186,14 +188,30 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         String conflictingUsername = SOME_USERNAME;
         createSampleUserAndAddUserToDb(conflictingUsername, SOME_INSTITUTION, SOME_ROLE);
 
-        UserDto conflictingUser = UserDto.newBuilder().withUsername(conflictingUsername)
-            .withInstitution(SOME_OTHER_INSTITUTION)
-            .withRoles(Collections.singletonList(createRole(SOME_OTHER_ROLE)))
-            .build();
+        UserDto conflictingUser = createUserWithRole(conflictingUsername,
+            SOME_OTHER_INSTITUTION, createRole(SOME_OTHER_ROLE));
 
         Executable action = () -> db.addUser(conflictingUser);
         ConflictException exception = assertThrows(ConflictException.class, action);
         assertThat(exception.getMessage(), containsString(USER_ALREADY_EXISTS_ERROR_MESSAGE));
+    }
+
+    @DisplayName("updateUser() updates existing user with input user when input user is valid")
+    @Test
+    public void updateUserUpdatesAssignsCorrectVersionOfRoleinUser()
+        throws ConflictException, InvalidEntryInternalException, NotFoundException, InvalidInputException {
+        RoleDto existingRole = createRole(SOME_ROLE);
+        db.addRole(existingRole);
+        UserDto existingUser = createUserWithRole(SOME_USERNAME, SOME_INSTITUTION, existingRole);
+        db.addUser(existingUser);
+
+        UserDto userUpdate = userUpdateWithRoleMissingAccessRights(existingUser);
+
+        UserDto expectedUser = existingUser.copy().withGivenName(SOME_GIVEN_NAME).build();
+        db.updateUser(userUpdate);
+        UserDto actualUser = db.getUser(expectedUser);
+        assertThat(actualUser, is(equalTo(expectedUser)));
+        assertThat(actualUser, is(not(sameInstance(expectedUser))));
     }
 
     @DisplayName("updateUser() updates existing user with input user when input user is valid")
@@ -221,7 +239,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
 
     @DisplayName("updateUser() throws InvalidInputException when the input is invalid ")
     @Test
-    public void updateUserThrowsInvalidInputExceptionWhenTheInputisInvalid()
+    public void updateUserThrowsInvalidInputExceptionWhenTheInputIsInvalid()
         throws ConflictException, InvalidEntryInternalException, InvalidInputException, NoSuchMethodException,
                IllegalAccessException, InvocationTargetException {
         createSampleUserAndAddUserToDb(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
@@ -263,6 +281,24 @@ public class DatabaseServiceTest extends DatabaseAccessor {
             () -> createTable(null, mockEnvironment());
         assertThrows(RuntimeException.class, action);
         assertThat(appender.getMessages(), containsString(DYNAMO_DB_CLIENT_NOT_SET_ERROR));
+    }
+
+    private UserDto userUpdateWithRoleMissingAccessRights(UserDto existingUser)
+        throws InvalidEntryInternalException {
+        RoleDto roleWithOnlyRolename = RoleDto.newBuilder().withName(SOME_ROLENAME).build();
+        UserDto userUpdate = existingUser.copy()
+            .withGivenName(SOME_GIVEN_NAME)
+            .withRoles(Collections.singletonList(roleWithOnlyRolename))
+            .build();
+        return userUpdate;
+    }
+
+    private UserDto createUserWithRole(String someUsername, String someInstitution, RoleDto existingRole)
+        throws InvalidEntryInternalException {
+        return UserDto.newBuilder().withUsername(someUsername)
+            .withInstitution(someInstitution)
+            .withRoles(Collections.singletonList(existingRole))
+            .build();
     }
 
     private UserDto createSampleUserWithoutInstitutionOrRoles(String username)
