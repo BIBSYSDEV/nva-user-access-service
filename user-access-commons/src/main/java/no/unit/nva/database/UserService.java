@@ -170,6 +170,7 @@ public class UserService extends DatabaseSubService {
         return currentUser.copy().withRoles(roles).build();
     }
 
+    // TODO: use batch query for minimizing the cost.
     private List<RoleDb> currentRoles(UserDb currentUser) {
         return currentUser
             .getRoles()
