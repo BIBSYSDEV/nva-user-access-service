@@ -87,6 +87,6 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     private static RuntimeException logErrorWithDynamoClientAndThrowException(Failure<AmazonDynamoDB> failure) {
         logger.error(DYNAMO_DB_CLIENT_NOT_SET_ERROR);
-        throw new RuntimeException(failure.getException());
+        return new RuntimeException(failure.getException());
     }
 }

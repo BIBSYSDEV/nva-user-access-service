@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import no.unit.nva.database.AccessRight;
 import no.unit.nva.exceptions.InvalidEntryInternalException;
 import no.unit.nva.model.RoleDto;
@@ -19,8 +19,8 @@ public final class EntityUtils {
     public static final String SOME_ROLENAME = "SomeRole";
     public static final String SOME_INSTITUTION = "SomeInstitution";
     public static final String EMPTY_STRING = "";
-    public static final List<AccessRight> SAMPLE_ACCESS_RIGHTS =
-        Collections.singletonList(AccessRight.APPROVE_DOI_REQUEST);
+    public static final Set<AccessRight> SAMPLE_ACCESS_RIGHTS =
+        Collections.singleton(AccessRight.APPROVE_DOI_REQUEST);
     private static final String SOME_GIVEN_NAME = "givenName";
     private static final String SOME_FAMILY_NAME = "familyName";
 
@@ -123,6 +123,10 @@ public final class EntityUtils {
     }
 
     public static RoleDto createRole(String someRole) throws InvalidEntryInternalException {
-        return RoleDto.newBuilder().withName(someRole).withAccessRights(SAMPLE_ACCESS_RIGHTS).build();
+        return
+            RoleDto.newBuilder()
+                .withName(someRole)
+                .withAccessRights(SAMPLE_ACCESS_RIGHTS)
+                .build();
     }
 }

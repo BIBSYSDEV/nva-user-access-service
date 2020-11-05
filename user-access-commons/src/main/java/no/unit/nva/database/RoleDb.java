@@ -6,8 +6,8 @@ import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
 import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import no.unit.nva.database.RoleDb.Builder;
 import no.unit.nva.database.interfaces.DynamoEntryWithRangeKey;
 import no.unit.nva.database.interfaces.WithCopy;
@@ -26,14 +26,14 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     @JsonProperty(PRIMARY_KEY_RANGE_KEY)
     private String primaryRangeKey;
     @JsonProperty("accessRights")
-    private List<AccessRight> accessRights;
+    private Set<AccessRight> accessRights;
 
     @JsonProperty("name")
     private String name;
 
     public RoleDb() {
         super();
-        this.accessRights = Collections.emptyList();
+        this.accessRights = Collections.emptySet();
     }
 
     private RoleDb(Builder builder) throws InvalidEntryInternalException {
@@ -104,11 +104,11 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
         return TYPE;
     }
 
-    public List<AccessRight> getAccessRights() {
+    public Set<AccessRight> getAccessRights() {
         return this.accessRights;
     }
 
-    public void setAccessRights(List<AccessRight> accessRights) {
+    public void setAccessRights(Set<AccessRight> accessRights) {
         this.accessRights = accessRights;
     }
 
@@ -153,10 +153,10 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
         private String name;
         private String primaryHashKey;
         private String primaryRangeKey;
-        private List<AccessRight> accessRights;
+        private Set<AccessRight> accessRights;
 
         private Builder() {
-            accessRights = Collections.emptyList();
+            accessRights = Collections.emptySet();
         }
 
         public Builder withName(String val) {
@@ -164,8 +164,8 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
             return this;
         }
 
-        public Builder withAccessRights(List<AccessRight> accessRights) {
-            this.accessRights = nonNull(accessRights) ? accessRights : Collections.emptyList();
+        public Builder withAccessRights(Set<AccessRight> accessRights) {
+            this.accessRights = nonNull(accessRights) ? accessRights : Collections.emptySet();
             return this;
         }
 
