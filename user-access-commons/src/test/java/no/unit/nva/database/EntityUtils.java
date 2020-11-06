@@ -122,6 +122,13 @@ public final class EntityUtils {
             .build();
     }
 
+    /**
+     * Creates a sample role.
+     *
+     * @param someRole the role.
+     * @return the role.
+     * @throws InvalidEntryInternalException when generated role is invalid.
+     */
     public static RoleDto createRole(String someRole) throws InvalidEntryInternalException {
         return
             RoleDto.newBuilder()

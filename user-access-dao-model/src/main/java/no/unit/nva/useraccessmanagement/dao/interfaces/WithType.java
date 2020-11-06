@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public interface WithType {
 
-    @JsonProperty(value = "type")
+    @JsonProperty("type")
     String getType();
 
     default void setType(String type) {

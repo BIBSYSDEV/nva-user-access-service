@@ -2,7 +2,6 @@ package no.unit.nva.useraccessmanagement.model;
 
 import static java.util.Objects.isNull;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Collections;
 import java.util.Objects;
@@ -12,7 +11,6 @@ import no.unit.nva.useraccessmanagement.dao.RoleDb;
 import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.dao.interfaces.JsonSerializable;
 import no.unit.nva.useraccessmanagement.dao.interfaces.WithCopy;
-import no.unit.nva.useraccessmanagement.dao.interfaces.WithType;
 import no.unit.nva.useraccessmanagement.model.RoleDto.Builder;
 import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.interfaces.Typed;

@@ -4,7 +4,6 @@ import static nva.commons.utils.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nva.commons.utils.JsonUtils;
 import nva.commons.utils.attempt.Failure;
-import nva.commons.utils.attempt.Try;
 
 public interface JsonSerializable {
 
@@ -19,7 +18,7 @@ public interface JsonSerializable {
      */
     default String toJsonString(ObjectMapper objectMapper) {
         return
-            Try.attempt(() -> objectMapper.writeValueAsString(this))
+            attempt(() -> objectMapper.writeValueAsString(this))
                 .orElseThrow(this::newUnexpectedException);
     }
 
