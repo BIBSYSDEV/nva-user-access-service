@@ -107,7 +107,7 @@ public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, 
             .withGivenName(givenName)
             .withFamilyName(familyName)
             .withInstitution(institution)
-            .withRoles(createRoleDb());
+            .withRoles(createRoleDbList());
 
         return userDb.build();
     }
@@ -217,14 +217,15 @@ public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, 
     /*This exception should not happen as a RoleDb should always convert to a RoleDto */
     private static <T> IllegalStateException unexpectedException(Failure<T> failure) {
         logger.error(ERROR_DUE_TO_INVALID_ROLE);
-        return new IllegalStateException(failure.getException());
+        IllegalStateException exception = new IllegalStateException(failure.getException());
+        return exception;
     }
 
     private List<RoleDto> listRoles() {
         return new ArrayList<>(Optional.ofNullable(roles).orElse(Collections.emptyList()));
     }
 
-    private List<RoleDb> createRoleDb() {
+    private List<RoleDb> createRoleDbList() {
         return
             Optional.ofNullable(this.roles)
                 .stream()

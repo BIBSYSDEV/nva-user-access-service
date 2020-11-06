@@ -1,7 +1,6 @@
 package no.unit.nva.useraccessmanagement.model;
 
 import static no.unit.nva.hamcrest.DoesNotHaveNullOrEmptyFields.doesNotHaveNullOrEmptyFields;
-
 import static no.unit.nva.useraccessmanagement.dao.AccessRight.APPROVE_DOI_REQUEST;
 import static no.unit.nva.useraccessmanagement.dao.AccessRight.REJECT_DOI_REQUEST;
 import static no.unit.nva.useraccessmanagement.model.EntityUtils.SOME_ROLENAME;
@@ -10,6 +9,7 @@ import static no.unit.nva.useraccessmanagement.model.EntityUtils.createRole;
 import static no.unit.nva.useraccessmanagement.model.EntityUtils.createUserWithRoleWithoutInstitution;
 import static no.unit.nva.useraccessmanagement.model.EntityUtils.createUserWithRolesAndInstitution;
 import static no.unit.nva.useraccessmanagement.model.UserDto.ERROR_DUE_TO_INVALID_ROLE;
+import static no.unit.nva.useraccessmanagement.model.UserDto.INVALID_USER_ERROR_MESSAGE;
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static nva.commons.utils.attempt.Try.attempt;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,11 +35,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import no.unit.nva.useraccessmanagement.dao.AccessRight;
-
 import no.unit.nva.useraccessmanagement.dao.RoleDb;
 import no.unit.nva.useraccessmanagement.dao.UserDb;
 import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.UserDto.Builder;
+import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
 import nva.commons.utils.attempt.Try;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
@@ -55,6 +55,7 @@ public class UserDtoTest extends DtoTest {
     public static final List<RoleDto> sampleRoles = createSampleRoles();
     public static final String SOME_INSTITUTION = "someInstitution";
     public static final String SOME_OTHER_ROLENAME = "SomeOtherRolename";
+    public static final String INVALID_ROLE_ERROR_MESSAGE = "Invalid role";
     protected static final String USER_TYPE_LITERAL = "User";
 
     @ParameterizedTest(name = "isValid() returns false when username is \"{0}\"")
@@ -120,6 +121,15 @@ public class UserDtoTest extends DtoTest {
         assertThat(actualAccessRights, is(equalTo(expectedAccessRights)));
     }
 
+
+    @Test
+    public void exceptionWhenInvalidReturnsInvalidInputException() throws InvalidEntryInternalException {
+        UserDto user = createUserWithRolesAndInstitution();
+        InvalidInputException exception = user.exceptionWhenInvalid();
+
+        assertThat(exception.getMessage(),containsString(INVALID_USER_ERROR_MESSAGE));
+    }
+
     @Test
     public void getAccessRightsReturnsAllAccessRightsContainedInTheUsersRoles()
         throws InvalidEntryInternalException {
@@ -133,6 +143,18 @@ public class UserDtoTest extends DtoTest {
 
         Set<AccessRight> expectedAccessRights = Set.of(firstRoleAccessRight, secondRoleAccessRight);
         assertThat(user.getAccessRights(), is(equalTo(expectedAccessRights)));
+    }
+
+    @Test
+    public void extractRolesThrowsExceptionWhenSomeRoleInInvalid() throws InvalidEntryInternalException {
+        RoleDb invalidRole = new RoleDb();
+        UserDb userWithInvalidRole = createUserWithRolesAndInstitution().toUserDb();
+        userWithInvalidRole.setRoles(Collections.singletonList(invalidRole));
+
+        Executable action = () -> UserDto.fromUserDb(userWithInvalidRole);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, action);
+        assertThat(exception.getCause(),is(instanceOf(InvalidEntryInternalException.class)));
     }
 
     @Test

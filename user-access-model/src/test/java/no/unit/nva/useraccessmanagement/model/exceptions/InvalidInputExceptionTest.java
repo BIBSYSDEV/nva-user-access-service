@@ -1,4 +1,4 @@
-package no.unit.nva.exceptions;
+package no.unit.nva.useraccessmanagement.model.exceptions;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
