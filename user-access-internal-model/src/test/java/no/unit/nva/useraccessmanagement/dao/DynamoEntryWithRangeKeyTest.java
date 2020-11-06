@@ -5,7 +5,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 

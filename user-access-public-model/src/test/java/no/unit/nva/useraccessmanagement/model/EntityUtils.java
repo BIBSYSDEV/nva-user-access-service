@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.Set;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.useraccessmanagement.dao.AccessRight;
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 
 public final class EntityUtils {
 

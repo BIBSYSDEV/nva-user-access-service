@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.unit.nva.useraccessmanagement.dao.UserDb.Builder;
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.attempt.Try;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

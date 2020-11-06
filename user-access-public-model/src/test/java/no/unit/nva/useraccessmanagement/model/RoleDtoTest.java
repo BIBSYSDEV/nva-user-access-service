@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.RoleDto.Builder;
 import org.hamcrest.core.IsSame;
 import org.hamcrest.core.StringContains;

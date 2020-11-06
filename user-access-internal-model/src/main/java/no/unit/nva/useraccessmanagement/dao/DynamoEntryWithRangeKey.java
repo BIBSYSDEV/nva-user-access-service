@@ -11,9 +11,10 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails;
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+
 import no.unit.nva.useraccessmanagement.dao.interfaces.JsonSerializable;
 import no.unit.nva.useraccessmanagement.dao.interfaces.WithType;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 
 public abstract class DynamoEntryWithRangeKey implements WithType, JsonSerializable {
 

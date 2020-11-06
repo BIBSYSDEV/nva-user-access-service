@@ -8,6 +8,10 @@ dependencies{
         because("commons is used by all modules in this project")
     }
 
-    implementation project(":user-access-constants")
+    compileOnly project(":user-access-constants")
+    testImplementation project(":user-access-constants")
+
+    compileOnly project(":user-access-errors")
+    testImplementation project(":user-access-errors")
 
 }

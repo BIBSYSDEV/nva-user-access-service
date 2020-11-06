@@ -5,7 +5,7 @@ import static nva.commons.utils.attempt.Try.attempt;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import nva.commons.handlers.ApiGatewayHandler;
 import nva.commons.utils.Environment;
 import nva.commons.utils.attempt.Failure;

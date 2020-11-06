@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import no.unit.nva.useraccessmanagement.dao.AccessRight;
 import no.unit.nva.useraccessmanagement.dao.RoleDb;
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.dao.interfaces.JsonSerializable;
 import no.unit.nva.useraccessmanagement.dao.interfaces.WithCopy;
 import no.unit.nva.useraccessmanagement.model.RoleDto.Builder;

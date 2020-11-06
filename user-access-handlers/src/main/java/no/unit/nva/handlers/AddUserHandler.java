@@ -5,7 +5,7 @@ import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 
 import no.unit.nva.exceptions.DataSyncException;
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.UserDto;
 import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
 import nva.commons.exceptions.ApiGatewayException;

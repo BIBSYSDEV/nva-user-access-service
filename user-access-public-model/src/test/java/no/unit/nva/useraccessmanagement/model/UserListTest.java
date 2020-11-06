@@ -8,7 +8,7 @@ import static org.hamcrest.core.IsSame.sameInstance;
 import java.util.Collections;
 import java.util.List;
 
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import org.junit.jupiter.api.Test;
 
 public class UserListTest {

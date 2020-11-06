@@ -4,9 +4,15 @@ final def awsSdkVersion = "1.11.833"
 dependencies {
 
 
-    implementation project (":user-access-public-model")
-    implementation project (":user-access-internal-model")
-    implementation project (":user-access-constants")
+    compileOnly project(":user-access-public-model")
+    compileOnly project(":user-access-internal-model")
+    compileOnly project(":user-access-constants")
+    compileOnly project(":user-access-errors")
+
+    testImplementation project(":user-access-public-model")
+    testImplementation project(":user-access-internal-model")
+    testImplementation project(":user-access-constants")
+    testImplementation project(":user-access-errors")
 
     api group: 'com.amazonaws', name: 'aws-java-sdk-api-gateway', version: awsSdkVersion
 

@@ -13,7 +13,7 @@ import java.util.Collections;
 import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.DatabaseService;
 
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
 import no.unit.nva.useraccessmanagement.model.UserDto;
 import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;

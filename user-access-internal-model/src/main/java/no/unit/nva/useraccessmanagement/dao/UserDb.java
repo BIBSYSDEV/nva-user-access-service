@@ -13,9 +13,9 @@ import java.util.Objects;
 import no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails;
 import no.unit.nva.useraccessmanagement.dao.UserDb.Builder;
 
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.dao.interfaces.WithCopy;
 import no.unit.nva.useraccessmanagement.dao.interfaces.WithType;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.JacocoGenerated;
 
 public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>, WithType {

@@ -9,9 +9,9 @@ import java.util.Objects;
 import java.util.Set;
 import no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails;
 import no.unit.nva.useraccessmanagement.dao.RoleDb.Builder;
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.dao.interfaces.WithCopy;
 import no.unit.nva.useraccessmanagement.dao.interfaces.WithType;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import nva.commons.utils.JacocoGenerated;
 
 public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>, WithType {

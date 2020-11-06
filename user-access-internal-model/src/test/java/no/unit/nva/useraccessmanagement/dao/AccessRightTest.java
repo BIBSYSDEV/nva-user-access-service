@@ -6,7 +6,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidAccessRightException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidAccessRightException;
 import nva.commons.utils.JsonUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;

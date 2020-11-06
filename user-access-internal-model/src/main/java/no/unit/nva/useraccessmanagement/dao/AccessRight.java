@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidAccessRightException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidAccessRightException;
 
 public enum AccessRight {
 

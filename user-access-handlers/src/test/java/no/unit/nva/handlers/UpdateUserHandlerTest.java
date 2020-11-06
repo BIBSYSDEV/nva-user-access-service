@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.Map;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
 import no.unit.nva.useraccessmanagement.model.UserDto;
 import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;

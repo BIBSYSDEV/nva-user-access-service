@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.useraccessmanagement.dao.RoleDb;
 import no.unit.nva.useraccessmanagement.dao.UserDb;
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.UserDto;
 import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
 import nva.commons.exceptions.commonexceptions.ConflictException;
