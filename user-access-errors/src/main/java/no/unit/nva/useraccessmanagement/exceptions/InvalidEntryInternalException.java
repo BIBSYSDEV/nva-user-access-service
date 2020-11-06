@@ -1,4 +1,4 @@
-package no.unit.nva.useraccessmanagement.dao.exceptions;
+package no.unit.nva.useraccessmanagement.exceptions;
 
 import java.net.HttpURLConnection;
 import nva.commons.exceptions.ApiGatewayException;
