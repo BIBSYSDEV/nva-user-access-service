@@ -16,11 +16,12 @@ import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.RoleService;
 import no.unit.nva.exceptions.DataSyncException;
-import no.unit.nva.exceptions.InvalidEntryInternalException;
-import no.unit.nva.exceptions.NotFoundException;
-import no.unit.nva.model.RoleDto;
+import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import no.unit.nva.useraccessmanagement.model.RoleDto;
 import nva.commons.exceptions.InvalidOrMissingTypeException;
+import nva.commons.exceptions.commonexceptions.NotFoundException;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;

@@ -1,12 +1,12 @@
 package no.unit.nva.database;
 
 import java.util.List;
-import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.InvalidEntryInternalException;
-import no.unit.nva.exceptions.InvalidInputException;
-import no.unit.nva.exceptions.NotFoundException;
-import no.unit.nva.model.RoleDto;
-import no.unit.nva.model.UserDto;
+import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.model.RoleDto;
+import no.unit.nva.useraccessmanagement.model.UserDto;
+import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
+import nva.commons.exceptions.commonexceptions.ConflictException;
+import nva.commons.exceptions.commonexceptions.NotFoundException;
 
 public interface DatabaseService {
 
