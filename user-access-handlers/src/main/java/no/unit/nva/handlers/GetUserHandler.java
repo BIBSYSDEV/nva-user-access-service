@@ -2,6 +2,7 @@ package no.unit.nva.handlers;
 
 import static java.util.function.Predicate.not;
 import com.amazonaws.services.lambda.runtime.Context;
+import java.net.HttpURLConnection;
 import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
@@ -11,7 +12,6 @@ import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.Environment;
 import nva.commons.utils.JacocoGenerated;
-import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ public class GetUserHandler extends HandlerAccessingUser<Void, UserDto> {
 
     @Override
     protected Integer getSuccessStatusCode(Void input, UserDto output) {
-        return HttpStatus.SC_OK;
+        return HttpURLConnection.HTTP_OK;
     }
 
     private static Logger defaultLogger() {

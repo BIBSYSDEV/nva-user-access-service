@@ -16,13 +16,14 @@ allprojects {
     project.ext{
         nvaCommonsVersion = '0.6.0'
         awsSdkVersion ="1.11.894"
+        jacksonVersion ="2.11.3"
     }
-//
-//    gradleLint {
-//        //TODO: fix gradle linting after refactor
-//        //rules = ['all-dependency', 'duplicate-dependency-class', 'unused-exclude-by-dep']
-//        rules = ['unused-dependency']
-//    }
+
+    gradleLint {
+        //TODO: fix gradle linting after refactor
+        //rules = ['all-dependency', 'duplicate-dependency-class', 'unused-exclude-by-dep']
+        rules = ['unused-dependency']
+    }
 
     repositories {
         jcenter()
@@ -57,13 +58,7 @@ subprojects {
         testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: jupiterVersion
         testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: jupiterVersion
         testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
-        gradleLint.ignore {
-            // gradleLint wants this to be testRuntimeOnly, but cucumber fails to run when this is not
-            // set to testImplementation.
-            testImplementation(group: 'io.cucumber', name: 'cucumber-picocontainer', version: '6.1.1') {
-                because("Dependency injection in cucumber glue code")
-            }
-        }
+
     }
 
     test {
