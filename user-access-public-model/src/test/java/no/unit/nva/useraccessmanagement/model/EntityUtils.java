@@ -123,7 +123,7 @@ public final class EntityUtils {
     /**
      * Creates a sample role.
      *
-     * @param someRole the rolename.
+     * @param someRole the role name.
      * @return the sample role.
      * @throws InvalidEntryInternalException when the generated role is invalid
      */

@@ -3,7 +3,6 @@ package no.unit.nva.useraccessmanagement.model;
 import static java.util.Objects.isNull;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
