@@ -21,7 +21,7 @@ class JsonSerializableTest {
     public static final String EXPECTED_ERROR_MESSAGE = "expectedErrorMessage";
 
     @Test
-    public void JsonSerializableReturnsValidJsonString() throws JsonProcessingException {
+    public void jsonSerializableReturnsValidJsonString() throws JsonProcessingException {
         JsonObject object = sampleObject();
         String json = object.toJsonString();
         JsonObject copy = JsonUtils.objectMapper.readValue(json, JsonObject.class);

@@ -29,7 +29,7 @@ public class InvalidEntryInternalExceptionTest {
     }
 
     @Test
-    public void InvalidEntryInternalExceptionContainsCause() {
+    public void invalidEntryInternalExceptionContainsCause() {
         Exception cause = new Exception(SOME_MESSAGE);
         InvalidEntryInternalException exception = new InvalidEntryInternalException(cause);
         assertThat(exception.getCause(), is(equalTo(cause)));
