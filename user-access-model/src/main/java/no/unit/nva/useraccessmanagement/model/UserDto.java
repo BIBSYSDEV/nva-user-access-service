@@ -163,6 +163,7 @@ public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, 
     }
 
     @Override
+    @JacocoGenerated
     public String toString() {
         return toJsonString(JsonUtils.objectMapper);
     }

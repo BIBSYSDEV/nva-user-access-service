@@ -19,6 +19,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsSame.sameInstance;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -145,17 +146,7 @@ public class UserDtoTest extends DtoTest {
         assertThat(user.getAccessRights(), is(equalTo(expectedAccessRights)));
     }
 
-    @Test
-    public void extractRolesThrowsExceptionWhenSomeRoleInInvalid() throws InvalidEntryInternalException {
-        RoleDb invalidRole = new RoleDb();
-        UserDb userWithInvalidRole = createUserWithRolesAndInstitution().toUserDb();
-        userWithInvalidRole.setRoles(Collections.singletonList(invalidRole));
 
-        Executable action = () -> UserDto.fromUserDb(userWithInvalidRole);
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, action);
-        assertThat(exception.getCause(),is(instanceOf(InvalidEntryInternalException.class)));
-    }
 
     @Test
     void userDtoHasAConstructorWithoutArgs() {
@@ -212,6 +203,13 @@ public class UserDtoTest extends DtoTest {
         Executable action = () -> UserDto.fromUserDb(userDbWithInvalidRole);
         RuntimeException exception = assertThrows(RuntimeException.class, action);
         assertThat(exception.getCause(), is(instanceOf(InvalidEntryInternalException.class)));
+    }
+
+    @Test
+    public void extractRolesDoesNotThrowExceptionWhenRolesAreValid() throws InvalidEntryInternalException {
+        UserDb userWithValidRole = createUserWithRolesAndInstitution().toUserDb();
+        Executable action = () -> UserDto.fromUserDb(userWithValidRole);
+        assertDoesNotThrow(action);
     }
 
     @ParameterizedTest
