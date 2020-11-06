@@ -6,7 +6,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
-import no.unit.nva.exceptions.BadRequestException;
+import no.unit.nva.useraccessmanagement.exceptions.BadRequestException;
 
 import no.unit.nva.useraccessmanagement.model.RoleDto;
 import nva.commons.exceptions.ApiGatewayException;

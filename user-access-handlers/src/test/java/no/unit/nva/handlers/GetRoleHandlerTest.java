@@ -17,11 +17,11 @@ import java.io.InputStream;
 import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.interfaces.WithEnvironment;
-import no.unit.nva.exceptions.BadRequestException;
+import no.unit.nva.useraccessmanagement.exceptions.BadRequestException;
 
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
-import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.exceptions.commonexceptions.ConflictException;

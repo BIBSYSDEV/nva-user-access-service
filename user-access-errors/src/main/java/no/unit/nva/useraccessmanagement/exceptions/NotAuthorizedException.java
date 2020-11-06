@@ -1,7 +1,7 @@
-package no.unit.nva.exceptions;
+package no.unit.nva.useraccessmanagement.exceptions;
 
+import java.net.HttpURLConnection;
 import nva.commons.exceptions.ApiGatewayException;
-import org.apache.http.HttpStatus;
 
 public class NotAuthorizedException extends ApiGatewayException {
 
@@ -11,6 +11,6 @@ public class NotAuthorizedException extends ApiGatewayException {
 
     @Override
     protected Integer statusCode() {
-        return HttpStatus.SC_UNAUTHORIZED;
+        return HttpURLConnection.HTTP_UNAUTHORIZED;
     }
 }

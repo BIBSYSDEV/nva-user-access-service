@@ -1,4 +1,4 @@
-package no.unit.nva.useraccessmanagement.model.exceptions;
+package no.unit.nva.useraccessmanagement.exceptions;
 
 import javax.net.ssl.HttpsURLConnection;
 import nva.commons.exceptions.ApiGatewayException;

@@ -1,6 +1,4 @@
-package no.unit.nva.exceptions;
-
-import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
+package no.unit.nva.useraccessmanagement.exceptions;
 
 public class EmptyInputException extends InvalidInputException {
 

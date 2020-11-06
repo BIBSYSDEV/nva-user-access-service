@@ -12,7 +12,7 @@ import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException
 import no.unit.nva.useraccessmanagement.dao.interfaces.JsonSerializable;
 import no.unit.nva.useraccessmanagement.dao.interfaces.WithCopy;
 import no.unit.nva.useraccessmanagement.model.RoleDto.Builder;
-import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.interfaces.Typed;
 import no.unit.nva.useraccessmanagement.model.interfaces.Validable;
 import nva.commons.utils.JacocoGenerated;

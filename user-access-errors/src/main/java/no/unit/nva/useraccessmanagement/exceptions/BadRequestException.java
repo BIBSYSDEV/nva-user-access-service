@@ -1,7 +1,7 @@
-package no.unit.nva.exceptions;
+package no.unit.nva.useraccessmanagement.exceptions;
 
+import java.net.HttpURLConnection;
 import nva.commons.exceptions.ApiGatewayException;
-import org.apache.http.HttpStatus;
 
 public class BadRequestException extends ApiGatewayException {
 
@@ -11,6 +11,6 @@ public class BadRequestException extends ApiGatewayException {
 
     @Override
     protected Integer statusCode() {
-        return HttpStatus.SC_BAD_REQUEST;
+        return HttpURLConnection.HTTP_BAD_REQUEST;
     }
 }
