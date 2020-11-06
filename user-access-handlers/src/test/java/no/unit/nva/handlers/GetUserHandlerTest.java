@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import no.unit.nva.exceptions.BadRequestException;
 
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.UserDto;
 import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
 

@@ -1,0 +1,17 @@
+dependencies{
+
+    api(group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: project.ext.awsSdkVersion) {
+        because("This module contains the Dynamo access details and will be used by " +
+                "any service accessing DynamoDB")
+    }
+    api( group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion){
+        because("commons is used by all modules in this project")
+    }
+
+    compileOnly project(":user-access-constants")
+    testImplementation project(":user-access-constants")
+
+    compileOnly project(":user-access-errors")
+    testImplementation project(":user-access-errors")
+
+}

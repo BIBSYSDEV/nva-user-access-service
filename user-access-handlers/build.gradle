@@ -1,7 +1,8 @@
 dependencies {
     implementation project(':user-access-commons')
-    implementation project(':user-access-model')
-    implementation project(':user-access-dao-model')
+    implementation project(':user-access-public-model')
+    implementation project(':user-access-internal-model')
+    implementation project(':user-access-errors')
 
     testImplementation project(':user-access-testing')
 }

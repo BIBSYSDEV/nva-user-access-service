@@ -11,7 +11,7 @@ import java.util.Optional;
 import no.unit.nva.exceptions.EmptyInputException;
 
 import no.unit.nva.useraccessmanagement.dao.DynamoEntryWithRangeKey;
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.dao.interfaces.JsonSerializable;
 import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
 

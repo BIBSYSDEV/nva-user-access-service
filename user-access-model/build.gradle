@@ -1,7 +1,0 @@
-dependencies{
-
-    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion
-
-    implementation project(":user-access-dao-model")
-
-}

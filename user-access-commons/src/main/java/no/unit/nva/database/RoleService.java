@@ -6,7 +6,7 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 import java.util.Optional;
 
 import no.unit.nva.useraccessmanagement.dao.RoleDb;
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
 import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
 import nva.commons.exceptions.commonexceptions.ConflictException;

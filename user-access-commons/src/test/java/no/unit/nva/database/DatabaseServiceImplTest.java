@@ -14,7 +14,7 @@ import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
 import no.unit.nva.useraccessmanagement.dao.DynamoEntryWithRangeKey;
 import no.unit.nva.useraccessmanagement.dao.RoleDb;
 import no.unit.nva.useraccessmanagement.dao.UserDb;
-import no.unit.nva.useraccessmanagement.dao.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
 import no.unit.nva.useraccessmanagement.model.UserDto;
 import nva.commons.utils.log.LogUtils;
