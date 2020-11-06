@@ -1,7 +1,7 @@
 package no.unit.nva.useraccessmanagement.model.interfaces;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 
 public interface Validable {
 

@@ -3,8 +3,8 @@ package no.unit.nva.useraccessmanagement.model.interfaces;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
-import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
+
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import org.junit.jupiter.api.Test;
 
 public class ValidableTest {

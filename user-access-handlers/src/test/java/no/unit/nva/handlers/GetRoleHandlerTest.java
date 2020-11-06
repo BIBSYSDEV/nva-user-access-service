@@ -21,7 +21,7 @@ import no.unit.nva.exceptions.BadRequestException;
 
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
-import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.exceptions.commonexceptions.ConflictException;

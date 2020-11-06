@@ -1,7 +1,7 @@
-package no.unit.nva.exceptions;
+package no.unit.nva.useraccessmanagement.exceptions;
 
+import java.net.HttpURLConnection;
 import nva.commons.exceptions.ApiGatewayException;
-import org.apache.http.HttpStatus;
 
 public class DataSyncException extends ApiGatewayException {
 
@@ -11,6 +11,6 @@ public class DataSyncException extends ApiGatewayException {
 
     @Override
     protected Integer statusCode() {
-        return HttpStatus.SC_INTERNAL_SERVER_ERROR;
+        return HttpURLConnection.HTTP_INTERNAL_ERROR;
     }
 }

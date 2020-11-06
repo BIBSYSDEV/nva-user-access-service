@@ -40,7 +40,7 @@ import no.unit.nva.useraccessmanagement.dao.RoleDb;
 import no.unit.nva.useraccessmanagement.dao.UserDb;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.UserDto.Builder;
-import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import nva.commons.utils.attempt.Try;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;

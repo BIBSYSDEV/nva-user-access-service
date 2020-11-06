@@ -8,12 +8,12 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import java.util.Optional;
 
-import no.unit.nva.exceptions.EmptyInputException;
+import no.unit.nva.useraccessmanagement.exceptions.EmptyInputException;
 
 import no.unit.nva.useraccessmanagement.dao.DynamoEntryWithRangeKey;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.dao.interfaces.JsonSerializable;
-import no.unit.nva.useraccessmanagement.model.exceptions.InvalidInputException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 
 import no.unit.nva.useraccessmanagement.model.interfaces.Validable;
 import nva.commons.utils.attempt.Failure;
