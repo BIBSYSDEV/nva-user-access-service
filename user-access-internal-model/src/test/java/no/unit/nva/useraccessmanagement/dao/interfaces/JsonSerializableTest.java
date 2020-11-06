@@ -20,16 +20,13 @@ class JsonSerializableTest {
 
     public static final String EXPECTED_ERROR_MESSAGE = "expectedErrorMessage";
 
-
-
     @Test
     public void JsonSerializableReturnsValidJsonString() throws JsonProcessingException {
-        JsonObject object= sampleObject();
+        JsonObject object = sampleObject();
         String json = object.toJsonString();
         JsonObject copy = JsonUtils.objectMapper.readValue(json, JsonObject.class);
         assertThat(copy, is(equalTo(object)));
     }
-
 
     @Test
     public void toJsonStringThrowsExceptionWithInternalCause() throws JsonProcessingException {
@@ -39,8 +36,7 @@ class JsonSerializableTest {
         Executable action = () -> object.toJsonString(mapper);
         RuntimeException exception = assertThrows(RuntimeException.class, action);
         Throwable cause = exception.getCause();
-        assertThat(cause.getMessage(),containsString(EXPECTED_ERROR_MESSAGE));
-
+        assertThat(cause.getMessage(), containsString(EXPECTED_ERROR_MESSAGE));
     }
 
     public JsonObject sampleObject() {

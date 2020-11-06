@@ -14,7 +14,7 @@ public class InvalidEntryInternalExceptionTest {
     private static final String SOME_MESSAGE = "SomeMessage";
 
     @Test
-    public void invalidUserInternalExceptionHasConstructorWithMessage() {
+    public void invalidInternalExceptionHasConstructorWithMessage() {
         Executable action = () -> {
             throw new InvalidEntryInternalException(SOME_MESSAGE);
         };
@@ -23,8 +23,15 @@ public class InvalidEntryInternalExceptionTest {
     }
 
     @Test
-    public void invalidUserInternalExceptionReturnsBadRequest() {
+    public void invalidInternalExceptionReturnsBadRequest() {
         InvalidEntryInternalException error = new InvalidEntryInternalException(SOME_MESSAGE);
         assertThat(error.getStatusCode(), is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
+    }
+
+    @Test
+    public void InvalidEntryInternalExceptionContainsCause() {
+        Exception cause = new Exception(SOME_MESSAGE);
+        InvalidEntryInternalException exception = new InvalidEntryInternalException(cause);
+        assertThat(exception.getCause(), is(equalTo(cause)));
     }
 }

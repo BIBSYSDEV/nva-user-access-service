@@ -1,4 +1,4 @@
-package no.unit.nva.exceptions;
+package no.unit.nva.useraccessmanagement.exceptions;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -26,6 +26,6 @@ public class DataSyncExceptionTest {
     @Test
     public void dataHandlingErrorReturnsInternalServerError() {
         DataSyncException error = new DataSyncException(SOME_MESSAGE);
-        assertThat(error.statusCode(), is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
+        assertThat(error.getStatusCode(), is(equalTo(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
     }
 }

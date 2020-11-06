@@ -4,7 +4,11 @@ dependencies {
     implementation project(':user-access-internal-model')
     implementation project(':user-access-errors')
 
+    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion
+
+    testImplementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion
     testImplementation project(':user-access-testing')
+
 }
 
 configurations.testImplementation.canBeResolved = true

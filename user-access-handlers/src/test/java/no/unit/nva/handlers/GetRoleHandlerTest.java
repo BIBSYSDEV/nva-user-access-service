@@ -8,8 +8,8 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-
 import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,12 +17,11 @@ import java.io.InputStream;
 import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.interfaces.WithEnvironment;
-import no.unit.nva.exceptions.BadRequestException;
-
-import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
-import no.unit.nva.useraccessmanagement.model.RoleDto;
-import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import no.unit.nva.useraccessmanagement.exceptions.BadRequestException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
+import no.unit.nva.useraccessmanagement.model.RoleDto;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.exceptions.commonexceptions.ConflictException;
 import nva.commons.exceptions.commonexceptions.NotFoundException;
@@ -77,13 +76,6 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
         assertThat(type, is(equalTo(RoleDto.TYPE)));
     }
 
-    private ObjectNode extractBodyFromResponseAsJsonObject(ByteArrayOutputStream outputStream)
-        throws com.fasterxml.jackson.core.JsonProcessingException {
-        GatewayResponse<ObjectNode> response = GatewayResponse.fromOutputStream(outputStream);
-
-        return response.getBodyObject(ObjectNode.class);
-    }
-
     @DisplayName("processInput returns RoleDto when a role with the input role-name exists")
     @Test
     void processInputReturnsRoleDtoWhenARoleWithTheInputRoleNameExists()
@@ -119,6 +111,13 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
         Executable action = () -> getRoleHandler.processInput(null, requestInfoWithBlankRoleName, context);
         BadRequestException exception = assertThrows(BadRequestException.class, action);
         assertThat(exception.getMessage(), containsString(GetRoleHandler.EMPTY_ROLE_NAME));
+    }
+
+    private ObjectNode extractBodyFromResponseAsJsonObject(ByteArrayOutputStream outputStream)
+        throws JsonProcessingException {
+        GatewayResponse<ObjectNode> response = GatewayResponse.fromOutputStream(outputStream);
+
+        return response.getBodyObject(ObjectNode.class);
     }
 
     private ByteArrayOutputStream sendGetRoleRequest() throws IOException {
