@@ -12,7 +12,7 @@ import no.unit.nva.useraccessmanagement.exceptions.EmptyInputException;
 
 import no.unit.nva.useraccessmanagement.dao.DynamoEntryWithRangeKey;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
-import no.unit.nva.useraccessmanagement.dao.interfaces.JsonSerializable;
+import no.unit.nva.useraccessmanagement.interfaces.JsonSerializable;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 
 import no.unit.nva.useraccessmanagement.model.interfaces.Validable;

@@ -15,8 +15,9 @@ import no.unit.nva.useraccessmanagement.dao.AccessRight;
 import no.unit.nva.useraccessmanagement.dao.RoleDb;
 import no.unit.nva.useraccessmanagement.dao.UserDb;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
-import no.unit.nva.useraccessmanagement.dao.interfaces.JsonSerializable;
-import no.unit.nva.useraccessmanagement.dao.interfaces.WithCopy;
+
+import no.unit.nva.useraccessmanagement.interfaces.JsonSerializable;
+import no.unit.nva.useraccessmanagement.interfaces.WithCopy;
 import no.unit.nva.useraccessmanagement.model.UserDto.Builder;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.interfaces.Typed;

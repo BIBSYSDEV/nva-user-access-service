@@ -1,4 +1,4 @@
-package no.unit.nva.useraccessmanagement.dao.interfaces;
+package interfaces;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
+import no.unit.nva.useraccessmanagement.interfaces.JsonSerializable;
 import nva.commons.utils.JsonUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;

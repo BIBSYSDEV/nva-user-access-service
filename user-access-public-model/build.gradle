@@ -9,6 +9,9 @@ dependencies{
     compileOnly project(":user-access-errors")
     testImplementation project(":user-access-errors")
 
+    compileOnly project(":user-access-commons")
+    testImplementation project(":user-access-commons")
+
 
 
 }

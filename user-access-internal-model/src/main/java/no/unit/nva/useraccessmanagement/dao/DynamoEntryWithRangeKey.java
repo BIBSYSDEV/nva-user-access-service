@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails;
 
-import no.unit.nva.useraccessmanagement.dao.interfaces.JsonSerializable;
-import no.unit.nva.useraccessmanagement.dao.interfaces.WithType;
+import no.unit.nva.useraccessmanagement.interfaces.JsonSerializable;
+import no.unit.nva.useraccessmanagement.interfaces.WithType;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 
 public abstract class DynamoEntryWithRangeKey implements WithType, JsonSerializable {

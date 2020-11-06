@@ -1,6 +1,7 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.nonNull;
+
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import java.util.Optional;
@@ -9,6 +10,7 @@ import no.unit.nva.useraccessmanagement.dao.RoleDb;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
+
 import nva.commons.exceptions.commonexceptions.ConflictException;
 import nva.commons.exceptions.commonexceptions.NotFoundException;
 import nva.commons.utils.attempt.Try;
