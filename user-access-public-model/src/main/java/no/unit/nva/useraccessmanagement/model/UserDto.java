@@ -4,41 +4,30 @@ import static java.util.Objects.isNull;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import no.unit.nva.useraccessmanagement.dao.AccessRight;
-import no.unit.nva.useraccessmanagement.dao.RoleDb;
-import no.unit.nva.useraccessmanagement.dao.UserDb;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
-
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.interfaces.JsonSerializable;
 import no.unit.nva.useraccessmanagement.interfaces.WithCopy;
 import no.unit.nva.useraccessmanagement.model.UserDto.Builder;
-import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.interfaces.Typed;
 import no.unit.nva.useraccessmanagement.model.interfaces.Validable;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.JsonUtils;
 import nva.commons.utils.StringUtils;
-import nva.commons.utils.attempt.Failure;
-import nva.commons.utils.attempt.Try;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @JsonTypeName(UserDto.TYPE)
 public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, Typed {
 
     public static final String TYPE = "User";
     public static final String MISSING_FIELD_ERROR = "Invalid User. Missing obligatory field: ";
-    public static final String ERROR_DUE_TO_INVALID_ROLE =
-        "Failure while trying to create user with role without role-name";
+
     public static final String INVALID_USER_ERROR_MESSAGE = "Invalid user. User should have non-empty username.";
-    private static final Logger logger = LoggerFactory.getLogger(UserDto.class);
     private List<RoleDto> roles;
     private String username;
     private String institution;
@@ -58,25 +47,6 @@ public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, 
     }
 
     /**
-     * Creates a {@link UserDto} from a {@link UserDb}.
-     *
-     * @param userDb a database object {@link UserDb}
-     * @return a data transfer object {@link UserDto}
-     * @throws InvalidEntryInternalException when database object is invalid (should never happen).
-     */
-    public static UserDto fromUserDb(UserDb userDb) throws InvalidEntryInternalException {
-
-        UserDto.Builder userDto = new UserDto.Builder();
-        userDto
-            .withUsername(userDb.getUsername())
-            .withGivenName(userDb.getGivenName())
-            .withFamilyName(userDb.getFamilyName())
-            .withRoles(extractRoles(userDb))
-            .withInstitution(userDb.getInstitution());
-        return userDto.build();
-    }
-
-    /**
      * returns a new builder.
      *
      * @return a new {@link UserDto.Builder}
@@ -86,31 +56,14 @@ public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, 
     }
 
     @JsonProperty("accessRights")
-    public Set<AccessRight> getAccessRights() {
+    public Set<String> getAccessRights() {
         return roles.stream()
             .flatMap(role -> role.getAccessRights().stream())
             .collect(Collectors.toSet());
     }
 
-    public void setAccessRights(List<AccessRight> accessRights) {
+    public void setAccessRights(List<String> accessRights) {
         //Do nothing
-    }
-
-    /**
-     * Transforms the DTO to a database object.
-     *
-     * @return a {@link UserDb}.
-     * @throws InvalidEntryInternalException when the DTO contains an invalid user.
-     */
-    public UserDb toUserDb() throws InvalidEntryInternalException {
-        UserDb.Builder userDb = UserDb.newBuilder()
-            .withUsername(username)
-            .withGivenName(givenName)
-            .withFamilyName(familyName)
-            .withInstitution(institution)
-            .withRoles(createRoleDbList());
-
-        return userDb.build();
     }
 
     public String getUsername() {
@@ -207,34 +160,8 @@ public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, 
         return Objects.hash(getUsername(), getInstitution(), getRoles());
     }
 
-    private static List<RoleDto> extractRoles(UserDb userDb) {
-        return Optional.ofNullable(userDb)
-            .stream()
-            .flatMap(user -> user.getRoles().stream())
-            .map(Try.attempt(RoleDto::fromRoleDb))
-            .map(attempt -> attempt.orElseThrow(UserDto::unexpectedException))
-            .collect(Collectors.toList());
-    }
-
-    /*This exception should not happen as a RoleDb should always convert to a RoleDto */
-    private static <T> IllegalStateException unexpectedException(Failure<T> failure) {
-        logger.error(ERROR_DUE_TO_INVALID_ROLE);
-        IllegalStateException exception = new IllegalStateException(failure.getException());
-        return exception;
-    }
-
     private List<RoleDto> listRoles() {
         return new ArrayList<>(Optional.ofNullable(roles).orElse(Collections.emptyList()));
-    }
-
-    private List<RoleDb> createRoleDbList() {
-        return
-            Optional.ofNullable(this.roles)
-                .stream()
-                .flatMap(Collection::stream)
-                .map(Try.attempt(RoleDto::toRoleDb))
-                .map(attempt -> attempt.orElseThrow(UserDto::unexpectedException))
-                .collect(Collectors.toList());
     }
 
     public static final class Builder {

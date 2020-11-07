@@ -1,7 +1,6 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.nonNull;
-
 import static no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
 import static no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails.SECONDARY_INDEX_1_HASH_KEY;
 import static nva.commons.utils.JsonUtils.objectMapper;
@@ -20,8 +19,8 @@ import java.util.stream.Collectors;
 import no.unit.nva.useraccessmanagement.dao.RoleDb;
 import no.unit.nva.useraccessmanagement.dao.UserDb;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
-import no.unit.nva.useraccessmanagement.model.UserDto;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
+import no.unit.nva.useraccessmanagement.model.UserDto;
 import nva.commons.exceptions.commonexceptions.ConflictException;
 import nva.commons.exceptions.commonexceptions.NotFoundException;
 import nva.commons.utils.attempt.Try;
@@ -62,7 +61,7 @@ public class UserService extends DatabaseSubService {
     /**
      * List of users for a specified institution.
      *
-     * @param institutionIdentifier the identifer of the insituttion
+     * @param institutionIdentifier the identifier of the institution
      * @return all users of the specified institution.
      */
     public List<UserDto> listUsers(String institutionIdentifier) {
@@ -71,7 +70,7 @@ public class UserService extends DatabaseSubService {
 
         return items.stream()
             .map(item -> UserDb.fromItem(item, UserDb.class))
-            .map(attempt(UserDto::fromUserDb))
+            .map(attempt(UserDb::toUserDto))
             .flatMap(Try::stream)
             .collect(Collectors.toList());
     }
@@ -90,7 +89,7 @@ public class UserService extends DatabaseSubService {
 
         validate(user);
         checkUserDoesNotAlreadyExist(user);
-        table.putItem(user.toUserDb().toItem());
+        table.putItem(UserDb.fromUserDto(user).toItem());
     }
 
     /**
@@ -115,11 +114,10 @@ public class UserService extends DatabaseSubService {
     }
 
     private UserDb checkRoleDetailsAreInSync(UserDto updateObject) throws InvalidEntryInternalException {
-        UserDb desiredUpdate = updateObject.toUserDb();
+        UserDb desiredUpdate = UserDb.fromUserDto(updateObject);
         UserDb desiredUpdateWithSyncedRoles = userWithSyncedRoles(desiredUpdate);
         return desiredUpdateWithSyncedRoles;
     }
-
 
     private Optional<UserDto> getUserAsOptional(UserDto queryObject) throws InvalidEntryInternalException {
         logger.debug(GET_USER_DEBUG_MESSAGE + convertToStringOrWriteErrorMessage(queryObject));
@@ -157,16 +155,16 @@ public class UserService extends DatabaseSubService {
     }
 
     private UserDto attemptToFetchObject(UserDto queryObject) throws InvalidEntryInternalException {
-        UserDb userDb = attempt(queryObject::toUserDb)
+        UserDb userDb = attempt(() -> UserDb.fromUserDto(queryObject))
             .map(this::fetchItem)
             .map(item -> UserDb.fromItem(item, UserDb.class))
             .orElseThrow(DatabaseSubService::handleError);
-        return nonNull(userDb) ? UserDto.fromUserDb(userDb) : null;
+        return nonNull(userDb) ? userDb.toUserDto() : null;
     }
 
     private boolean userHasChanged(UserDto existingUser, UserDb desiredUpdateWithSyncedRoles)
         throws InvalidEntryInternalException {
-        return !desiredUpdateWithSyncedRoles.equals(existingUser.toUserDb());
+        return !desiredUpdateWithSyncedRoles.equals(UserDb.fromUserDto(existingUser));
     }
 
     private void updateTable(UserDb userUpdateWithSyncedRoles) {
