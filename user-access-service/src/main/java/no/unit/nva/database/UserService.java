@@ -168,7 +168,6 @@ public class UserService extends DatabaseSubService {
     }
 
     private void updateTable(UserDb userUpdateWithSyncedRoles) {
-
         table.putItem(userUpdateWithSyncedRoles.toItem());
     }
 
