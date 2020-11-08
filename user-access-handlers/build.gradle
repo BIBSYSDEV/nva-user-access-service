@@ -1,7 +1,9 @@
 dependencies {
-    compileOnly project(':user-access-commons')
+    implementation project(':user-access-commons')
+    implementation project(':user-access-public-model')
+    implementation project(':user-access-internal-model')
+    implementation project(':user-access-errors')
 
-    testImplementation project(':user-access-commons')
     testImplementation project(':user-access-testing')
 }
 

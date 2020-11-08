@@ -1,18 +1,23 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.isNull;
-import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
-import static no.unit.nva.database.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
+import static no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
+import static no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
+
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import java.util.Optional;
-import no.unit.nva.database.interfaces.DynamoEntryWithRangeKey;
-import no.unit.nva.exceptions.EmptyInputException;
-import no.unit.nva.exceptions.InvalidEntryInternalException;
-import no.unit.nva.exceptions.InvalidInputException;
-import no.unit.nva.model.JsonSerializable;
-import no.unit.nva.model.Validable;
+
+import no.unit.nva.useraccessmanagement.exceptions.EmptyInputException;
+
+import no.unit.nva.useraccessmanagement.dao.DynamoEntryWithRangeKey;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.dao.interfaces.JsonSerializable;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
+
+import no.unit.nva.useraccessmanagement.model.interfaces.Validable;
 import nva.commons.utils.attempt.Failure;
+
 
 public class DatabaseSubService {
 
@@ -33,8 +38,8 @@ public class DatabaseSubService {
         }
     }
 
-    protected static boolean isInvalid(Validable roleDto) {
-        return isNull(roleDto) || !roleDto.isValid();
+    protected static boolean isInvalid(Validable validable) {
+        return isNull(validable) || validable.isInvalid();
     }
 
     protected static String convertToStringOrWriteErrorMessage(JsonSerializable queryObject) {

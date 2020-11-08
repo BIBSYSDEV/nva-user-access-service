@@ -1,0 +1,14 @@
+dependencies{
+
+    compileOnly group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion
+    testImplementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion
+
+    compileOnly project(":user-access-internal-model")
+    testImplementation project(":user-access-internal-model")
+
+    compileOnly project(":user-access-errors")
+    testImplementation project(":user-access-errors")
+
+
+
+}

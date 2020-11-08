@@ -2,9 +2,18 @@ final def jacksonVersion = "2.11.2"
 final def awsSdkVersion = "1.11.833"
 
 dependencies {
-    api(group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: awsSdkVersion) {
-        because("This service communicates with dynamo-db directly")
-    }
+
+
+    compileOnly project(":user-access-public-model")
+    compileOnly project(":user-access-internal-model")
+    compileOnly project(":user-access-constants")
+    compileOnly project(":user-access-errors")
+
+    testImplementation project(":user-access-public-model")
+    testImplementation project(":user-access-internal-model")
+    testImplementation project(":user-access-constants")
+    testImplementation project(":user-access-errors")
+
     api group: 'com.amazonaws', name: 'aws-java-sdk-api-gateway', version: awsSdkVersion
 
     api(group: 'com.amazonaws', name: 'aws-java-sdk-core', version: awsSdkVersion) {
@@ -17,14 +26,15 @@ dependencies {
     api(group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.2.1') {
         because("It implements lambda handlers")
     }
-    api group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: '0.5.1'
     api(group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4') {
         because "Because we use the library directly to define loggers in our code"
     }
     api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
 
     api(group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion)
+
+
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
 
     testImplementation project(':user-access-testing')
 }

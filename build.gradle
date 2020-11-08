@@ -7,15 +7,24 @@ plugins {
     id 'maven'
 }
 
+
+
+
+
 allprojects {
     apply plugin: 'maven'
     apply plugin: 'nebula.lint'
 
-    gradleLint {
-        //TODO: fix gradle linting after refactor
-        //rules = ['all-dependency', 'duplicate-dependency-class', 'unused-exclude-by-dep']
-        rules = ['unused-dependency']
+    project.ext{
+        nvaCommonsVersion = '0.6.0'
+        awsSdkVersion ="1.11.894"
     }
+//
+//    gradleLint {
+//        //TODO: fix gradle linting after refactor
+//        //rules = ['all-dependency', 'duplicate-dependency-class', 'unused-exclude-by-dep']
+//        rules = ['unused-dependency']
+//    }
 
     repositories {
         jcenter()
@@ -106,23 +115,24 @@ subprojects {
                 limit {
                     counter = 'METHOD'
                     value = 'COVEREDRATIO'
-                    minimum = 1.000
+                    minimum = 0.000
                 }
             }
             rule {
                 limit {
                     counter = 'CLASS'
                     value = 'COVEREDRATIO'
-                    minimum = 1.000
+                    minimum = 0.000
                 }
             }
         }
     }
+
+    // publish submodules
     task sourcesJar(type: Jar, dependsOn: classes) {
         archiveClassifier = 'sources'
         from sourceSets.main.allSource
     }
-
 
     artifacts {
         archives sourcesJar

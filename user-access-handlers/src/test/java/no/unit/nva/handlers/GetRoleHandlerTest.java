@@ -17,15 +17,15 @@ import java.io.InputStream;
 import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.interfaces.WithEnvironment;
-import no.unit.nva.exceptions.BadRequestException;
-import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.InvalidEntryInternalException;
-import no.unit.nva.exceptions.InvalidInputException;
-import no.unit.nva.exceptions.NotFoundException;
-import no.unit.nva.model.RoleDto;
-import no.unit.nva.model.TypedObjectsDetails;
+import no.unit.nva.useraccessmanagement.exceptions.BadRequestException;
+
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.model.RoleDto;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.exceptions.ApiGatewayException;
+import nva.commons.exceptions.commonexceptions.ConflictException;
+import nva.commons.exceptions.commonexceptions.NotFoundException;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.JsonUtils;
@@ -40,6 +40,7 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
 
     public static final String THE_ROLE = "theRole";
     public static final String BLANK_STR = " ";
+    public static final String TYPE_ATTRIBUTE = "type";
     private DatabaseServiceImpl databaseService;
     private GetRoleHandler getRoleHandler;
     private Context context;
@@ -70,9 +71,9 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
         ByteArrayOutputStream outputStream = sendGetRoleRequest();
         ObjectNode bodyObject = extractBodyFromResponseAsJsonObject(outputStream);
 
-        assertThat(bodyObject.get(TypedObjectsDetails.TYPE_ATTRIBUTE), is(not(nullValue())));
+        assertThat(bodyObject.get(TYPE_ATTRIBUTE), is(not(nullValue())));
 
-        String type = bodyObject.get(TypedObjectsDetails.TYPE_ATTRIBUTE).asText();
+        String type = bodyObject.get(TYPE_ATTRIBUTE).asText();
         assertThat(type, is(equalTo(RoleDto.TYPE)));
     }
 

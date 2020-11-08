@@ -12,13 +12,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import no.unit.nva.database.DatabaseAccessor;
 import no.unit.nva.database.DatabaseService;
-import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.InvalidEntryInternalException;
-import no.unit.nva.exceptions.InvalidInputException;
-import no.unit.nva.model.RoleDto;
-import no.unit.nva.model.TypedObjectsDetails;
-import no.unit.nva.model.UserDto;
+
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.model.RoleDto;
+import no.unit.nva.useraccessmanagement.model.UserDto;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
+
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.exceptions.commonexceptions.ConflictException;
 
 public class HandlerTest extends DatabaseAccessor {
 
@@ -27,6 +28,7 @@ public class HandlerTest extends DatabaseAccessor {
     public static final String DEFAULT_INSTITUTION = "SomeInstitution";
     private static final String SPECIAL_CHARACTER = "@";
     private static final String ENCODED_SPECIAL_CHARACTER = "%40";
+    public static final String TYPE_ATTRIBUTE = "type";
 
     protected DatabaseService databaseService;
 
@@ -62,7 +64,7 @@ public class HandlerTest extends DatabaseAccessor {
 
     protected <I> ObjectNode createInputObjectWithoutType(I dtoObject) {
         ObjectNode objectWithoutType = objectMapper.convertValue(dtoObject, ObjectNode.class);
-        objectWithoutType.remove(TypedObjectsDetails.TYPE_ATTRIBUTE);
+        objectWithoutType.remove(TYPE_ATTRIBUTE);
         return objectWithoutType;
     }
 

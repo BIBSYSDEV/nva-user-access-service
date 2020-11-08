@@ -13,15 +13,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-import no.unit.nva.exceptions.BadRequestException;
-import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.InvalidEntryInternalException;
-import no.unit.nva.exceptions.InvalidInputException;
-import no.unit.nva.exceptions.NotFoundException;
-import no.unit.nva.model.TypedObjectsDetails;
-import no.unit.nva.model.UserDto;
+import no.unit.nva.useraccessmanagement.exceptions.BadRequestException;
+
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.model.UserDto;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
+
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.exceptions.ApiGatewayException;
+import nva.commons.exceptions.commonexceptions.ConflictException;
+import nva.commons.exceptions.commonexceptions.NotFoundException;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.JsonUtils;
@@ -57,8 +58,8 @@ class GetUserHandlerTest extends HandlerTest {
         GatewayResponse<ObjectNode> response = GatewayResponse.fromOutputStream(outputStream);
         ObjectNode bodyObject = response.getBodyObject(ObjectNode.class);
 
-        assertThat(bodyObject.get(TypedObjectsDetails.TYPE_ATTRIBUTE), is(not(nullValue())));
-        String type = bodyObject.get(TypedObjectsDetails.TYPE_ATTRIBUTE).asText();
+        assertThat(bodyObject.get(TYPE_ATTRIBUTE), is(not(nullValue())));
+        String type = bodyObject.get(TYPE_ATTRIBUTE).asText();
         assertThat(type, is(equalTo(UserDto.TYPE)));
     }
 

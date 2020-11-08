@@ -21,12 +21,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.InvalidEntryInternalException;
-import no.unit.nva.exceptions.InvalidInputException;
-import no.unit.nva.model.UserDto;
-import no.unit.nva.model.UserList;
+
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.model.UserDto;
+import no.unit.nva.useraccessmanagement.model.UserList;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
+
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.exceptions.commonexceptions.ConflictException;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.JsonUtils;

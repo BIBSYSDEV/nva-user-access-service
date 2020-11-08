@@ -1,18 +1,18 @@
 package no.unit.nva.handlers;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import java.net.HttpURLConnection;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
-import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.DataSyncException;
-import no.unit.nva.exceptions.InvalidEntryInternalException;
-import no.unit.nva.exceptions.InvalidInputException;
-import no.unit.nva.exceptions.NotFoundException;
-import no.unit.nva.model.RoleDto;
+import no.unit.nva.useraccessmanagement.exceptions.DataSyncException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.model.RoleDto;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
+import nva.commons.exceptions.commonexceptions.ConflictException;
+import nva.commons.exceptions.commonexceptions.NotFoundException;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.Environment;
 import nva.commons.utils.JacocoGenerated;
-import org.apache.http.HttpStatus;
 import org.slf4j.LoggerFactory;
 
 public class AddRoleHandler extends HandlerWithEventualConsistency<RoleDto, RoleDto> {
@@ -25,8 +25,7 @@ public class AddRoleHandler extends HandlerWithEventualConsistency<RoleDto, Role
      */
     @JacocoGenerated
     public AddRoleHandler() {
-        this(new Environment(),
-            new DatabaseServiceImpl()
+        this(new Environment(), new DatabaseServiceImpl()
         );
     }
 
@@ -52,6 +51,6 @@ public class AddRoleHandler extends HandlerWithEventualConsistency<RoleDto, Role
 
     @Override
     protected Integer getSuccessStatusCode(RoleDto input, RoleDto output) {
-        return HttpStatus.SC_OK;
+        return HttpURLConnection.HTTP_OK;
     }
 }

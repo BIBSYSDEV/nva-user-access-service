@@ -10,11 +10,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
-import no.unit.nva.database.interfaces.DynamoEntryWithRangeKey;
-import no.unit.nva.exceptions.InvalidEntryInternalException;
-import no.unit.nva.model.RoleDto;
-import no.unit.nva.model.UserDto;
-import no.unit.nva.utils.EntityUtils;
+
+import no.unit.nva.useraccessmanagement.dao.DynamoEntryWithRangeKey;
+import no.unit.nva.useraccessmanagement.dao.RoleDb;
+import no.unit.nva.useraccessmanagement.dao.UserDb;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.model.RoleDto;
+import no.unit.nva.useraccessmanagement.model.UserDto;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
 import org.hamcrest.core.StringContains;
