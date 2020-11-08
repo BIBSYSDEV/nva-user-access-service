@@ -63,7 +63,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 
     @Override
     public void addRole(RoleDto roleDto)
-        throws ConflictException, InvalidInputException, InvalidEntryInternalException {
+        throws InvalidInputException, InvalidEntryInternalException, ConflictException {
         this.roleService.addRole(roleDto);
     }
 

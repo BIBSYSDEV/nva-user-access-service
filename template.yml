@@ -435,8 +435,8 @@ Resources:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: user-access-commons-layer
-      Description: User Access Commons
-      ContentUri: user-access-commons/build/distributions/user-access-commons.zip
+      Description: User Access Service
+      ContentUri: user-access-service/build/distributions/user-access-service.zip
       CompatibleRuntimes:
         - java11
       LicenseInfo: 'MIT'

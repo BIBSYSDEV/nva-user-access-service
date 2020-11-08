@@ -10,12 +10,12 @@ import org.junit.jupiter.api.Test;
 
 public class NotAuthorizedExceptionTest {
 
-    public static final String SOME_MESAGE = "Some mesage";
+    public static final String SOME_MESAGE = "Some message";
 
     @Test
     public void notAuthorizedExceptionReturnsUnauthorizedStatusCode() {
         NotAuthorizedException exception = new NotAuthorizedException(SOME_MESAGE);
-        assertThat(exception.statusCode(), is(equalTo(HttpStatus.SC_UNAUTHORIZED)));
+        assertThat(exception.getStatusCode(), is(equalTo(HttpStatus.SC_UNAUTHORIZED)));
     }
 
     @Test

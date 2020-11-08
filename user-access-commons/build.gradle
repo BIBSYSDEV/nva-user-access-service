@@ -1,75 +1,10 @@
-final def jacksonVersion = "2.11.2"
-final def awsSdkVersion = "1.11.833"
-
 dependencies {
+    implementation( group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion)
 
+    runtimeOnly group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: project.ext.jacksonVersion
+    testImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: project.ext.jacksonVersion
 
-    compileOnly project(":user-access-public-model")
-    compileOnly project(":user-access-internal-model")
-    compileOnly project(":user-access-constants")
-    compileOnly project(":user-access-errors")
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: project.ext.jacksonVersion
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: project.ext.jacksonVersion
 
-    testImplementation project(":user-access-public-model")
-    testImplementation project(":user-access-internal-model")
-    testImplementation project(":user-access-constants")
-    testImplementation project(":user-access-errors")
-
-    api group: 'com.amazonaws', name: 'aws-java-sdk-api-gateway', version: awsSdkVersion
-
-    api(group: 'com.amazonaws', name: 'aws-java-sdk-core', version: awsSdkVersion) {
-        because("It is used by our code directly")
-    }
-
-    api(group: 'com.amazonaws', name: 'aws-java-sdk-secretsmanager', version: awsSdkVersion) {
-        because("we need to read the API key")
-    }
-    api(group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.2.1') {
-        because("It implements lambda handlers")
-    }
-    api(group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4') {
-        because "Because we use the library directly to define loggers in our code"
-    }
-    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
-
-    api(group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion)
-
-
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
-
-    testImplementation project(':user-access-testing')
 }
-
-configurations.testImplementation.canBeResolved = true
-
-task copyNativeDeps(type: Copy) {
-    from(configurations.testImplementation) {
-        include "*.dylib"
-        include "*.so"
-        include "*.dll"
-    }
-    into 'build/dynamodb-local'
-}
-
-test.dependsOn copyNativeDeps
-test.doFirst {
-    systemProperty "java.library.path", 'build/dynamodb-local'
-}
-
-// Build and package user-access-commons and dependencies for Lambda Layer
-
-configurations.api.canBeResolved = true
-
-task copyDepsForLayer(type: Copy) {
-    from(configurations.api) {
-    }
-    into 'build/libs'
-}
-
-task buildZipForLayer(type: Zip) {
-    from('build/libs') {
-    }
-    into('java/lib')
-}
-
-buildZipForLayer.dependsOn copyDepsForLayer
-build.dependsOn buildZipForLayer

@@ -5,6 +5,7 @@ import static no.unit.nva.useraccessmanagement.model.EntityUtils.SAMPLE_ACCESS_R
 import static no.unit.nva.useraccessmanagement.model.EntityUtils.SOME_ROLENAME;
 import static no.unit.nva.useraccessmanagement.model.EntityUtils.createRole;
 
+import static no.unit.nva.useraccessmanagement.model.RoleDto.MISSING_ROLE_NAME_ERROR;
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -23,6 +24,7 @@ import java.lang.reflect.Method;
 
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.RoleDto.Builder;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import org.hamcrest.core.IsSame;
 import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.DisplayName;
@@ -134,5 +136,13 @@ public class RoleDtoTest extends DtoTest {
 
         assertThat(deserializedItem, is(equalTo(someRole)));
         assertThat(deserializedItem, is(not(IsSame.sameInstance(someRole))));
+    }
+
+    @Test
+    public void exceptionWhenInvalidReturnsInvalidInputException() throws InvalidEntryInternalException {
+        RoleDto roleDto = createRole(SOME_ROLE_NAME);
+        InvalidInputException exception = roleDto.exceptionWhenInvalid();
+
+        assertThat(exception.getMessage(), StringContains.containsString(MISSING_ROLE_NAME_ERROR));
     }
 }

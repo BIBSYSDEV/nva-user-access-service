@@ -1,13 +1,11 @@
 package no.unit.nva.handlers;
 
 import static java.util.function.Predicate.not;
-
 import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.useraccessmanagement.exceptions.BadRequestException;
-
 import no.unit.nva.useraccessmanagement.model.RoleDto;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.handlers.ApiGatewayHandler;
@@ -20,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
 
-    public static final String ROLE_NOT_FOUND_ERROR_MESSAGE = "Could not find role: ";
     public static final String EMPTY_ROLE_NAME = "Role-name cannot be empty";
     public static final String ROLE_PATH_PARAMETER = "role";
     private static final Logger logger = LoggerFactory.getLogger(GetRoleHandler.class);

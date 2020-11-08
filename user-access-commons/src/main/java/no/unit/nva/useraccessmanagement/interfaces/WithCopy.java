@@ -1,4 +1,4 @@
-package no.unit.nva.useraccessmanagement.dao.interfaces;
+package no.unit.nva.useraccessmanagement.interfaces;
 
 /**
  * Example usage:

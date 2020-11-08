@@ -15,8 +15,9 @@ import no.unit.nva.useraccessmanagement.dao.AccessRight;
 import no.unit.nva.useraccessmanagement.dao.RoleDb;
 import no.unit.nva.useraccessmanagement.dao.UserDb;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
-import no.unit.nva.useraccessmanagement.dao.interfaces.JsonSerializable;
-import no.unit.nva.useraccessmanagement.dao.interfaces.WithCopy;
+
+import no.unit.nva.useraccessmanagement.interfaces.JsonSerializable;
+import no.unit.nva.useraccessmanagement.interfaces.WithCopy;
 import no.unit.nva.useraccessmanagement.model.UserDto.Builder;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.interfaces.Typed;
@@ -107,7 +108,7 @@ public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, 
             .withGivenName(givenName)
             .withFamilyName(familyName)
             .withInstitution(institution)
-            .withRoles(createRoleDb());
+            .withRoles(createRoleDbList());
 
         return userDb.build();
     }
@@ -163,6 +164,7 @@ public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, 
     }
 
     @Override
+    @JacocoGenerated
     public String toString() {
         return toJsonString(JsonUtils.objectMapper);
     }
@@ -217,14 +219,15 @@ public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, 
     /*This exception should not happen as a RoleDb should always convert to a RoleDto */
     private static <T> IllegalStateException unexpectedException(Failure<T> failure) {
         logger.error(ERROR_DUE_TO_INVALID_ROLE);
-        return new IllegalStateException(failure.getException());
+        IllegalStateException exception = new IllegalStateException(failure.getException());
+        return exception;
     }
 
     private List<RoleDto> listRoles() {
         return new ArrayList<>(Optional.ofNullable(roles).orElse(Collections.emptyList()));
     }
 
-    private List<RoleDb> createRoleDb() {
+    private List<RoleDb> createRoleDbList() {
         return
             Optional.ofNullable(this.roles)
                 .stream()
