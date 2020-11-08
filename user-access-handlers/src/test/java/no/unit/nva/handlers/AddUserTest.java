@@ -15,7 +15,6 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -23,7 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.exceptions.ConflictException;
@@ -171,8 +169,8 @@ public class AddUserTest extends HandlerTest {
     private DatabaseService databaseServiceReturnsAlwaysEmptyUser() {
         return new DatabaseServiceImpl(localDynamo, envWithTableName) {
             @Override
-            public Optional<UserDto> getUserAsOptional(UserDto queryObject) {
-                return Optional.empty();
+            public UserDto getUser(UserDto queryObject) {
+                return null;
             }
         };
     }

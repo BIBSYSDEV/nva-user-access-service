@@ -3,6 +3,10 @@ package no.unit.nva.database;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.database.DatabaseServiceImpl.DYNAMO_DB_CLIENT_NOT_SET_ERROR;
 import static no.unit.nva.database.DatabaseServiceImpl.createTable;
+import static no.unit.nva.database.RoleService.ROLE_ALREADY_EXISTS_ERROR_MESSAGE;
+import static no.unit.nva.database.RoleService.ROLE_NOT_FOUND_MESSAGE;
+import static no.unit.nva.database.UserService.USER_ALREADY_EXISTS_ERROR_MESSAGE;
+import static no.unit.nva.database.UserService.USER_NOT_FOUND_MESSAGE;
 import static no.unit.nva.model.DoesNotHaveNullFields.doesNotHaveNullFields;
 import static no.unit.nva.utils.EntityUtils.SOME_ROLENAME;
 import static no.unit.nva.utils.EntityUtils.createRole;
@@ -76,7 +80,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         Executable action = () -> db.getRole(queryObject);
 
         NotFoundException exception = assertThrows(NotFoundException.class, action);
-        assertThat(exception.getMessage(), containsString(DatabaseServiceImpl.ROLE_NOT_FOUND_MESSAGE));
+        assertThat(exception.getMessage(), containsString(ROLE_NOT_FOUND_MESSAGE));
     }
 
     @DisplayName("addRole() inserts valid role")
@@ -111,7 +115,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
 
         Executable action = () -> db.addRole(conflictingRole);
         ConflictException exception = assertThrows(ConflictException.class, action);
-        assertThat(exception.getMessage(), containsString(DatabaseServiceImpl.ROLE_ALREADY_EXISTS_ERROR_MESSAGE));
+        assertThat(exception.getMessage(), containsString(ROLE_ALREADY_EXISTS_ERROR_MESSAGE));
     }
 
     @DisplayName("getUser() returns non empty user when username exists in database")
@@ -132,7 +136,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         Executable action = () -> db.getUser(queryObject);
 
         NotFoundException exception = assertThrows(NotFoundException.class, action);
-        assertThat(exception.getMessage(), containsString(DatabaseServiceImpl.USER_NOT_FOUND_MESSAGE));
+        assertThat(exception.getMessage(), containsString(USER_NOT_FOUND_MESSAGE));
     }
 
     @DisplayName("addUser() inserts valid user with institution and roles in database")
@@ -189,7 +193,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
 
         Executable action = () -> db.addUser(conflictingUser);
         ConflictException exception = assertThrows(ConflictException.class, action);
-        assertThat(exception.getMessage(), containsString(DatabaseServiceImpl.USER_ALREADY_EXISTS_ERROR_MESSAGE));
+        assertThat(exception.getMessage(), containsString(USER_ALREADY_EXISTS_ERROR_MESSAGE));
     }
 
     @DisplayName("updateUser() updates existing user with input user when input user is valid")
@@ -230,7 +234,7 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         UserDto userUpdate = createSampleUser(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLE);
         Executable action = () -> db.updateUser(userUpdate);
         NotFoundException exception = assertThrows(NotFoundException.class, action);
-        assertThat(exception.getMessage(), containsString(DatabaseServiceImpl.USER_NOT_FOUND_MESSAGE));
+        assertThat(exception.getMessage(), containsString(USER_NOT_FOUND_MESSAGE));
     }
 
     @DisplayName("updateUser() throws InvalidInputException when the input is invalid ")

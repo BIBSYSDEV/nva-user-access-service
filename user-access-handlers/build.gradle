@@ -21,43 +21,5 @@ test.doFirst {
     systemProperty "java.library.path", 'build/dynamodb-local'
 }
 
-// Cucumber configurations
-configurations.testImplementation.canBeResolved = true
-configurations {
-    cucumberRuntime {
-        extendsFrom testImplementation
-    }
-}
 
-task cucumber() {
-    dependsOn assemble, compileTestJava
-    doLast {
-        javaexec {
-            main = "io.cucumber.core.cli.Main"
-            systemProperties = ["java.library.path": 'build/dynamodb-local']
-            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--glue', 'features', 'src/test/resources']
-        }
-    }
-}
 
-task debugCucumber() {
-    dependsOn assemble, compileTestJava
-    doLast {
-        javaexec {
-            main = "io.cucumber.core.cli.Main"
-            systemProperties = ["java.library.path": 'build/dynamodb-local']
-            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-            // add an @runme tag to debug one or more cucumber tests
-            args = ['--plugin', 'pretty', '--glue', 'features', '--tags', '@runme', 'src/test/resources',]
-            debugOptions {
-                enabled = true
-                suspend = true
-                port = 5005
-                server = true
-            }
-        }
-    }
-}
-
-test.dependsOn(cucumber)
