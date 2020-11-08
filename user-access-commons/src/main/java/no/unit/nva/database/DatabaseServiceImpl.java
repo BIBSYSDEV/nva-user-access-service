@@ -19,6 +19,7 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.database.interfaces.DynamoEntryWithRangeKey;
@@ -38,6 +39,9 @@ import nva.commons.utils.attempt.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+//TODO break it up in modules. Coming in next PR.
+@SuppressWarnings("PMD.GodClass")
 public class DatabaseServiceImpl implements DatabaseService {
 
     public static final String DYNAMO_DB_CLIENT_NOT_SET_ERROR = "DynamoDb client has not been set";
@@ -47,6 +51,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     public static final String ROLE_ALREADY_EXISTS_ERROR_MESSAGE = "Role already exists: ";
     public static final String USER_NOT_FOUND_MESSAGE = "Could not find user with username: ";
     public static final String ROLE_NOT_FOUND_MESSAGE = "Could not find role: ";
+    public static final String UPDATE_USER_DEBUG_MESSAGE = "Updating user: ";
 
     public static final String GET_USER_DEBUG_MESSAGE = "Getting user:";
     public static final String GET_ROLE_DEBUG_MESSAGE = "Getting role:";
@@ -54,7 +59,6 @@ public class DatabaseServiceImpl implements DatabaseService {
     public static final String ADD_ROLE_DEBUG_MESSAGE = "Adding role:";
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
-    private static final String UPDATE_ROLE_DEBUG_MESSAGE = "Updating role: ";
     private final Table table;
     private final Index institutionsIndex;
 
@@ -112,16 +116,22 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    public void updateUser(UserDto queryObject)
-        throws InvalidEntryInternalException, NotFoundException, InvalidInputException {
+    public void updateUser(UserDto updateObject)
+        throws InvalidEntryInternalException, InvalidInputException, NotFoundException {
 
-        logger.debug(UPDATE_ROLE_DEBUG_MESSAGE + queryObject.toJsonString(objectMapper));
-
-        validate(queryObject);
-        UserDto existingUser = getExistingUserOrSendNotFoundError(queryObject);
-        if (!existingUser.equals(queryObject)) {
-            table.putItem(queryObject.toUserDb().toItem());
+        logger.debug(UPDATE_USER_DEBUG_MESSAGE + updateObject.toJsonString(objectMapper));
+        validate(updateObject);
+        UserDto existingUser = getExistingUserOrSendNotFoundError(updateObject);
+        UserDb updateObjectWithSyncedRoles = checkRoleDetailsAreInSync(updateObject);
+        if (userHasChanged(existingUser, updateObjectWithSyncedRoles)) {
+            updateTable(updateObjectWithSyncedRoles);
         }
+    }
+
+    private UserDb checkRoleDetailsAreInSync(UserDto queryObject) throws InvalidEntryInternalException {
+        UserDb desiredUpdate = queryObject.toUserDb();
+        UserDb desiredUpdateWithSyncedRoles = userWithSyncedRoles(desiredUpdate);
+        return desiredUpdateWithSyncedRoles;
     }
 
     @Override
@@ -154,6 +164,11 @@ public class DatabaseServiceImpl implements DatabaseService {
             PRIMARY_KEY_HASH_KEY, requestEntry.getPrimaryHashKey(),
             PRIMARY_KEY_RANGE_KEY, requestEntry.getPrimaryRangeKey()
         );
+    }
+
+    protected RoleDb fetchRoleDao(RoleDb queryObject) {
+        Item item = fetchItem(queryObject);
+        return (item != null) ? RoleDb.fromItem(item, RoleDb.class) : null;
     }
 
     private static void assertDynamoClientIsNotNull(AmazonDynamoDB dynamoDbClient) {
@@ -194,6 +209,31 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static RuntimeException logErrorWithDynamoClientAndThrowException(Failure<AmazonDynamoDB> failure) {
         logger.error(DYNAMO_DB_CLIENT_NOT_SET_ERROR);
         return new RuntimeException(failure.getException());
+
+    }
+
+    private boolean userHasChanged(UserDto existingUser, UserDb desiredUpdateWithSyncedRoles)
+        throws InvalidEntryInternalException {
+        return !desiredUpdateWithSyncedRoles.equals(existingUser.toUserDb());
+    }
+
+    private void updateTable(UserDb userUpdateWithSyncedRoles) {
+
+        table.putItem(userUpdateWithSyncedRoles.toItem());
+    }
+
+    private UserDb userWithSyncedRoles(UserDb currentUser) throws InvalidEntryInternalException {
+        List<RoleDb> roles = currentRoles(currentUser);
+        return currentUser.copy().withRoles(roles).build();
+    }
+
+    private List<RoleDb> currentRoles(UserDb currentUser) {
+        return currentUser
+            .getRoles()
+            .stream()
+            .map(this::fetchRoleDao)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 
     private QuerySpec createListUsersByInstitutionQuery(String institution) {
