@@ -94,7 +94,7 @@ public class AddRoleHandlerTest extends HandlerTest {
     public void handleRequestReturnsInternalServerErrorWhenDatabaseFailsToSaveTheData()
         throws InvalidEntryInternalException, IOException {
         RoleDto actualRole = sampleRole();
-        DatabaseService service = databaseReturningNotFound();
+        DatabaseService service = databaseServiceAddingButNotGettingArole();
         addRoleHandler = new AddRoleHandler(mockEnvironment(), service);
 
         GatewayResponse<Problem> response = sendRequest(actualRole);
@@ -114,7 +114,7 @@ public class AddRoleHandlerTest extends HandlerTest {
         throws InvalidEntryInternalException {
 
         RoleDto inputRole = sampleRole();
-        AddRoleHandler addRoleHandler = addRoleHandlerThrowsUnexpectedException();
+        AddRoleHandler addRoleHandler = addRoleHandlerDoesNotFindRoleAfterAddingIt();
         Executable action = () -> addRoleHandler.processInput(inputRole, null, null);
 
         DataSyncException exception = assertThrows(DataSyncException.class, action);
@@ -126,7 +126,7 @@ public class AddRoleHandlerTest extends HandlerTest {
         throws IOException {
         TestAppender testingAppender = LogUtils.getTestingAppender(AddRoleHandler.class);
 
-        AddRoleHandler addRoleHandler = addRoleHandlerThrowsUnexpectedException();
+        AddRoleHandler addRoleHandler = addRoleHandlerDoesNotFindRoleAfterAddingIt();
         InputStream inputRequest = new HandlerRequestBuilder<>(objectMapper).withBody(sampleRole).build();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -160,16 +160,20 @@ public class AddRoleHandlerTest extends HandlerTest {
         return RoleDto.newBuilder().withName(SOME_ROLE_NAME).build();
     }
 
-    private AddRoleHandler addRoleHandlerThrowsUnexpectedException() {
-        DatabaseService databaseServiceThrowingException = new DatabaseServiceImpl(localDynamo, envWithTableName) {
+    private AddRoleHandler addRoleHandlerDoesNotFindRoleAfterAddingIt() {
+        DatabaseService databaseNotFoundingRoles = databaseServiceAddingButNotGettingArole();
+
+        return new AddRoleHandler(mockEnvironment(), databaseNotFoundingRoles);
+    }
+
+    private DatabaseServiceImpl databaseServiceAddingButNotGettingArole() {
+        return new DatabaseServiceImpl(localDynamo, envWithTableName) {
 
             @Override
             public RoleDto getRole(RoleDto queryObject) throws NotFoundException {
                 throw new NotFoundException(RoleService.ROLE_NOT_FOUND_MESSAGE);
             }
         };
-
-        return new AddRoleHandler(mockEnvironment(), databaseServiceThrowingException);
     }
 
     private DatabaseServiceImpl databaseServiceWithSyncDelay() {
@@ -183,15 +187,6 @@ public class AddRoleHandlerTest extends HandlerTest {
                     throw new NotFoundException(RoleService.ROLE_NOT_FOUND_MESSAGE);
                 }
                 return super.getRole(queryObject);
-            }
-        };
-    }
-
-    private DatabaseServiceImpl databaseReturningNotFound() {
-        return new DatabaseServiceImpl(localDynamo, envWithTableName) {
-            @Override
-            public RoleDto getRole(RoleDto queryObject) throws NotFoundException {
-                throw new NotFoundException(RoleService.ROLE_NOT_FOUND_MESSAGE);
             }
         };
     }
