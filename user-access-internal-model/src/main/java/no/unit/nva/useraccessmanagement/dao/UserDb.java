@@ -2,28 +2,36 @@ package no.unit.nva.useraccessmanagement.dao;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static nva.commons.utils.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
 import java.util.Objects;
-
+import java.util.Optional;
+import java.util.stream.Collectors;
 import no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails;
 import no.unit.nva.useraccessmanagement.dao.UserDb.Builder;
-
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.interfaces.WithCopy;
 import no.unit.nva.useraccessmanagement.interfaces.WithType;
+import no.unit.nva.useraccessmanagement.model.RoleDto;
+import no.unit.nva.useraccessmanagement.model.UserDto;
 import nva.commons.utils.JacocoGenerated;
+import nva.commons.utils.attempt.Failure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>, WithType {
 
     public static final String TYPE = "USER";
     public static final String INVALID_USER_EMPTY_USERNAME = "Invalid user entry: Empty username is not allowed";
     public static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey of user should start with \"USER\"";
+    public static final String ERROR_DUE_TO_INVALID_ROLE =
+        "Failure while trying to create user with role without role-name";
     private static final String INVALID_PRIMARY_RANGE_KEY = "PrimaryRangeKey of user should start wih \"USER\"";
+    private static Logger logger = LoggerFactory.getLogger(UserDb.class);
 
     @JsonProperty(DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY)
     private String primaryHashKey;
@@ -58,6 +66,40 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
 
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    /**
+     * Transforms the DTO to a database object.
+     *
+     * @return a {@link UserDb}.
+     * @throws InvalidEntryInternalException when the DTO contains an invalid user.
+     */
+    public static UserDb fromUserDto(UserDto userDto) throws InvalidEntryInternalException {
+        UserDb.Builder userDb = UserDb.newBuilder()
+            .withUsername(userDto.getUsername())
+            .withGivenName(userDto.getGivenName())
+            .withFamilyName(userDto.getFamilyName())
+            .withInstitution(userDto.getInstitution())
+            .withRoles(createRoleDbList(userDto));
+
+        return userDb.build();
+    }
+
+    /**
+     * Creates a {@link UserDto} from a {@link UserDb}.
+     *
+     * @return a data transfer object {@link UserDto}
+     * @throws InvalidEntryInternalException when database object is invalid (should never happen).
+     */
+    public UserDto toUserDto() throws InvalidEntryInternalException {
+
+        UserDto.Builder userDto = UserDto.newBuilder()
+            .withUsername(this.getUsername())
+            .withGivenName(this.getGivenName())
+            .withFamilyName(this.getFamilyName())
+            .withRoles(extractRoles(this))
+            .withInstitution(this.getInstitution());
+        return userDto.build();
     }
 
     @JacocoGenerated
@@ -242,6 +284,29 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     public int hashCode() {
         return Objects.hash(getPrimaryHashKey(), getPrimaryRangeKey(), getUsername(), getInstitution(), getRoles(),
             getGivenName(), getFamilyName());
+    }
+
+    private static Collection<RoleDb> createRoleDbList(UserDto userDto) {
+        return userDto.getRoles().stream()
+            .map(attempt(RoleDb::fromRoleDto))
+            .map(attempt -> attempt.orElseThrow(UserDb::unexpectedException))
+            .collect(Collectors.toSet());
+    }
+
+    private static List<RoleDto> extractRoles(UserDb userDb) {
+        return Optional.ofNullable(userDb)
+            .stream()
+            .flatMap(user -> user.getRoles().stream())
+            .map(attempt(RoleDb::toRoleDto))
+            .map(attempt -> attempt.orElseThrow(UserDb::unexpectedException))
+            .collect(Collectors.toList());
+    }
+
+    /*This exception should not happen as a RoleDb should always convert to a RoleDto */
+    private static <T> IllegalStateException unexpectedException(Failure<T> failure) {
+        logger.error(ERROR_DUE_TO_INVALID_ROLE);
+        IllegalStateException exception = new IllegalStateException(failure.getException());
+        return exception;
     }
 
     public static final class Builder {

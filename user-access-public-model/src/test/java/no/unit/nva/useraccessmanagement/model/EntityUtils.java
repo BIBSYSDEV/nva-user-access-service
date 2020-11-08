@@ -8,7 +8,6 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Set;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import no.unit.nva.useraccessmanagement.dao.AccessRight;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 
 public final class EntityUtils {
@@ -17,8 +16,8 @@ public final class EntityUtils {
     public static final String SOME_ROLENAME = "SomeRole";
     public static final String SOME_INSTITUTION = "SomeInstitution";
     public static final String EMPTY_STRING = "";
-    public static final Set<AccessRight> SAMPLE_ACCESS_RIGHTS =
-        Collections.singleton(AccessRight.APPROVE_DOI_REQUEST);
+    public static final Set<String> SAMPLE_ACCESS_RIGHTS =
+        Collections.singleton("APPROVE_DOI_REQUEST");
     private static final String SOME_GIVEN_NAME = "givenName";
     private static final String SOME_FAMILY_NAME = "familyName";
 

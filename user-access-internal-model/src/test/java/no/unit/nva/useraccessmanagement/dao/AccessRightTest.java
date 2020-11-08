@@ -13,7 +13,7 @@ import org.junit.jupiter.api.function.Executable;
 
 class AccessRightTest {
 
-    public static final String APPROVE_DOI_REQUEST_STRING = "\"approve_doi_request\"";
+    public static final String APPROVE_DOI_REQUEST_STRING = "\"APPROVE_DOI_REQUEST\"";
 
     @Test
     public void fromStringParsesStringCaseInsensitive() {
@@ -31,7 +31,7 @@ class AccessRightTest {
     }
 
     @Test
-    public void accessRightIsSerializedLowerCased() throws JsonProcessingException {
+    public void accessRightIsSerializedUpperCase() throws JsonProcessingException {
         String value = JsonUtils.objectMapper.writeValueAsString(AccessRight.APPROVE_DOI_REQUEST);
         String expectedValue = APPROVE_DOI_REQUEST_STRING;
         assertThat(value, is(equalTo(expectedValue)));

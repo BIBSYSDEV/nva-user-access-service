@@ -24,9 +24,9 @@ public enum AccessRight {
     @JsonCreator
     public static AccessRight fromString(String accessRight) {
 
-        String lowerCased = accessRight.toLowerCase(Locale.getDefault());
-        if (index.containsKey(lowerCased)) {
-            return index.get(lowerCased);
+        String formattedString = formatString(accessRight);
+        if (index.containsKey(formattedString)) {
+            return index.get(formattedString);
         } else {
             throw new InvalidAccessRightException(accessRight);
         }
@@ -35,7 +35,11 @@ public enum AccessRight {
     @Override
     @JsonValue
     public String toString() {
-        return this.name().toLowerCase(Locale.getDefault());
+        return formatString(this.name());
+    }
+
+    private static String formatString(String accessRightString) {
+        return accessRightString.toUpperCase(Locale.getDefault());
     }
 
     private static Map<String, AccessRight> createIndex() {

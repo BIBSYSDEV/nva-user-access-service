@@ -5,14 +5,16 @@ import static java.util.Objects.nonNull;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
 import java.util.Objects;
-
 import java.util.Set;
+import java.util.stream.Collectors;
 import no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails;
 import no.unit.nva.useraccessmanagement.dao.RoleDb.Builder;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.interfaces.WithCopy;
 import no.unit.nva.useraccessmanagement.interfaces.WithType;
-import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.model.RoleDto;
 import nva.commons.utils.JacocoGenerated;
+import nva.commons.utils.attempt.Try;
 
 public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>, WithType {
 
@@ -45,6 +47,25 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
 
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    /**
+     * Creates a DAO from a DTO.
+     *
+     * @param roleDto the dto.
+     * @return the dao
+     * @throws InvalidEntryInternalException when the generated entry is not valid.
+     */
+    public static RoleDb fromRoleDto(RoleDto roleDto) throws InvalidEntryInternalException {
+        Set<AccessRight> accessRights = roleDto.getAccessRights()
+            .stream()
+            .map(AccessRight::fromString)
+            .collect(Collectors.toSet());
+
+        return RoleDb.newBuilder()
+            .withName(roleDto.getRoleName())
+            .withAccessRights(accessRights)
+            .build();
     }
 
     @JacocoGenerated
@@ -144,6 +165,23 @@ public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     @JacocoGenerated
     public int hashCode() {
         return Objects.hash(getPrimaryHashKey(), getPrimaryRangeKey(), getAccessRights(), getName());
+    }
+
+    /**
+     * Creates a DTO from a DAO.
+     *
+     * @return the DTO
+     * @throws InvalidEntryInternalException when the input is not valid.
+     */
+    public RoleDto toRoleDto() throws InvalidEntryInternalException {
+        Set<String> accessRightsStrings = this.getAccessRights().stream()
+            .map(AccessRight::toString)
+            .collect(Collectors.toSet());
+        return Try.attempt(() -> RoleDto.newBuilder()
+            .withName(this.getName())
+            .withAccessRights(accessRightsStrings)
+            .build())
+            .orElseThrow(fail -> new InvalidEntryInternalException(fail.getException()));
     }
 
     public static final class Builder {

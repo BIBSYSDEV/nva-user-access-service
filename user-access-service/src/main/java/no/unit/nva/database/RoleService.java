@@ -43,7 +43,7 @@ public class RoleService extends DatabaseSubService {
 
         validate(roleDto);
         checkRoleDoesNotExist(roleDto);
-        table.putItem(roleDto.toRoleDb().toItem());
+        table.putItem(RoleDb.fromRoleDto(roleDto).toItem());
     }
 
     /**
@@ -86,9 +86,9 @@ public class RoleService extends DatabaseSubService {
 
     private RoleDto attemptFetchRole(RoleDto queryObject) throws InvalidEntryInternalException {
         RoleDb roledb = Try.of(queryObject)
-            .map(RoleDto::toRoleDb)
+            .map(RoleDb::fromRoleDto)
             .map(this::fetchRoleDao)
             .orElseThrow(DatabaseSubService::handleError);
-        return nonNull(roledb) ? RoleDto.fromRoleDb(roledb) : null;
+        return nonNull(roledb) ? roledb.toRoleDto() : null;
     }
 }

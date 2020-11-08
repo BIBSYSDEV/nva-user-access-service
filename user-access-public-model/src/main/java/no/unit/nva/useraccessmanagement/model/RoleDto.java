@@ -6,8 +6,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
-import no.unit.nva.useraccessmanagement.dao.AccessRight;
-import no.unit.nva.useraccessmanagement.dao.RoleDb;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.interfaces.JsonSerializable;
@@ -17,7 +15,6 @@ import no.unit.nva.useraccessmanagement.model.interfaces.Typed;
 import no.unit.nva.useraccessmanagement.model.interfaces.Validable;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.JsonUtils;
-import nva.commons.utils.attempt.Try;
 
 @JsonTypeName(RoleDto.TYPE)
 public class RoleDto implements WithCopy<Builder>, JsonSerializable, Validable, Typed {
@@ -27,7 +24,7 @@ public class RoleDto implements WithCopy<Builder>, JsonSerializable, Validable, 
     @JsonProperty("rolename")
     private String roleName;
     @JsonProperty("accessRights")
-    private Set<AccessRight> accessRights;
+    private Set<String> accessRights;
 
     public RoleDto() {
         accessRights = Collections.emptySet();
@@ -46,21 +43,6 @@ public class RoleDto implements WithCopy<Builder>, JsonSerializable, Validable, 
         return new Builder();
     }
 
-    /**
-     * Creates a DTO from a DAO.
-     *
-     * @param roleDb the DAO
-     * @return the DTO
-     * @throws InvalidEntryInternalException when the input is not valid.
-     */
-    public static RoleDto fromRoleDb(RoleDb roleDb) throws InvalidEntryInternalException {
-        return Try.attempt(() -> newBuilder()
-            .withName(roleDb.getName())
-            .withAccessRights(roleDb.getAccessRights())
-            .build())
-            .orElseThrow(fail -> new InvalidEntryInternalException(fail.getException()));
-    }
-
     @Override
     public Builder copy() {
         return new Builder()
@@ -77,16 +59,12 @@ public class RoleDto implements WithCopy<Builder>, JsonSerializable, Validable, 
         this.roleName = roleName;
     }
 
-    public Set<AccessRight> getAccessRights() {
+    public Set<String> getAccessRights() {
         return accessRights;
     }
 
-    public void setAccessRights(Set<AccessRight> accessRights) {
+    public void setAccessRights(Set<String> accessRights) {
         this.accessRights = accessRights;
-    }
-
-    public RoleDb toRoleDb() throws InvalidEntryInternalException {
-        return RoleDb.newBuilder().withName(this.roleName).withAccessRights(accessRights).build();
     }
 
     @Override
@@ -128,7 +106,7 @@ public class RoleDto implements WithCopy<Builder>, JsonSerializable, Validable, 
     public static final class Builder {
 
         private String roleName;
-        private Set<AccessRight> accessRights;
+        private Set<String> accessRights;
 
         private Builder() {
             this.accessRights = Collections.emptySet();
@@ -139,7 +117,7 @@ public class RoleDto implements WithCopy<Builder>, JsonSerializable, Validable, 
             return this;
         }
 
-        public Builder withAccessRights(Set<AccessRight> accessRights) {
+        public Builder withAccessRights(Set<String> accessRights) {
             this.accessRights = accessRights;
             return this;
         }

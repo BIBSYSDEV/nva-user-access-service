@@ -8,6 +8,10 @@ dependencies{
         because("commons is used by all modules in this project")
     }
 
+
+    compileOnly project(":user-access-public-model")
+    testImplementation project(":user-access-public-model")
+
     compileOnly project(":user-access-commons")
     testImplementation project(":user-access-commons")
 
