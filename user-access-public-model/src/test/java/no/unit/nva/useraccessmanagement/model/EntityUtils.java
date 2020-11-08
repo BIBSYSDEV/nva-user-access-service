@@ -123,8 +123,8 @@ public final class EntityUtils {
     /**
      * Creates a sample role.
      *
-     * @param someRole role name.
-     * @return a sample role.
+     * @param someRole The sample role role name.
+     * @return the sample role
      * @throws InvalidEntryInternalException when the generated role is invalid.
      */
     public static RoleDto createRole(String someRole) throws InvalidEntryInternalException {
