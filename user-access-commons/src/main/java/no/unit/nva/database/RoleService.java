@@ -46,7 +46,7 @@ public class RoleService extends DatabaseSubService {
     }
 
     /**
-     * Fethes a role from the database.
+     * Fetches a role from the database.
      *
      * @param queryObject the query object containing the rolename.
      * @return the Role that corresponds to the given rolename.
