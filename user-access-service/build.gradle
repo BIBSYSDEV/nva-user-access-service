@@ -1,6 +1,5 @@
 dependencies {
 
-
     compileOnly project(":user-access-public-model")
     compileOnly project(":user-access-internal-model")
     compileOnly project(":user-access-commons")
@@ -57,7 +56,7 @@ test.doFirst {
     systemProperty "java.library.path", 'build/dynamodb-local'
 }
 
-// Build and package user-access-commons and dependencies for Lambda Layer
+// Build and package user-access-service and dependencies for Lambda Layer
 
 configurations.api.canBeResolved = true
 
