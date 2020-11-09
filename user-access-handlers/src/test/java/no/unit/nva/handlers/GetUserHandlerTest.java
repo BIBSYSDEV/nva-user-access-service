@@ -48,7 +48,7 @@ class GetUserHandlerTest extends HandlerTest {
     @DisplayName("handleRequest returns User object with type \"User\"")
     @Test
     public void handleRequestReturnsUserObjectWithTypeRole()
-        throws ConflictException, InvalidEntryInternalException, InvalidInputException, IOException {
+        throws ConflictException, InvalidEntryInternalException, InvalidInputException, IOException, NotFoundException {
         insertSampleUserToDatabase();
 
         ByteArrayOutputStream outputStream = sendGetUserRequestToHandler();

@@ -29,16 +29,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import no.unit.nva.useraccessmanagement.dao.AccessRight;
 import no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails;
+import no.unit.nva.useraccessmanagement.dao.AccessRight;
 import no.unit.nva.useraccessmanagement.dao.RoleDb;
 import no.unit.nva.useraccessmanagement.dao.UserDb;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
 import no.unit.nva.useraccessmanagement.model.UserDto;
-import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import nva.commons.exceptions.commonexceptions.ConflictException;
 import nva.commons.exceptions.commonexceptions.NotFoundException;
+import nva.commons.utils.SingletonCollector;
 import nva.commons.utils.log.LogUtils;
 import nva.commons.utils.log.TestAppender;
 import org.junit.jupiter.api.Assertions;
@@ -205,9 +206,35 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         assertThat(exception.getMessage(), containsString(USER_ALREADY_EXISTS_ERROR_MESSAGE));
     }
 
+    @Test
+    public void addUserAddsCurrentlySavedVersionOfRoleInNewUser()
+        throws ConflictException, InvalidEntryInternalException, InvalidInputException, NotFoundException {
+        RoleDto existingRole = createSampleRoleAndAddToDb(SOME_ROLENAME);
+        assertThat(existingRole, doesNotHaveNullOrEmptyFields());
+
+        UserDto userWithoutRoleDetails = createUserWithRoleReference(existingRole);
+        db.addUser(userWithoutRoleDetails);
+        UserDto savedUser = db.getUser(userWithoutRoleDetails);
+        RoleDto actualRole = savedUser.getRoles().stream().collect(SingletonCollector.collect());
+        assertThat(actualRole, is(equalTo(existingRole)));
+    }
+
+    @Test
+    public void addUserDoesNotAddNonExistingRolesInCreatedUser()
+        throws InvalidEntryInternalException, ConflictException, InvalidInputException, NotFoundException {
+        UserDto userWithNonExistingRole = createUserWithRole(SOME_USERNAME, SOME_INSTITUTION,
+            createRole(SOME_ROLENAME));
+        db.addUser(userWithNonExistingRole);
+
+        UserDto actualUser = db.getUser(userWithNonExistingRole);
+        UserDto expectedUser = userWithNonExistingRole.copy().withRoles(Collections.emptyList()).build();
+
+        assertThat(actualUser, is(equalTo(expectedUser)));
+    }
+
     @DisplayName("updateUser() updates existing user with input user when input user is valid")
     @Test
-    public void updateUserUpdatesAssignsCorrectVersionOfRoleinUser()
+    public void updateUserUpdatesAssignsCorrectVersionOfRoleInUser()
         throws ConflictException, InvalidEntryInternalException, NotFoundException, InvalidInputException {
         RoleDto existingRole = createRole(SOME_ROLENAME);
         db.addRole(existingRole);
@@ -343,6 +370,15 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         } catch (InvalidEntryInternalException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private UserDto createUserWithRoleReference(RoleDto existingRole) throws InvalidEntryInternalException {
+        RoleDto roleWithoutDetails = RoleDto.newBuilder().withName(existingRole.getRoleName()).build();
+        RoleDto.newBuilder().withName(existingRole.getRoleName()).build();
+        return createSampleUser(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLENAME)
+            .copy()
+            .withRoles(Collections.singletonList(roleWithoutDetails))
+            .build();
     }
 
     private Item fetchRoleDirectlyFromTable(Table table, RoleDb roleWithAccessRights) {
