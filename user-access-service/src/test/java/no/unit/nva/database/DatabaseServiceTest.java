@@ -16,7 +16,6 @@ import static no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails.PR
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.emptyCollectionOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -233,15 +232,6 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         assertThat(actualUser, is(equalTo(expectedUser)));
     }
 
-    public UserDto createUserWithRoleReference(RoleDto existingRole) throws InvalidEntryInternalException {
-        RoleDto roleWithoutDetails = RoleDto.newBuilder().withName(existingRole.getRoleName()).build();
-        RoleDto.newBuilder().withName(existingRole.getRoleName()).build();
-        return createSampleUser(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLENAME)
-            .copy()
-            .withRoles(Collections.singletonList(roleWithoutDetails))
-            .build();
-    }
-
     @DisplayName("updateUser() updates existing user with input user when input user is valid")
     @Test
     public void updateUserUpdatesAssignsCorrectVersionOfRoleInUser()
@@ -380,6 +370,15 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         } catch (InvalidEntryInternalException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private UserDto createUserWithRoleReference(RoleDto existingRole) throws InvalidEntryInternalException {
+        RoleDto roleWithoutDetails = RoleDto.newBuilder().withName(existingRole.getRoleName()).build();
+        RoleDto.newBuilder().withName(existingRole.getRoleName()).build();
+        return createSampleUser(SOME_USERNAME, SOME_INSTITUTION, SOME_ROLENAME)
+            .copy()
+            .withRoles(Collections.singletonList(roleWithoutDetails))
+            .build();
     }
 
     private Item fetchRoleDirectlyFromTable(Table table, RoleDb roleWithAccessRights) {
