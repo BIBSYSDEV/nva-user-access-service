@@ -147,11 +147,13 @@ public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, 
             return false;
         }
         UserDto userDto = (UserDto) o;
-        return Objects.equals(getUsername(), userDto.getUsername())
+        boolean result1 = Objects.equals(getUsername(), userDto.getUsername())
             && Objects.equals(getGivenName(), userDto.getGivenName())
-            && Objects.equals(getFamilyName(), userDto.getFamilyName())
-            && Objects.equals(getInstitution(), userDto.getInstitution())
-            && Objects.equals(getRoles(), userDto.getRoles());
+            && Objects.equals(getFamilyName(), userDto.getFamilyName());
+        boolean result2 =
+            Objects.equals(getInstitution(), userDto.getInstitution())
+                && Objects.equals(getRoles(), userDto.getRoles());
+        return result1 && result2;
     }
 
     @Override

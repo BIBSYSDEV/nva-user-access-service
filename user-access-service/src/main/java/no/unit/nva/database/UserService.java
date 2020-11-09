@@ -89,7 +89,8 @@ public class UserService extends DatabaseSubService {
 
         validate(user);
         checkUserDoesNotAlreadyExist(user);
-        table.putItem(UserDb.fromUserDto(user).toItem());
+        UserDb databaseEntryWithSyncedRoles = syncRoleDetails(UserDb.fromUserDto(user));
+        table.putItem(databaseEntryWithSyncedRoles.toItem());
     }
 
     /**
@@ -107,15 +108,14 @@ public class UserService extends DatabaseSubService {
         logger.debug(UPDATE_USER_DEBUG_MESSAGE + updateObject.toJsonString(objectMapper));
         validate(updateObject);
         UserDto existingUser = getExistingUserOrSendNotFoundError(updateObject);
-        UserDb updatedObjectWithSyncedRoles = checkRoleDetailsAreInSync(updateObject);
+        UserDb updatedObjectWithSyncedRoles = syncRoleDetails(UserDb.fromUserDto(updateObject));
         if (userHasChanged(existingUser, updatedObjectWithSyncedRoles)) {
             updateTable(updatedObjectWithSyncedRoles);
         }
     }
 
-    private UserDb checkRoleDetailsAreInSync(UserDto updateObject) throws InvalidEntryInternalException {
-        UserDb desiredUpdate = UserDb.fromUserDto(updateObject);
-        UserDb desiredUpdateWithSyncedRoles = userWithSyncedRoles(desiredUpdate);
+    private UserDb syncRoleDetails(UserDb updateObject) throws InvalidEntryInternalException {
+        UserDb desiredUpdateWithSyncedRoles = userWithSyncedRoles(updateObject);
         return desiredUpdateWithSyncedRoles;
     }
 
