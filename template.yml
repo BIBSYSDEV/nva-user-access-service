@@ -170,36 +170,36 @@ Resources:
               enum:
                 - APPROVE_DOI_REQUEST
                 - REJECT_DOI_REQUEST
-              Role:
-                properties:
-                  type:
-                    type: string
-                  rolename:
-                    type: string
-                  accessRight:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AccessRight'
-              User:
-                properties:
-                  type:
-                    type: string
-                  username:
-                    type: string
-                  givenName:
-                    type: string
-                  familyName:
-                    type: string
-                  institution:
-                    type: string
-                  roles:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Role'
-                  accessRight:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AccessRight'
+            Role:
+              properties:
+                type:
+                  type: string
+                rolename:
+                  type: string
+                accessRight:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccessRight'
+            User:
+              properties:
+                type:
+                  type: string
+                username:
+                  type: string
+                givenName:
+                  type: string
+                familyName:
+                  type: string
+                institution:
+                  type: string
+                roles:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Role'
+                accessRight:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccessRight'
           securitySchemes:
             ApiKey:
               type: apiKey
@@ -382,36 +382,36 @@ Resources:
               enum:
                 - APPROVE_DOI_REQUEST
                 - REJECT_DOI_REQUEST
-              Role:
-                properties:
-                  type:
-                    type: string
-                  rolename:
-                    type: string
-                  accessRight:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AccessRight'
-              User:
-                properties:
-                  type:
-                    type: string
-                  username:
-                    type: string
-                  givenName:
-                    type: string
-                  familyName:
-                    type: string
-                  institution:
-                    type: string
-                  roles:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Role'
-                  accessRight:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AccessRight'
+            Role:
+              properties:
+                type:
+                  type: string
+                rolename:
+                  type: string
+                accessRight:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccessRight'
+            User:
+              properties:
+                type:
+                  type: string
+                username:
+                  type: string
+                givenName:
+                  type: string
+                familyName:
+                  type: string
+                institution:
+                  type: string
+                roles:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Role'
+                accessRight:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccessRight'
           securitySchemes:
             CognitoUserPool:
               type: apiKey
