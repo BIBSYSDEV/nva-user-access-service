@@ -2,9 +2,6 @@ package no.unit.nva.handlers;
 
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.core.StringContains.containsString;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -20,7 +17,6 @@ import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
 import no.unit.nva.useraccessmanagement.model.UserDto;
 import nva.commons.exceptions.commonexceptions.ConflictException;
-import nva.commons.exceptions.commonexceptions.NotFoundException;
 
 public class HandlerTest extends DatabaseAccessor {
 
@@ -33,7 +29,7 @@ public class HandlerTest extends DatabaseAccessor {
     protected DatabaseService databaseService;
 
     protected UserDto insertSampleUserToDatabase(String username, String institution)
-        throws InvalidEntryInternalException, ConflictException, InvalidInputException, NotFoundException {
+        throws InvalidEntryInternalException, ConflictException, InvalidInputException {
         UserDto sampleUser = createSampleUserWithExistingRoles(username, institution);
 
         databaseService.addUser(sampleUser);
@@ -41,21 +37,18 @@ public class HandlerTest extends DatabaseAccessor {
     }
 
     protected UserDto insertSampleUserToDatabase()
-        throws InvalidEntryInternalException, ConflictException, InvalidInputException, NotFoundException {
+        throws InvalidEntryInternalException, ConflictException, InvalidInputException {
         return insertSampleUserToDatabase(DEFAULT_USERNAME, DEFAULT_INSTITUTION);
     }
 
     protected UserDto createSampleUserWithExistingRoles(String username, String institution)
-        throws InvalidEntryInternalException, NotFoundException {
+        throws InvalidEntryInternalException {
         UserDto sampleUser = createSampleUser(username, institution);
         sampleUser.getRoles().forEach((this::insertRole));
-        RoleDto role = databaseService.getRole(
-            RoleDto.newBuilder().withName(sampleUser.getRoles().get(0).getRoleName()).build());
-        assertThat(role, is(not(nullValue())));
         return sampleUser;
     }
 
-    protected UserDto createSampleUserWithExistingRoles() throws InvalidEntryInternalException, NotFoundException {
+    protected UserDto createSampleUserWithExistingRoles() throws InvalidEntryInternalException {
         return createSampleUserWithExistingRoles(DEFAULT_USERNAME, DEFAULT_INSTITUTION);
     }
 

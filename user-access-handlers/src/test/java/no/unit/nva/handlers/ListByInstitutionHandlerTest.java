@@ -10,7 +10,6 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.ByteArrayOutputStream;
@@ -21,15 +20,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.UserDto;
 import no.unit.nva.useraccessmanagement.model.UserList;
-import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
-
-import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.exceptions.commonexceptions.ConflictException;
-import nva.commons.exceptions.commonexceptions.NotFoundException;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.JsonUtils;
@@ -64,7 +60,7 @@ class ListByInstitutionHandlerTest extends HandlerTest {
 
     @Test
     public void handleRequestReturnsListOfUsersGivenAnInstitution()
-        throws IOException, ConflictException, InvalidEntryInternalException, InvalidInputException, NotFoundException {
+        throws IOException, ConflictException, InvalidEntryInternalException, InvalidInputException {
         UserList expectedUsers = insertTwoUsersOfSameInstitution();
 
         InputStream validRequest = createListRequest(DEFAULT_INSTITUTION);
@@ -79,7 +75,7 @@ class ListByInstitutionHandlerTest extends HandlerTest {
 
     @Test
     public void handleRequestReturnsListOfUsersContainingOnlyUsersOfGivenInstitution()
-        throws IOException, ConflictException, InvalidEntryInternalException, InvalidInputException, NotFoundException {
+        throws IOException, ConflictException, InvalidEntryInternalException, InvalidInputException {
         UserList insertedUsers = insertTwoUsersOfDifferentInstitutions();
 
         InputStream validRequest = createListRequest(DEFAULT_INSTITUTION);
@@ -98,7 +94,7 @@ class ListByInstitutionHandlerTest extends HandlerTest {
 
     @Test
     public void handleRequestReturnsEmptyListOfUsersWhenNoUsersOfSpecifiedInstitutionAreFound()
-        throws IOException, ConflictException, InvalidEntryInternalException, InvalidInputException, NotFoundException {
+        throws IOException, ConflictException, InvalidEntryInternalException, InvalidInputException {
         insertTwoUsersOfSameInstitution();
 
         InputStream validRequest = createListRequest(SOME_OTHER_INSTITUTION);
@@ -148,7 +144,7 @@ class ListByInstitutionHandlerTest extends HandlerTest {
     }
 
     private UserList insertTwoUsersOfDifferentInstitutions()
-        throws InvalidEntryInternalException, ConflictException, InvalidInputException, NotFoundException {
+        throws InvalidEntryInternalException, ConflictException, InvalidInputException {
         UserList users = new UserList();
         users.add(insertSampleUserToDatabase(DEFAULT_USERNAME, HandlerTest.DEFAULT_INSTITUTION));
         users.add(insertSampleUserToDatabase(SOME_OTHER_USERNAME, SOME_OTHER_INSTITUTION));
@@ -168,7 +164,7 @@ class ListByInstitutionHandlerTest extends HandlerTest {
     }
 
     private UserList insertTwoUsersOfSameInstitution()
-        throws ConflictException, InvalidEntryInternalException, InvalidInputException, NotFoundException {
+        throws ConflictException, InvalidEntryInternalException, InvalidInputException {
         UserList users = new UserList();
         users.add(insertSampleUserToDatabase(DEFAULT_USERNAME, DEFAULT_INSTITUTION));
         users.add(insertSampleUserToDatabase(SOME_OTHER_USERNAME, DEFAULT_INSTITUTION));
