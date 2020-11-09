@@ -29,6 +29,7 @@ import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.exceptions.commonexceptions.ConflictException;
+import nva.commons.exceptions.commonexceptions.NotFoundException;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.JsonUtils;
@@ -63,7 +64,7 @@ class ListByInstitutionHandlerTest extends HandlerTest {
 
     @Test
     public void handleRequestReturnsListOfUsersGivenAnInstitution()
-        throws IOException, ConflictException, InvalidEntryInternalException, InvalidInputException {
+        throws IOException, ConflictException, InvalidEntryInternalException, InvalidInputException, NotFoundException {
         UserList expectedUsers = insertTwoUsersOfSameInstitution();
 
         InputStream validRequest = createListRequest(DEFAULT_INSTITUTION);
@@ -78,7 +79,7 @@ class ListByInstitutionHandlerTest extends HandlerTest {
 
     @Test
     public void handleRequestReturnsListOfUsersContainingOnlyUsersOfGivenInstitution()
-        throws IOException, ConflictException, InvalidEntryInternalException, InvalidInputException {
+        throws IOException, ConflictException, InvalidEntryInternalException, InvalidInputException, NotFoundException {
         UserList insertedUsers = insertTwoUsersOfDifferentInstitutions();
 
         InputStream validRequest = createListRequest(DEFAULT_INSTITUTION);
@@ -97,7 +98,7 @@ class ListByInstitutionHandlerTest extends HandlerTest {
 
     @Test
     public void handleRequestReturnsEmptyListOfUsersWhenNoUsersOfSpecifiedInstitutionAreFound()
-        throws IOException, ConflictException, InvalidEntryInternalException, InvalidInputException {
+        throws IOException, ConflictException, InvalidEntryInternalException, InvalidInputException, NotFoundException {
         insertTwoUsersOfSameInstitution();
 
         InputStream validRequest = createListRequest(SOME_OTHER_INSTITUTION);
@@ -147,7 +148,7 @@ class ListByInstitutionHandlerTest extends HandlerTest {
     }
 
     private UserList insertTwoUsersOfDifferentInstitutions()
-        throws InvalidEntryInternalException, ConflictException, InvalidInputException {
+        throws InvalidEntryInternalException, ConflictException, InvalidInputException, NotFoundException {
         UserList users = new UserList();
         users.add(insertSampleUserToDatabase(DEFAULT_USERNAME, HandlerTest.DEFAULT_INSTITUTION));
         users.add(insertSampleUserToDatabase(SOME_OTHER_USERNAME, SOME_OTHER_INSTITUTION));
@@ -167,7 +168,7 @@ class ListByInstitutionHandlerTest extends HandlerTest {
     }
 
     private UserList insertTwoUsersOfSameInstitution()
-        throws ConflictException, InvalidEntryInternalException, InvalidInputException {
+        throws ConflictException, InvalidEntryInternalException, InvalidInputException, NotFoundException {
         UserList users = new UserList();
         users.add(insertSampleUserToDatabase(DEFAULT_USERNAME, DEFAULT_INSTITUTION));
         users.add(insertSampleUserToDatabase(SOME_OTHER_USERNAME, DEFAULT_INSTITUTION));

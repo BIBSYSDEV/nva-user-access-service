@@ -1,6 +1,7 @@
 package no.unit.nva.handlers;
 
 import static no.unit.nva.handlers.AddUserHandler.SYNC_ERROR_MESSAGE;
+
 import static no.unit.nva.handlers.EntityUtils.createRequestWithUserWithoutUsername;
 import static no.unit.nva.handlers.EntityUtils.createUserWithRoleWithoutInstitution;
 import static no.unit.nva.handlers.EntityUtils.createUserWithRolesAndInstitution;
@@ -44,13 +45,14 @@ import org.zalando.problem.Problem;
 
 public class AddUserTest extends HandlerTest {
 
+    public static final String EMPTY_INSTITUTION = null;
     private AddUserHandler handler;
     private RequestInfo requestInfo;
     private Context context;
 
     @BeforeEach
     public void init() {
-        DatabaseServiceImpl databaseService = createDatabaseServiceUsingLocalStorage();
+        databaseService = createDatabaseServiceUsingLocalStorage();
         handler = new AddUserHandler(mockEnvironment(), databaseService);
 
         requestInfo = new RequestInfo();
@@ -76,18 +78,19 @@ public class AddUserTest extends HandlerTest {
     @DisplayName("processInput() adds user to database when input is a user with username and roles")
     @Test
     public void processInputAddsUserToDatabaseWhenInputIsUserWithNamesAndRoles() throws ApiGatewayException {
-        UserDto expectedUser = createUserWithRoleWithoutInstitution();
+        UserDto expectedUser = createSampleUserWithExistingRoles(DEFAULT_USERNAME, EMPTY_INSTITUTION);
         UserDto savedUser = handler.processInput(expectedUser, requestInfo, context);
         assertThat(savedUser, is(not(sameInstance(expectedUser))));
         assertThat(savedUser, is(equalTo(expectedUser)));
     }
 
     @DisplayName("processInput() adds user to database when input is a user with username and roles and with"
-        + "institutions")
+        + " institutions")
     @Test
     public void processInputAddsUserToDatabaseWhenInputIsUserWithNamesAndRolesAndInstitutions()
         throws ApiGatewayException {
-        UserDto expectedUser = createUserWithRolesAndInstitution();
+        UserDto expectedUser = createSampleUserWithExistingRoles();
+
         UserDto savedUser = handler.processInput(expectedUser, requestInfo, context);
         assertThat(savedUser, is(not(sameInstance(expectedUser))));
         assertThat(savedUser, is(equalTo(expectedUser)));

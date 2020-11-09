@@ -16,6 +16,7 @@ import static no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails.PR
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyCollectionOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -217,6 +218,19 @@ public class DatabaseServiceTest extends DatabaseAccessor {
         UserDto savedUser = db.getUser(userWithoutRoleDetails);
         RoleDto actualRole = savedUser.getRoles().stream().collect(SingletonCollector.collect());
         assertThat(actualRole, is(equalTo(existingRole)));
+    }
+
+    @Test
+    public void addUserDoesNotAddNonExistingRolesInCreatedUser()
+        throws InvalidEntryInternalException, ConflictException, InvalidInputException, NotFoundException {
+        UserDto userWithNonExistingRole = createUserWithRole(SOME_USERNAME, SOME_INSTITUTION,
+            createRole(SOME_ROLENAME));
+        db.addUser(userWithNonExistingRole);
+
+        UserDto actualUser = db.getUser(userWithNonExistingRole);
+        UserDto expectedUser = userWithNonExistingRole.copy().withRoles(Collections.emptyList()).build();
+
+        assertThat(actualUser, is(equalTo(expectedUser)));
     }
 
     public UserDto createUserWithRoleReference(RoleDto existingRole) throws InvalidEntryInternalException {
