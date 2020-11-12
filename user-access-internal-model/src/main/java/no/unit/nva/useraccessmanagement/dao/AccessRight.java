@@ -11,7 +11,8 @@ import no.unit.nva.useraccessmanagement.exceptions.InvalidAccessRightException;
 public enum AccessRight {
 
     APPROVE_DOI_REQUEST,
-    REJECT_DOI_REQUEST;
+    REJECT_DOI_REQUEST,
+    READ_DOI_REQUEST;
 
     private static final Map<String, AccessRight> index = createIndex();
 
