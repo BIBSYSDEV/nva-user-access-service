@@ -165,12 +165,21 @@ Resources:
                 type: aws_proxy
         components:
           schemas:
+            AccessRight:
+              type: string
+              enum:
+                - APPROVE_DOI_REQUEST
+                - REJECT_DOI_REQUEST
             Role:
               properties:
                 type:
                   type: string
                 rolename:
                   type: string
+                accessRight:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccessRight'
             User:
               properties:
                 type:
@@ -187,6 +196,10 @@ Resources:
                   type: array
                   items:
                     $ref: '#/components/schemas/Role'
+                accessRight:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccessRight'
           securitySchemes:
             ApiKey:
               type: apiKey
@@ -364,17 +377,30 @@ Resources:
                 type: aws_proxy
         components:
           schemas:
+            AccessRight:
+              type: string
+              enum:
+                - APPROVE_DOI_REQUEST
+                - REJECT_DOI_REQUEST
             Role:
               properties:
                 type:
                   type: string
                 rolename:
                   type: string
+                accessRight:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccessRight'
             User:
               properties:
                 type:
                   type: string
                 username:
+                  type: string
+                givenName:
+                  type: string
+                familyName:
                   type: string
                 institution:
                   type: string
@@ -382,6 +408,10 @@ Resources:
                   type: array
                   items:
                     $ref: '#/components/schemas/Role'
+                accessRight:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccessRight'
           securitySchemes:
             CognitoUserPool:
               type: apiKey
@@ -407,8 +437,8 @@ Resources:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: user-access-commons-layer
-      Description: User Access Commons
-      ContentUri: user-access-commons/build/distributions/user-access-commons.zip
+      Description: User Access Service
+      ContentUri: user-access-service/build/distributions/user-access-service.zip
       CompatibleRuntimes:
         - java11
       LicenseInfo: 'MIT'

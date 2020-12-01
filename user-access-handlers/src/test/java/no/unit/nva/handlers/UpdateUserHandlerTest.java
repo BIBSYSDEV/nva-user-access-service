@@ -1,6 +1,7 @@
 package no.unit.nva.handlers;
 
-import static no.unit.nva.database.DatabaseServiceImpl.USER_NOT_FOUND_MESSAGE;
+import static no.unit.nva.database.UserService.USER_NOT_FOUND_MESSAGE;
+import static no.unit.nva.handlers.EntityUtils.createUserWithoutUsername;
 import static no.unit.nva.handlers.UpdateUserHandler.INCONSISTENT_USERNAME_IN_PATH_AND_OBJECT_ERROR;
 import static no.unit.nva.handlers.UpdateUserHandler.LOCATION_HEADER;
 import static no.unit.nva.handlers.UpdateUserHandler.USERNAME_PATH_PARAMETER;
@@ -11,28 +12,24 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.Mockito.mock;
-
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import no.unit.nva.database.DatabaseServiceImpl;
-import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.InvalidEntryInternalException;
-import no.unit.nva.exceptions.InvalidInputException;
-import no.unit.nva.exceptions.NotFoundException;
-import no.unit.nva.model.RoleDto;
-import no.unit.nva.model.TypedObjectsDetails;
-import no.unit.nva.model.UserDto;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import no.unit.nva.utils.EntityUtils;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.model.RoleDto;
+import no.unit.nva.useraccessmanagement.model.UserDto;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.exceptions.InvalidOrMissingTypeException;
+import nva.commons.exceptions.commonexceptions.ConflictException;
+import nva.commons.exceptions.commonexceptions.NotFoundException;
 import nva.commons.handlers.ApiGatewayHandler;
 import nva.commons.handlers.GatewayResponse;
 import org.apache.http.HttpStatus;
@@ -132,7 +129,7 @@ public class UpdateUserHandlerTest extends HandlerTest {
                InvocationTargetException {
 
         UserDto existingUser = storeUserInDatabase(sampleUser());
-        UserDto userUpdate = EntityUtils.createUserWithoutUsername();
+        UserDto userUpdate = createUserWithoutUsername();
 
         GatewayResponse<Problem> gatewayResponse = sendUpdateRequest(existingUser.getUsername(), userUpdate);
 
@@ -209,7 +206,7 @@ public class UpdateUserHandlerTest extends HandlerTest {
 
     private ObjectNode inputObjectWithoutType(UserDto userDto) {
         ObjectNode objectWithoutType = objectMapper.convertValue(userDto, ObjectNode.class);
-        objectWithoutType.remove(TypedObjectsDetails.TYPE_ATTRIBUTE);
+        objectWithoutType.remove(TYPE_ATTRIBUTE);
         return objectWithoutType;
     }
 

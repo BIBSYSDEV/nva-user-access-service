@@ -1,11 +1,10 @@
 package no.unit.nva.handlers;
 
 import static no.unit.nva.handlers.AddUserHandler.SYNC_ERROR_MESSAGE;
-import static no.unit.nva.utils.EntityUtils.createRequestWithUserWithoutUsername;
-import static no.unit.nva.utils.EntityUtils.createUserWithRoleWithoutInstitution;
-import static no.unit.nva.utils.EntityUtils.createUserWithRolesAndInstitution;
-import static no.unit.nva.utils.EntityUtils.createUserWithoutRoles;
-import static no.unit.nva.utils.EntityUtils.createUserWithoutUsername;
+import static no.unit.nva.handlers.EntityUtils.createRequestWithUserWithoutUsername;
+import static no.unit.nva.handlers.EntityUtils.createUserWithRolesAndInstitution;
+import static no.unit.nva.handlers.EntityUtils.createUserWithoutRoles;
+import static no.unit.nva.handlers.EntityUtils.createUserWithoutUsername;
 import static nva.commons.utils.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -15,7 +14,6 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsSame.sameInstance;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -23,16 +21,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
-import no.unit.nva.exceptions.ConflictException;
-import no.unit.nva.exceptions.DataSyncException;
-import no.unit.nva.exceptions.InvalidEntryInternalException;
-import no.unit.nva.exceptions.InvalidInputException;
-import no.unit.nva.model.UserDto;
+import no.unit.nva.useraccessmanagement.exceptions.DataSyncException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
+import no.unit.nva.useraccessmanagement.model.UserDto;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.exceptions.InvalidOrMissingTypeException;
+import nva.commons.exceptions.commonexceptions.ConflictException;
 import nva.commons.handlers.GatewayResponse;
 import nva.commons.handlers.RequestInfo;
 import org.apache.http.HttpStatus;
@@ -44,13 +41,14 @@ import org.zalando.problem.Problem;
 
 public class AddUserTest extends HandlerTest {
 
+    public static final String EMPTY_INSTITUTION = null;
     private AddUserHandler handler;
     private RequestInfo requestInfo;
     private Context context;
 
     @BeforeEach
     public void init() {
-        DatabaseServiceImpl databaseService = createDatabaseServiceUsingLocalStorage();
+        databaseService = createDatabaseServiceUsingLocalStorage();
         handler = new AddUserHandler(mockEnvironment(), databaseService);
 
         requestInfo = new RequestInfo();
@@ -76,18 +74,19 @@ public class AddUserTest extends HandlerTest {
     @DisplayName("processInput() adds user to database when input is a user with username and roles")
     @Test
     public void processInputAddsUserToDatabaseWhenInputIsUserWithNamesAndRoles() throws ApiGatewayException {
-        UserDto expectedUser = createUserWithRoleWithoutInstitution();
+        UserDto expectedUser = createSampleUserWithExistingRoles(DEFAULT_USERNAME, EMPTY_INSTITUTION);
         UserDto savedUser = handler.processInput(expectedUser, requestInfo, context);
         assertThat(savedUser, is(not(sameInstance(expectedUser))));
         assertThat(savedUser, is(equalTo(expectedUser)));
     }
 
     @DisplayName("processInput() adds user to database when input is a user with username and roles and with"
-        + "institutions")
+        + " institutions")
     @Test
     public void processInputAddsUserToDatabaseWhenInputIsUserWithNamesAndRolesAndInstitutions()
         throws ApiGatewayException {
-        UserDto expectedUser = createUserWithRolesAndInstitution();
+        UserDto expectedUser = createSampleUserWithExistingRoles();
+
         UserDto savedUser = handler.processInput(expectedUser, requestInfo, context);
         assertThat(savedUser, is(not(sameInstance(expectedUser))));
         assertThat(savedUser, is(equalTo(expectedUser)));
@@ -171,8 +170,8 @@ public class AddUserTest extends HandlerTest {
     private DatabaseService databaseServiceReturnsAlwaysEmptyUser() {
         return new DatabaseServiceImpl(localDynamo, envWithTableName) {
             @Override
-            public Optional<UserDto> getUserAsOptional(UserDto queryObject) {
-                return Optional.empty();
+            public UserDto getUser(UserDto queryObject) {
+                return null;
             }
         };
     }

@@ -5,6 +5,7 @@ Feature: Users
 
     Given a Database for users and roles
     And an AuthorizedClient that is authorized through Feide
+    And an ExistingRole with role-name "RoleA" that exists in the Database
 
     And an ExistingUser with username "existingUser" that exists in the Database
     And the ExistingUser belongs to the institution "StandardInstitution"
@@ -33,6 +34,7 @@ Feature: Users
     Then a NotFound message is returned
 
   Scenario:  Authorized client updates existing user
+    Given a NewRole with role-name "roleAfterUpdate" that exists in the Database
     When the AuthorizedClient requests to update the ExistingUser setting the following roles:
       | roles           |
       | roleAfterUpdate |

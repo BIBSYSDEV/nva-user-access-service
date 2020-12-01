@@ -1,19 +1,19 @@
 package no.unit.nva.handlers;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import java.net.HttpURLConnection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
-import no.unit.nva.exceptions.InvalidInputException;
-import no.unit.nva.model.UserDto;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
+import no.unit.nva.useraccessmanagement.model.UserDto;
 import nva.commons.exceptions.ApiGatewayException;
 import nva.commons.handlers.RequestInfo;
 import nva.commons.utils.Environment;
 import nva.commons.utils.JacocoGenerated;
-import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ public class UpdateUserHandler extends HandlerAccessingUser<UserDto, Void> {
 
     @Override
     protected Integer getSuccessStatusCode(UserDto input, Void output) {
-        return HttpStatus.SC_ACCEPTED;
+        return HttpURLConnection.HTTP_ACCEPTED;
     }
 
     private void validateRequest(UserDto input, RequestInfo requestInfo)

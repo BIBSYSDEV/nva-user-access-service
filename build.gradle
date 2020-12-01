@@ -4,10 +4,20 @@ plugins {
     id 'checkstyle'
     id 'pmd'
     id "nebula.lint" version "16.9.1"
+    id 'maven'
 }
 
+
+
 allprojects {
+    apply plugin: 'maven'
     apply plugin: 'nebula.lint'
+
+    project.ext{
+        nvaCommonsVersion = '0.6.0'
+        awsSdkVersion ="1.11.894"
+        jacksonVersion ="2.11.3"
+    }
 
     gradleLint {
         //TODO: fix gradle linting after refactor
@@ -35,10 +45,6 @@ subprojects {
         testImplementation group: 'com.github.BIBSYSDEV', name: 'nva-testutils', version: '0.1.13'
         testImplementation group: 'com.amazonaws', name: 'DynamoDBLocal', version: '1.12.0'
         testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
-        testImplementation group: 'io.cucumber', name: 'cucumber-java', version: '5.6.0'
-        testImplementation(group: 'io.cucumber', name: 'datatable', version: '3.3.1') {
-            because("it is transitive dependency and we use it directly")
-        }
 
         testImplementation('org.zalando:problem:0.24.0') {
             dependencies {
@@ -52,18 +58,12 @@ subprojects {
         testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: jupiterVersion
         testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: jupiterVersion
         testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
-        gradleLint.ignore {
-            // gradleLint wants this to be testRuntimeOnly, but cucumber fails to run when this is not
-            // set to testImplementation.
-            testImplementation(group: 'io.cucumber', name: 'cucumber-picocontainer', version: '6.1.1') {
-                because("Dependency injection in cucumber glue code")
-            }
-        }
+
     }
 
     test {
         useJUnitPlatform()
-        failFast = false
+        failFast = true
         testLogging {
             events('skipped', 'passed', 'failed')
         }
@@ -119,5 +119,15 @@ subprojects {
                 }
             }
         }
+    }
+
+    // publish submodules
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        archiveClassifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives sourcesJar
     }
 }
