@@ -3,16 +3,10 @@ dependencies {
 
     implementation project(":user-access-internal-model")
 
-
-    api project(":user-access-commons"){
-        because("We need the api qualifier to avoid including the library for every handler")
-    }
-    api project(":user-access-errors"){
-        because("We need the api qualifier to avoid including the library for every handler")
-    }
-    api project(":user-access-public-model"){
-        because("We need the api qualifier to avoid including the library for every handler")
-    }
+    //We need the api qualifier to avoid including the library for every handler
+    api project(":user-access-commons")
+    api project(":user-access-errors")
+    api project(":user-access-public-model")
 
 
     api(group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: project.ext.awsSdkVersion) {
