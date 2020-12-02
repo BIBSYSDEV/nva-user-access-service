@@ -436,7 +436,7 @@ Resources:
   UserAccessCommonsLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: user-access-commons-layer
+      LayerName: user-access-service-layer
       Description: User Access Service
       ContentUri: user-access-service/build/distributions/user-access-service.zip
       CompatibleRuntimes:
