@@ -21,18 +21,10 @@ dependencies {
         because "We use it directly"
     }
 
-    implementation(group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.3') {
-        because "We use it directly"
-    }
-
-    implementation(group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.3') {
-        because "We use it directly"
-    }
-
     compileOnly(group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: project.ext.awsSdkVersion){
         because "PMD fails without it"
     }
-    testImplementation(group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: project.ext.awsSdkVersion)
+
     testImplementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion
     testImplementation project(':user-access-internal-model')
     testImplementation project(':user-access-testing')

@@ -6,6 +6,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.IOException;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidAccessRightException;
 import nva.commons.utils.JsonUtils;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ class AccessRightTest {
     }
 
     @Test
-    public void accessRightIsDeserializedFromString() throws JsonProcessingException {
+    public void accessRightIsDeserializedFromString() throws IOException {
         String accessRightString = APPROVE_DOI_REQUEST_STRING;
         AccessRight accessRight = JsonUtils.objectMapper.readValue(accessRightString, AccessRight.class);
         assertThat(accessRight, is(equalTo(AccessRight.APPROVE_DOI_REQUEST)));

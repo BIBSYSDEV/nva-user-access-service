@@ -87,7 +87,7 @@ public class UserDtoTest extends DtoTest {
     @DisplayName("UserDto can be created when it contains the right type value")
     @Test
     public void userDtoCanBeDeserializedWhenItContainsTheRightTypeValue()
-        throws InvalidEntryInternalException, JsonProcessingException {
+        throws InvalidEntryInternalException, IOException {
         UserDto sampleUser = createUserWithRolesAndInstitution();
         ObjectNode json = objectMapper.convertValue(sampleUser, ObjectNode.class);
         assertThatSerializedItemContainsType(json, USER_TYPE_LITERAL);
@@ -212,7 +212,7 @@ public class UserDtoTest extends DtoTest {
             .build();
     }
 
-    private List<RoleDto> duplicateRoles(UserDto user) throws InvalidEntryInternalException {
+    private List<RoleDto> duplicateRoles(UserDto user) {
         List<RoleDto> duplicateRoles = user.getRoles().stream()
             .map(attempt(r -> r.copy().withName(r.getRoleName() + "_copy").build()))
             .flatMap(Try::stream)
