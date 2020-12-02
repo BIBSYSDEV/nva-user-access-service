@@ -14,9 +14,9 @@ allprojects {
     apply plugin: 'nebula.lint'
 
     project.ext{
-        nvaCommonsVersion = '0.6.0'
+        nvaCommonsVersion = '0.6.3'
         awsSdkVersion ="1.11.894"
-        jacksonVersion ="2.11.3"
+        jacksonVersion ="2.10.3"
     }
 
     gradleLint {
@@ -42,7 +42,14 @@ subprojects {
 
     dependencies {
 
-        testImplementation group: 'com.github.BIBSYSDEV', name: 'nva-testutils', version: '0.1.13'
+        testImplementation (group: 'com.github.BIBSYSDEV', name: 'nva-testutils', version: '0.1.13'){
+            exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
+            exclude group: 'com.fasterxml.jackson.datatype', module: 'jackson-datatype-jdk8'
+            exclude group: 'com.fasterxml.jackson.datatype', module: 'jackson-datatype-jsr310'
+            exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
+            exclude group: 'com.fasterxml.jackson.module', module: 'jackson-module-parameter-names'
+            exclude group: 'com.fasterxml.jackson.core', module: 'jackson-annotations'
+        }
         testImplementation group: 'com.amazonaws', name: 'DynamoDBLocal', version: '1.12.0'
         testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
 
@@ -130,4 +137,8 @@ subprojects {
     artifacts {
         archives sourcesJar
     }
+
+
+    task listAllDependencies(type: DependencyReportTask) {}
+
 }

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -125,7 +126,7 @@ public class RoleDtoTest extends DtoTest {
     @DisplayName("RoleDto can be created when it contains the right type value")
     @Test
     public void roleDtoCanBeDeserializedWhenItContainsTheRightTypeValue()
-        throws InvalidEntryInternalException, JsonProcessingException {
+        throws InvalidEntryInternalException, IOException {
         RoleDto someRole = createRole(SOME_ROLE_NAME);
         ObjectNode json = objectMapper.convertValue(someRole, ObjectNode.class);
         assertThatSerializedItemContainsType(json, ROLE_TYPE_LITERAL);
