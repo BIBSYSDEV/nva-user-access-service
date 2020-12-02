@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.Objects;
 import no.unit.nva.useraccessmanagement.interfaces.JsonSerializable;
 import nva.commons.utils.JsonUtils;
@@ -22,7 +23,7 @@ class JsonSerializableTest {
     public static final String EXPECTED_ERROR_MESSAGE = "expectedErrorMessage";
 
     @Test
-    public void jsonSerializableReturnsValidJsonString() throws JsonProcessingException {
+    public void jsonSerializableReturnsValidJsonString() throws IOException {
         JsonObject object = sampleObject();
         String json = object.toJsonString();
         JsonObject copy = JsonUtils.objectMapper.readValue(json, JsonObject.class);
