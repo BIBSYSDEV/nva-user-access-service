@@ -1,17 +1,18 @@
 dependencies {
 
-    implementation project(':user-access-commons')
-    implementation project(':user-access-public-model')
+    compileOnly project(':user-access-commons')
+    compileOnly project(':user-access-public-model')
+    compileOnly project(':user-access-errors')
+    compileOnly project(':user-access-service')
 
-    implementation project(':user-access-errors')
-    implementation project(':user-access-service')
+    testImplementation project(':user-access-commons')
+    testImplementation project(':user-access-public-model')
+    testImplementation project(':user-access-errors')
+    testImplementation project(':user-access-service')
 
 
-    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion
+    compileOnly (group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion)
 
-    implementation(group: 'com.amazonaws', name: 'aws-java-sdk-secretsmanager', version: project.ext.awsSdkVersion) {
-        because("we need to read the API key")
-    }
 
     implementation(group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4') {
         because "We use it directly"
@@ -24,6 +25,9 @@ dependencies {
     compileOnly(group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: project.ext.awsSdkVersion){
         because "PMD fails without it"
     }
+
+    compileOnly group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: project.ext.jacksonVersion
+    testImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: project.ext.jacksonVersion
 
     testImplementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion
     testImplementation project(':user-access-internal-model')

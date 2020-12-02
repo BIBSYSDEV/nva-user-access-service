@@ -16,15 +16,27 @@ dependencies {
         exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
         exclude group: 'com.fasterxml.jackson.module', module: 'jackson-module-parameter-names'
         exclude group: 'com.fasterxml.jackson.core', module: 'jackson-annotations'
+    }
 
+
+    api (group: 'com.amazonaws', name: 'aws-java-sdk-secretsmanager', version: project.ext.awsSdkVersion) {
+        because("We want to have this library in the AWS::Serverless::LayerVersion resource" +
+                "and do not want to have duplicates of this lib for each handler. ")
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
+        exclude group: 'com.fasterxml.jackson.datatype', module: 'jackson-datatype-jdk8'
+        exclude group: 'com.fasterxml.jackson.datatype', module: 'jackson-datatype-jsr310'
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
+        exclude group: 'com.fasterxml.jackson.module', module: 'jackson-module-parameter-names'
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-annotations'
     }
 
     implementation(group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4') {
         because "Because we use the library directly to define loggers in our code"
     }
 
+    api group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: project.ext.jacksonVersion
-    implementation group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion
+
     runtimeOnly(group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: project.ext.jacksonVersion)
 
     testImplementation project(':user-access-testing')
