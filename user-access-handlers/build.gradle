@@ -12,6 +12,7 @@ dependencies {
     implementation(group: 'com.amazonaws', name: 'aws-java-sdk-secretsmanager', version: project.ext.awsSdkVersion) {
         because("we need to read the API key")
     }
+
     implementation(group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4') {
         because "We use it directly"
     }
