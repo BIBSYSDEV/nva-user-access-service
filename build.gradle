@@ -16,7 +16,7 @@ allprojects {
     project.ext{
         nvaCommonsVersion = '0.6.3'
         awsSdkVersion ="1.11.894"
-        jacksonVersion ="2.10.3"
+        jacksonVersion ="2.11.3"
     }
 
     gradleLint {
