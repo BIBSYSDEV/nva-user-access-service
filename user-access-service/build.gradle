@@ -1,9 +1,11 @@
 dependencies {
 
 
-    implementation project(":user-access-internal-model")
 
-    //We need the api qualifier to avoid including the library for every handler
+
+    //We need the api qualifier to avoid including the library for every handler and avoid Runtime
+    // NoClassDefFound Exceptions
+    api project(":user-access-internal-model")
     api project(":user-access-commons")
     api project(":user-access-errors")
     api project(":user-access-public-model")
