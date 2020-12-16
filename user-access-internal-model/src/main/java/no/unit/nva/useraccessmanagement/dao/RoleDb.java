@@ -13,6 +13,7 @@ import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException
 import no.unit.nva.useraccessmanagement.interfaces.WithCopy;
 import no.unit.nva.useraccessmanagement.interfaces.WithType;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
+import no.unit.useraccessserivce.accessrights.AccessRight;
 import nva.commons.utils.JacocoGenerated;
 import nva.commons.utils.attempt.Try;
 

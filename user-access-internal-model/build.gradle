@@ -28,6 +28,10 @@ dependencies {
 
     testImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: project.ext.jacksonVersion
 
+    compileOnly project(":user-access-rights")
+    testImplementation project(":user-access-rights")
+
+
     compileOnly project(":user-access-public-model")
     testImplementation project(":user-access-public-model")
 

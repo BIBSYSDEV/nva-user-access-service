@@ -4,11 +4,13 @@ dependencies {
     compileOnly project(':user-access-public-model')
     compileOnly project(':user-access-errors')
     compileOnly project(':user-access-service')
+    compileOnly project(':user-access-rights')
 
     testImplementation project(':user-access-commons')
     testImplementation project(':user-access-public-model')
     testImplementation project(':user-access-errors')
     testImplementation project(':user-access-service')
+    testImplementation project(':user-access-rights')
 
 
     compileOnly (group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion)

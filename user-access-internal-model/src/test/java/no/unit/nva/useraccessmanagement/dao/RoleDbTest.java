@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Set;
 import no.unit.nva.useraccessmanagement.dao.RoleDb.Builder;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.useraccessserivce.accessrights.AccessRight;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;

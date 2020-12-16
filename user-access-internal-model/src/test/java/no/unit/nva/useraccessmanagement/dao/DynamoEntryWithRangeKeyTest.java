@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import java.util.Collections;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.useraccessserivce.accessrights.AccessRight;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
