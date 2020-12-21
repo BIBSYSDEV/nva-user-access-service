@@ -1,4 +1,4 @@
-package no.unit.nva.useraccessmanagement.dao;
+package no.unit.useraccessserivce.accessrights;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-import no.unit.nva.useraccessmanagement.exceptions.InvalidAccessRightException;
 
 public enum AccessRight {
 
@@ -17,10 +16,10 @@ public enum AccessRight {
     private static final Map<String, AccessRight> index = createIndex();
 
     /**
-     * Creates an AccessRight instance from a string (case insensitive).
+     * Creates an no.unit.useraccessserivce.accessrights.AccessRight instance from a string (case insensitive).
      *
      * @param accessRight string representation of access right
-     * @return an AccessRight instance.
+     * @return an no.unit.useraccessserivce.accessrights.AccessRight instance.
      */
     @JsonCreator
     public static AccessRight fromString(String accessRight) {

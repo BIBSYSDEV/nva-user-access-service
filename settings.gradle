@@ -6,4 +6,5 @@ include 'user-access-testing'
 include 'user-access-handlers'
 include 'user-access-public-model'
 include 'user-access-internal-model'
+include 'user-access-rights'
 
