@@ -1,7 +1,7 @@
 package no.unit.nva.useraccessmanagement.interfaces;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import nva.commons.utils.JacocoGenerated;
+import nva.commons.core.JacocoGenerated;
 
 public interface WithType {
 

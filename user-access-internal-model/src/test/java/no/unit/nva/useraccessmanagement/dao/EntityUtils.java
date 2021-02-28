@@ -1,7 +1,7 @@
 package no.unit.nva.useraccessmanagement.dao;
 
 import static no.unit.useraccessserivce.accessrights.AccessRight.APPROVE_DOI_REQUEST;
-import static nva.commons.utils.JsonUtils.objectMapper;
+import static nva.commons.core.JsonUtils.objectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;

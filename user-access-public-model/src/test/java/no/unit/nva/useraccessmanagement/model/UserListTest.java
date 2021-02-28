@@ -7,7 +7,6 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.core.IsSame.sameInstance;
 import java.util.Collections;
 import java.util.List;
-
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import org.junit.jupiter.api.Test;
 

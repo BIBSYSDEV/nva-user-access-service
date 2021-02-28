@@ -18,12 +18,12 @@ import no.unit.nva.useraccessmanagement.exceptions.BadRequestException;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.UserDto;
-import nva.commons.exceptions.ApiGatewayException;
-import nva.commons.exceptions.commonexceptions.ConflictException;
-import nva.commons.exceptions.commonexceptions.NotFoundException;
-import nva.commons.handlers.GatewayResponse;
-import nva.commons.handlers.RequestInfo;
-import nva.commons.utils.JsonUtils;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.ConflictException;
+import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.JsonUtils;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,7 +48,7 @@ class GetUserHandlerTest extends HandlerTest {
     @DisplayName("handleRequest returns User object with type \"User\"")
     @Test
     public void handleRequestReturnsUserObjectWithTypeRole()
-        throws ConflictException, InvalidEntryInternalException, InvalidInputException, IOException, NotFoundException {
+        throws ConflictException, InvalidEntryInternalException, InvalidInputException, IOException {
         insertSampleUserToDatabase();
 
         ByteArrayOutputStream outputStream = sendGetUserRequestToHandler();

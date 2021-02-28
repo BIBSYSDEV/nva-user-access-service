@@ -7,20 +7,17 @@ import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.useraccessmanagement.exceptions.BadRequestException;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
-import nva.commons.exceptions.ApiGatewayException;
-import nva.commons.handlers.ApiGatewayHandler;
-import nva.commons.handlers.RequestInfo;
-import nva.commons.utils.Environment;
-import nva.commons.utils.JacocoGenerated;
+import nva.commons.apigateway.ApiGatewayHandler;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 import org.apache.http.HttpStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
 
     public static final String EMPTY_ROLE_NAME = "Role-name cannot be empty";
     public static final String ROLE_PATH_PARAMETER = "role";
-    private static final Logger logger = LoggerFactory.getLogger(GetRoleHandler.class);
 
     private final DatabaseService databaseService;
 
@@ -33,7 +30,7 @@ public class GetRoleHandler extends ApiGatewayHandler<Void, RoleDto> {
     }
 
     public GetRoleHandler(Environment environment, DatabaseService databaseService) {
-        super(Void.class, environment, logger);
+        super(Void.class, environment);
         this.databaseService = databaseService;
     }
 

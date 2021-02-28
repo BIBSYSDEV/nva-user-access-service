@@ -1,12 +1,12 @@
 package no.unit.nva.handlers.authorizer;
 
+import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.secretsmanager.AWSSecretsManager;
 import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
-import nva.commons.exceptions.ForbiddenException;
-import nva.commons.handlers.authentication.RequestAuthorizer;
-import nva.commons.utils.Environment;
-import nva.commons.utils.JacocoGenerated;
-import nva.commons.utils.aws.SecretsReader;
+import no.unit.commons.apigateway.authentication.RequestAuthorizer;
+import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.secrets.SecretsReader;
 
 public class LambdaAuthorizer extends RequestAuthorizer {
 
@@ -31,11 +31,12 @@ public class LambdaAuthorizer extends RequestAuthorizer {
     }
 
     @Override
-    protected String fetchSecret() throws ForbiddenException {
+    protected String fetchSecret() {
         final String secretName = environment.readEnv(AWS_SECRET_NAME_ENV_VAR);
         final String secretKey = environment.readEnv(AWS_SECRET_KEY_ENV_VAR);
         SecretsReader secretsReader = new SecretsReader(awsSecretsManager);
-        return secretsReader.fetchSecret(secretName, secretKey);
+        return attempt(() -> secretsReader.fetchSecret(secretName, secretKey))
+                   .orElseThrow();
     }
 
     @JacocoGenerated

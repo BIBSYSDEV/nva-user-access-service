@@ -5,18 +5,7 @@ dependencies {
                 "any service accessing DynamoDB")
     }
 
-    implementation (group: 'com.github.BIBSYSDEV', name: 'nva-commons', version: project.ext.nvaCommonsVersion) {
-        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
-        exclude group: 'com.fasterxml.jackson.datatype', module: 'jackson-datatype-jdk8'
-        exclude group: 'com.fasterxml.jackson.datatype', module: 'jackson-datatype-jsr310'
-        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
-        exclude group: 'com.fasterxml.jackson.module', module: 'jackson-module-parameter-names'
-        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-annotations'
-        exclude group: 'com.amazonaws', module: 'aws-java-sdk-sts'
-        exclude group: 'com.amazonaws', module: 'aws-java-sdk-secretsmanager'
-        exclude group: 'com.amazonaws', module: 'aws-lambda-java-events'
-        exclude group: 'com.amazonaws', module: 'aws-java-sdk-lambda'
-    }
+    implementation group: 'com.github.bibsysdev', name: 'apigateway', version: '1.1.3'
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: project.ext.jacksonVersion
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: project.ext.jacksonVersion
@@ -25,6 +14,7 @@ dependencies {
     runtimeOnly group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: project.ext.jacksonVersion
     runtimeOnly group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: project.ext.jacksonVersion
 
+    testImplementation group: 'com.github.bibsysdev', name: 'logutils', version: '1.1.3'
     testImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: project.ext.jacksonVersion
 
     compileOnly project(":user-access-rights")

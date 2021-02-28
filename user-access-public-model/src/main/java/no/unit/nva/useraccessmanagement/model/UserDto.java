@@ -12,14 +12,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
-import no.unit.nva.useraccessmanagement.interfaces.JsonSerializable;
 import no.unit.nva.useraccessmanagement.interfaces.WithCopy;
 import no.unit.nva.useraccessmanagement.model.UserDto.Builder;
 import no.unit.nva.useraccessmanagement.model.interfaces.Typed;
 import no.unit.nva.useraccessmanagement.model.interfaces.Validable;
-import nva.commons.utils.JacocoGenerated;
-import nva.commons.utils.JsonUtils;
-import nva.commons.utils.StringUtils;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonSerializable;
+import nva.commons.core.StringUtils;
 
 @JsonTypeName(UserDto.TYPE)
 public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, Typed {
@@ -119,7 +118,7 @@ public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, 
     @Override
     @JacocoGenerated
     public String toString() {
-        return toJsonString(JsonUtils.objectMapper);
+        return toJsonString();
     }
 
     /**
@@ -208,7 +207,7 @@ public class UserDto implements WithCopy<Builder>, JsonSerializable, Validable, 
          * @throws InvalidEntryInternalException when the used to be built is invalid.
          */
         public UserDto build() throws InvalidEntryInternalException {
-            if (StringUtils.isEmpty(username)) {
+            if (StringUtils.isBlank(username)) {
                 throw new InvalidEntryInternalException(MISSING_FIELD_ERROR + "username");
             }
             return new UserDto(this);
