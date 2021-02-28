@@ -1,9 +1,8 @@
 package no.unit.nva.handlers;
 
 import java.nio.charset.StandardCharsets;
-import nva.commons.handlers.ApiGatewayHandler;
-import nva.commons.utils.Environment;
-import org.slf4j.Logger;
+import nva.commons.apigateway.ApiGatewayHandler;
+import nva.commons.core.Environment;
 
 public abstract class HandlerAccessingUser<I, O> extends ApiGatewayHandler<I, O> {
 
@@ -13,8 +12,8 @@ public abstract class HandlerAccessingUser<I, O> extends ApiGatewayHandler<I, O>
     public static final String EMPTY_USERNAME_PATH_PARAMETER_ERROR =
         "Path parameter \"" + USERNAME_PATH_PARAMETER + "\" cannot be empty";
 
-    public HandlerAccessingUser(Class<I> iclass, Environment environment, Logger logger) {
-        super(iclass, environment, logger);
+    public HandlerAccessingUser(Class<I> iclass, Environment environment) {
+        super(iclass, environment);
     }
 
     protected String decodeUrlPart(String encodedString) {

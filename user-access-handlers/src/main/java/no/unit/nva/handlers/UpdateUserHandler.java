@@ -10,12 +10,10 @@ import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.UserDto;
-import nva.commons.exceptions.ApiGatewayException;
-import nva.commons.handlers.RequestInfo;
-import nva.commons.utils.Environment;
-import nva.commons.utils.JacocoGenerated;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 
 public class UpdateUserHandler extends HandlerAccessingUser<UserDto, Void> {
 
@@ -32,7 +30,7 @@ public class UpdateUserHandler extends HandlerAccessingUser<UserDto, Void> {
     }
 
     public UpdateUserHandler(Environment environment, DatabaseService databaseService) {
-        super(UserDto.class, environment, createLogger());
+        super(UserDto.class, environment);
         this.databaseService = databaseService;
     }
 
@@ -40,7 +38,7 @@ public class UpdateUserHandler extends HandlerAccessingUser<UserDto, Void> {
     protected Void processInput(UserDto input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         validateRequest(input, requestInfo);
         databaseService.updateUser(input);
-        setAdditionalHeadersSupplier(addLocationHeaderToResponseSupplier(input));
+        addAdditionalHeaders(addLocationHeaderToResponseSupplier(input));
         return null;
     }
 
@@ -62,9 +60,9 @@ public class UpdateUserHandler extends HandlerAccessingUser<UserDto, Void> {
 
     private String extractUsernameFromPathParameters(RequestInfo requestInfo) {
         return Optional.ofNullable(requestInfo.getPathParameters())
-            .flatMap(pathParams -> Optional.ofNullable(pathParams.get(USERNAME_PATH_PARAMETER)))
-            .map(this::decodeUrlPart)
-            .orElseThrow(() -> new RuntimeException(EMPTY_USERNAME_PATH_PARAMETER_ERROR));
+                   .flatMap(pathParams -> Optional.ofNullable(pathParams.get(USERNAME_PATH_PARAMETER)))
+                   .map(this::decodeUrlPart)
+                   .orElseThrow(() -> new RuntimeException(EMPTY_USERNAME_PATH_PARAMETER_ERROR));
     }
 
     private void comparePathAndInputObjectUsername(UserDto input, String userIdFromPathParameter)
@@ -81,9 +79,5 @@ public class UpdateUserHandler extends HandlerAccessingUser<UserDto, Void> {
 
     private String createUserLocationPath(UserDto input) {
         return USERS_RELATIVE_PATH + input.getUsername();
-    }
-
-    private static Logger createLogger() {
-        return LoggerFactory.getLogger(UpdateUserHandler.class);
     }
 }

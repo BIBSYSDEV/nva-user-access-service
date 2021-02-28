@@ -1,22 +1,19 @@
 package no.unit.nva.handlers;
 
 import static java.util.function.Predicate.not;
-
 import com.amazonaws.services.lambda.runtime.Context;
 import java.util.List;
-
 import java.util.Optional;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.useraccessmanagement.model.UserDto;
 import no.unit.nva.useraccessmanagement.model.UserList;
-import nva.commons.exceptions.ApiGatewayException;
-import nva.commons.handlers.ApiGatewayHandler;
-import nva.commons.handlers.RequestInfo;
-import nva.commons.utils.Environment;
-import nva.commons.utils.JacocoGenerated;
+import nva.commons.apigateway.ApiGatewayHandler;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 import org.apache.http.HttpStatus;
-import org.slf4j.LoggerFactory;
 
 public class ListByInstitutionHandler extends ApiGatewayHandler<Void, UserList> {
 
@@ -32,7 +29,7 @@ public class ListByInstitutionHandler extends ApiGatewayHandler<Void, UserList> 
     }
 
     public ListByInstitutionHandler(Environment environment, DatabaseService databaseService) {
-        super(Void.class, environment, LoggerFactory.getLogger(ListByInstitutionHandler.class));
+        super(Void.class, environment);
         this.databaseService = databaseService;
     }
 

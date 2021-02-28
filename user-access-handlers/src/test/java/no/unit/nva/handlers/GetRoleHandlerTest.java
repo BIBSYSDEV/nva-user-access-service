@@ -1,5 +1,6 @@
 package no.unit.nva.handlers;
 
+import static nva.commons.core.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -22,12 +23,11 @@ import no.unit.nva.useraccessmanagement.exceptions.BadRequestException;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
-import nva.commons.exceptions.ApiGatewayException;
-import nva.commons.exceptions.commonexceptions.ConflictException;
-import nva.commons.exceptions.commonexceptions.NotFoundException;
-import nva.commons.handlers.GatewayResponse;
-import nva.commons.handlers.RequestInfo;
-import nva.commons.utils.JsonUtils;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.ConflictException;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import org.apache.http.HttpStatus;
 import org.eclipse.jetty.http.HttpMethods;
 import org.junit.jupiter.api.BeforeEach;
@@ -122,7 +122,7 @@ public class GetRoleHandlerTest extends DatabaseAccessor implements WithEnvironm
 
     private ByteArrayOutputStream sendGetRoleRequest() throws IOException {
         RequestInfo requestInfo = queryWithRoleName(THE_ROLE);
-        InputStream requestStream = new HandlerRequestBuilder<>(JsonUtils.objectMapper)
+        InputStream requestStream = new HandlerRequestBuilder<>(objectMapper)
             .withPathParameters(requestInfo.getPathParameters())
             .withHttpMethod(HttpMethods.GET)
             .build();

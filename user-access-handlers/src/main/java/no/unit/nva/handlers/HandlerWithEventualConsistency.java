@@ -1,26 +1,26 @@
 package no.unit.nva.handlers;
 
-import static nva.commons.utils.attempt.Try.attempt;
-
+import static nva.commons.core.attempt.Try.attempt;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
-import nva.commons.handlers.ApiGatewayHandler;
-import nva.commons.utils.Environment;
-import nva.commons.utils.attempt.Failure;
+import nva.commons.apigateway.ApiGatewayHandler;
+import nva.commons.core.Environment;
+import nva.commons.core.attempt.Failure;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class HandlerWithEventualConsistency<I, O> extends ApiGatewayHandler<I, O> {
 
     public static final String FAILED_TO_FETCH_OBJECT = "Failed to fetch object.Effort %s/%s";
+    public static final String INVALID_ENTRY_IN_DATABASE = "Saved invalid entry in database.";
     protected static final int MAX_EFFORTS_FOR_FETCHING_OBJECT = 2;
     protected static final String INTERRUPTION_ERROR = "Interuption while waiting to get role.";
     protected static final long WAITING_TIME = 100;
-    public static final String INVALID_ENTRY_IN_DATABASE = "Saved invalid entry in database.";
+    private static final Logger  logger = LoggerFactory.getLogger(HandlerWithEventualConsistency.class);
 
-    protected HandlerWithEventualConsistency(Class<I> iclass, Environment environment, Logger logger) {
-        super(iclass, environment, logger);
+    protected HandlerWithEventualConsistency(Class<I> iclass, Environment environment) {
+        super(iclass, environment);
     }
 
     protected Optional<O> getEventuallyConsistent(Callable<O> fetchEntry) {

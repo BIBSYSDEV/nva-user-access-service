@@ -1,24 +1,22 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.requireNonNull;
-import static nva.commons.utils.attempt.Try.attempt;
+import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import java.util.List;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
 import no.unit.nva.useraccessmanagement.model.UserDto;
-import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
-
-import nva.commons.exceptions.commonexceptions.ConflictException;
-import nva.commons.exceptions.commonexceptions.NotFoundException;
-import nva.commons.utils.Environment;
-import nva.commons.utils.JacocoGenerated;
-import nva.commons.utils.attempt.Failure;
+import nva.commons.apigateway.exceptions.ConflictException;
+import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.attempt.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 @SuppressWarnings("PMD.GodClass")
 public class DatabaseServiceImpl implements DatabaseService {
@@ -60,7 +58,6 @@ public class DatabaseServiceImpl implements DatabaseService {
         this.userService.addUser(user);
     }
 
-
     @Override
     public void addRole(RoleDto roleDto)
         throws InvalidInputException, InvalidEntryInternalException, ConflictException {
@@ -92,7 +89,5 @@ public class DatabaseServiceImpl implements DatabaseService {
     private static RuntimeException logErrorWithDynamoClientAndThrowException(Failure<AmazonDynamoDB> failure) {
         logger.error(DYNAMO_DB_CLIENT_NOT_SET_ERROR);
         return new RuntimeException(failure.getException());
-
     }
-
 }

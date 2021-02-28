@@ -3,8 +3,7 @@ package no.unit.nva.database;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
 import static no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails.SECONDARY_INDEX_1_HASH_KEY;
-import static nva.commons.utils.JsonUtils.objectMapper;
-import static nva.commons.utils.attempt.Try.attempt;
+import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
@@ -21,9 +20,9 @@ import no.unit.nva.useraccessmanagement.dao.UserDb;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.UserDto;
-import nva.commons.exceptions.commonexceptions.ConflictException;
-import nva.commons.exceptions.commonexceptions.NotFoundException;
-import nva.commons.utils.attempt.Try;
+import nva.commons.apigateway.exceptions.ConflictException;
+import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.attempt.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +104,7 @@ public class UserService extends DatabaseSubService {
     public void updateUser(UserDto updateObject)
         throws InvalidEntryInternalException, InvalidInputException, NotFoundException {
 
-        logger.debug(UPDATE_USER_DEBUG_MESSAGE + updateObject.toJsonString(objectMapper));
+        logger.debug(UPDATE_USER_DEBUG_MESSAGE + updateObject.toJsonString());
         validate(updateObject);
         UserDto existingUser = getExistingUserOrSendNotFoundError(updateObject);
         UserDb updatedObjectWithSyncedRoles = syncRoleDetails(UserDb.fromUserDto(updateObject));
@@ -115,8 +114,7 @@ public class UserService extends DatabaseSubService {
     }
 
     private UserDb syncRoleDetails(UserDb updateObject) throws InvalidEntryInternalException {
-        UserDb desiredUpdateWithSyncedRoles = userWithSyncedRoles(updateObject);
-        return desiredUpdateWithSyncedRoles;
+        return userWithSyncedRoles(updateObject);
     }
 
     private Optional<UserDto> getUserAsOptional(UserDto queryObject) throws InvalidEntryInternalException {

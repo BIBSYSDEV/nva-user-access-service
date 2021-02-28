@@ -1,7 +1,7 @@
 package no.unit.nva.useraccessmanagement.exceptions;
 
 import java.net.HttpURLConnection;
-import nva.commons.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 
 public class BadRequestException extends ApiGatewayException {
 

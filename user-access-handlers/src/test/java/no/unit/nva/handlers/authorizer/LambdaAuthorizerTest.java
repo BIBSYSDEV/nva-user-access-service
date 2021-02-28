@@ -1,12 +1,12 @@
 package no.unit.nva.handlers.authorizer;
 
+import static nva.commons.core.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.secretsmanager.AWSSecretsManager;
 import com.amazonaws.services.secretsmanager.model.GetSecretValueRequest;
@@ -18,12 +18,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import no.unit.commons.apigateway.authentication.AuthorizerResponse;
+import no.unit.commons.apigateway.authentication.StatementElement;
 import no.unit.nva.database.interfaces.WithEnvironment;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.handlers.authentication.AuthorizerResponse;
-import nva.commons.handlers.authentication.StatementElement;
-import nva.commons.utils.Environment;
-import nva.commons.utils.JsonUtils;
+import nva.commons.core.Environment;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -117,12 +116,11 @@ public class LambdaAuthorizerTest implements WithEnvironment {
         InputStream request = buildRequest();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         authorizer.handleRequest(request, outputStream, context);
-        AuthorizerResponse response = AuthorizerResponse.fromOutputStream(outputStream);
-        return response;
+        return AuthorizerResponse.fromOutputStream(outputStream);
     }
 
     private InputStream buildRequest() throws JsonProcessingException {
-        return new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
+        return new HandlerRequestBuilder<Void>(objectMapper)
             .withHeaders(Map.of(HttpHeaders.AUTHORIZATION, CORRECT_SECRET_VALUE))
             .withOtherProperties(Map.of(METHOD_ARN_REQUEST_FIELD, DEFAULT_METHOD_ARN))
             .build();
@@ -145,6 +143,6 @@ public class LambdaAuthorizerTest implements WithEnvironment {
 
     private String createSecretAsJson(String secretKey, String secreteValue) throws JsonProcessingException {
         Map<String, String> secret = Map.of(secretKey, secreteValue);
-        return JsonUtils.objectMapper.writeValueAsString(secret);
+        return objectMapper.writeValueAsString(secret);
     }
 }

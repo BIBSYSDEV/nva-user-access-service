@@ -2,19 +2,17 @@ package no.unit.nva.useraccessmanagement.dao;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static nva.commons.utils.JsonUtils.objectMapper;
+import static nva.commons.core.JsonUtils.objectMapper;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JavaType;
-
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails;
-
-import no.unit.nva.useraccessmanagement.interfaces.JsonSerializable;
-import no.unit.nva.useraccessmanagement.interfaces.WithType;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
+import no.unit.nva.useraccessmanagement.interfaces.WithType;
+import nva.commons.core.JsonSerializable;
 
 public abstract class DynamoEntryWithRangeKey implements WithType, JsonSerializable {
 
@@ -64,7 +62,7 @@ public abstract class DynamoEntryWithRangeKey implements WithType, JsonSerializa
     public abstract void setPrimaryRangeKey(String primaryRangeKey) throws InvalidEntryInternalException;
 
     public Item toItem() {
-        String jsonString = this.toJsonString(objectMapper);
+        String jsonString = this.toJsonString();
         return Item.fromJSON(jsonString);
     }
 

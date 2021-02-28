@@ -1,6 +1,6 @@
 package no.unit.nva.handlers;
 
-import static nva.commons.utils.JsonUtils.objectMapper;
+import static nva.commons.core.JsonUtils.objectMapper;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -15,15 +15,16 @@ import java.io.InputStream;
 import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.database.RoleService;
+import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.useraccessmanagement.exceptions.DataSyncException;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
-import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
-import nva.commons.exceptions.InvalidOrMissingTypeException;
-import nva.commons.exceptions.commonexceptions.NotFoundException;
-import nva.commons.handlers.GatewayResponse;
-import nva.commons.utils.log.LogUtils;
-import nva.commons.utils.log.TestAppender;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.RestRequestHandler;
+import nva.commons.apigateway.exceptions.InvalidOrMissingTypeException;
+import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.logutils.LogUtils;
+import nva.commons.logutils.TestAppender;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -124,7 +125,7 @@ public class AddRoleHandlerTest extends HandlerTest {
     @Test
     public void errorMessageIsLoggedWhenAddRoleHandlerThrowsDatasyncException()
         throws IOException {
-        TestAppender testingAppender = LogUtils.getTestingAppender(AddRoleHandler.class);
+        TestAppender testingAppender = LogUtils.getTestingAppender(RestRequestHandler.class);
 
         AddRoleHandler addRoleHandler = addRoleHandlerDoesNotFindRoleAfterAddingIt();
         InputStream inputRequest = new HandlerRequestBuilder<>(objectMapper).withBody(sampleRole).build();

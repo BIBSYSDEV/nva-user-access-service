@@ -10,9 +10,9 @@ import no.unit.nva.useraccessmanagement.dao.DynamoEntryWithRangeKey;
 import no.unit.nva.useraccessmanagement.exceptions.EmptyInputException;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
-import no.unit.nva.useraccessmanagement.interfaces.JsonSerializable;
 import no.unit.nva.useraccessmanagement.model.interfaces.Validable;
-import nva.commons.utils.attempt.Failure;
+import nva.commons.core.JsonSerializable;
+import nva.commons.core.attempt.Failure;
 
 public class DatabaseSubService {
 
