@@ -8,12 +8,10 @@ import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.useraccessmanagement.exceptions.BadRequestException;
 import no.unit.nva.useraccessmanagement.model.UserDto;
-import nva.commons.exceptions.ApiGatewayException;
-import nva.commons.handlers.RequestInfo;
-import nva.commons.utils.Environment;
-import nva.commons.utils.JacocoGenerated;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 
 public class GetUserHandler extends HandlerAccessingUser<Void, UserDto> {
 
@@ -25,7 +23,7 @@ public class GetUserHandler extends HandlerAccessingUser<Void, UserDto> {
     }
 
     public GetUserHandler(Environment environment, DatabaseService databaseService) {
-        super(Void.class, environment, defaultLogger());
+        super(Void.class, environment);
         this.databaseService = databaseService;
     }
 
@@ -43,16 +41,12 @@ public class GetUserHandler extends HandlerAccessingUser<Void, UserDto> {
         return HttpURLConnection.HTTP_OK;
     }
 
-    private static Logger defaultLogger() {
-        return LoggerFactory.getLogger(GetUserHandler.class);
-    }
-
     private String extractValidUserNameOrThrowException(RequestInfo requestInfo) throws BadRequestException {
         return Optional.of(requestInfo)
-            .map(RequestInfo::getPathParameters)
-            .map(map -> map.get(USERNAME_PATH_PARAMETER))
-            .map(this::decodeUrlPart)
-            .filter(not(String::isBlank))
-            .orElseThrow(() -> new BadRequestException(EMPTY_USERNAME_PATH_PARAMETER_ERROR));
+                   .map(RequestInfo::getPathParameters)
+                   .map(map -> map.get(USERNAME_PATH_PARAMETER))
+                   .map(this::decodeUrlPart)
+                   .filter(not(String::isBlank))
+                   .orElseThrow(() -> new BadRequestException(EMPTY_USERNAME_PATH_PARAMETER_ERROR));
     }
 }

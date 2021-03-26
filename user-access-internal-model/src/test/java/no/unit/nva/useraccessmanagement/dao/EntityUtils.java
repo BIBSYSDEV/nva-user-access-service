@@ -1,7 +1,7 @@
 package no.unit.nva.useraccessmanagement.dao;
 
-import static no.unit.nva.useraccessmanagement.dao.AccessRight.APPROVE_DOI_REQUEST;
-import static nva.commons.utils.JsonUtils.objectMapper;
+import static no.unit.useraccessserivce.accessrights.AccessRight.APPROVE_DOI_REQUEST;
+import static nva.commons.core.JsonUtils.objectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -13,6 +13,7 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
 import no.unit.nva.useraccessmanagement.model.UserDto;
+import no.unit.useraccessserivce.accessrights.AccessRight;
 
 public final class EntityUtils {
 

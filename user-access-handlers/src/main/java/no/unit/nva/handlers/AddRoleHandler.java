@@ -6,14 +6,13 @@ import no.unit.nva.database.DatabaseService;
 import no.unit.nva.database.DatabaseServiceImpl;
 import no.unit.nva.useraccessmanagement.exceptions.DataSyncException;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
-import no.unit.nva.useraccessmanagement.model.RoleDto;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
-import nva.commons.exceptions.commonexceptions.ConflictException;
-import nva.commons.exceptions.commonexceptions.NotFoundException;
-import nva.commons.handlers.RequestInfo;
-import nva.commons.utils.Environment;
-import nva.commons.utils.JacocoGenerated;
-import org.slf4j.LoggerFactory;
+import no.unit.nva.useraccessmanagement.model.RoleDto;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.ConflictException;
+import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 
 public class AddRoleHandler extends HandlerWithEventualConsistency<RoleDto, RoleDto> {
 
@@ -33,7 +32,7 @@ public class AddRoleHandler extends HandlerWithEventualConsistency<RoleDto, Role
         Environment environment,
         DatabaseService databaseService
     ) {
-        super(RoleDto.class, environment, LoggerFactory.getLogger(AddRoleHandler.class));
+        super(RoleDto.class, environment);
         this.databaseService = databaseService;
     }
 

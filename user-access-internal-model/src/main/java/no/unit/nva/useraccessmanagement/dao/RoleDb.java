@@ -13,10 +13,12 @@ import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException
 import no.unit.nva.useraccessmanagement.interfaces.WithCopy;
 import no.unit.nva.useraccessmanagement.interfaces.WithType;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
-import nva.commons.utils.JacocoGenerated;
-import nva.commons.utils.attempt.Try;
+import no.unit.useraccessserivce.accessrights.AccessRight;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonSerializable;
+import nva.commons.core.attempt.Try;
 
-public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>, WithType {
+public class RoleDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>, WithType, JsonSerializable {
 
     public static String TYPE = "ROLE";
     public static final String INVALID_PRIMARY_HASH_KEY = "PrimaryHashKey should start with \"" + TYPE + "\"";

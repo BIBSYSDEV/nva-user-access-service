@@ -30,6 +30,14 @@ Parameters:
     Type: String
   CustomDomain:
     Type: String
+  MaxConcurrency:
+    Type: String
+    Description: Maximum capacity for provisioned concurrency
+    Default: 10
+  MinConcurrency:
+    Type: String
+    Description: Minimum capacity for provisioned concurrency
+    Default: 1
 
 Globals:
   Api:
@@ -105,7 +113,7 @@ Resources:
                         $ref: '#/components/schemas/User'
               x-amazon-apigateway-integration:
                 uri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ServiceAddUserHandler.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ServiceAddUserHandler.Arn}:live/invocations
                 responses: {}
                 httpMethod: POST
                 type: aws_proxy
@@ -129,7 +137,7 @@ Resources:
                         $ref: '#/components/schemas/User'
               x-amazon-apigateway-integration:
                 uri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ServiceGetUserHandler.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ServiceGetUserHandler.Arn}:live/invocations
                 responses: {}
                 httpMethod: POST
                 type: aws_proxy
@@ -596,6 +604,11 @@ Resources:
         - !Ref UserAccessCommonsLayer
       Runtime: java11
       MemorySize: 1408
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: AllAtOnce
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 1
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -642,6 +655,11 @@ Resources:
         - !Ref UserAccessCommonsLayer
       Runtime: java11
       MemorySize: 1408
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: AllAtOnce
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 1
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -656,6 +674,49 @@ Resources:
             Path: /service/users
             Method: post
             RestApiId: !Ref InternalApi
+
+  ServiceGetUserScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: !Ref MaxConcurrency
+      MinCapacity: !Ref MinConcurrency
+      ResourceId: !Sub function:${ServiceGetUserHandler}:live
+      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lambda.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_LambdaConcurrency
+      ScalableDimension: lambda:function:ProvisionedConcurrency
+      ServiceNamespace: lambda
+    DependsOn: ServiceGetUserHandlerAliaslive
+  ServiceGetUserScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: utilization
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref ServiceGetUserScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 0.70
+        PredefinedMetricSpecification:
+          PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
+
+  ServiceAddUserScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: !Ref MaxConcurrency
+      MinCapacity: !Ref MinConcurrency
+      ResourceId: !Sub function:${ServiceAddUserHandler}:live
+      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lambda.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_LambdaConcurrency
+      ScalableDimension: lambda:function:ProvisionedConcurrency
+      ServiceNamespace: lambda
+    DependsOn: ServiceAddUserHandlerAliaslive
+  ServiceAddUserScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: utilization
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref ServiceAddUserScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 0.70
+        PredefinedMetricSpecification:
+          PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
+
   InternalApiStaticUrl:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:

@@ -4,9 +4,8 @@ import static no.unit.nva.hamcrest.DoesNotHaveNullOrEmptyFields.doesNotHaveNullO
 import static no.unit.nva.useraccessmanagement.model.EntityUtils.SAMPLE_ACCESS_RIGHTS;
 import static no.unit.nva.useraccessmanagement.model.EntityUtils.SOME_ROLENAME;
 import static no.unit.nva.useraccessmanagement.model.EntityUtils.createRole;
-
 import static no.unit.nva.useraccessmanagement.model.RoleDto.MISSING_ROLE_NAME_ERROR;
-import static nva.commons.utils.JsonUtils.objectMapper;
+import static nva.commons.core.JsonUtils.objectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.sameInstance;
@@ -22,10 +21,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import no.unit.nva.useraccessmanagement.exceptions.InvalidEntryInternalException;
-import no.unit.nva.useraccessmanagement.model.RoleDto.Builder;
 import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
+import no.unit.nva.useraccessmanagement.model.RoleDto.Builder;
 import org.hamcrest.core.IsSame;
 import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.DisplayName;

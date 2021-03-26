@@ -1,7 +1,6 @@
 package no.unit.nva.database;
 
 import static java.util.Objects.nonNull;
-
 import static no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails.PRIMARY_KEY_HASH_KEY;
 import static no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails.PRIMARY_KEY_RANGE_KEY;
 import static no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails.SEARCH_USERS_BY_INSTITUTION_INDEX_NAME;
@@ -10,7 +9,6 @@ import static no.unit.nva.useraccessmanagement.constants.DatabaseIndexDetails.SE
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
@@ -28,8 +26,7 @@ import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import java.util.ArrayList;
 import java.util.List;
 import no.unit.nva.database.interfaces.WithEnvironment;
-
-import nva.commons.utils.Environment;
+import nva.commons.core.Environment;
 import org.junit.jupiter.api.AfterEach;
 
 public abstract class DatabaseAccessor implements WithEnvironment {

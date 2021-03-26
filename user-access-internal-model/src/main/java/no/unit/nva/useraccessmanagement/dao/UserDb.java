@@ -2,7 +2,7 @@ package no.unit.nva.useraccessmanagement.dao;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static nva.commons.utils.attempt.Try.attempt;
+import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,8 +18,8 @@ import no.unit.nva.useraccessmanagement.interfaces.WithCopy;
 import no.unit.nva.useraccessmanagement.interfaces.WithType;
 import no.unit.nva.useraccessmanagement.model.RoleDto;
 import no.unit.nva.useraccessmanagement.model.UserDto;
-import nva.commons.utils.JacocoGenerated;
-import nva.commons.utils.attempt.Failure;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.attempt.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -305,8 +305,7 @@ public class UserDb extends DynamoEntryWithRangeKey implements WithCopy<Builder>
     /*This exception should not happen as a RoleDb should always convert to a RoleDto */
     private static <T> IllegalStateException unexpectedException(Failure<T> failure) {
         logger.error(ERROR_DUE_TO_INVALID_ROLE);
-        IllegalStateException exception = new IllegalStateException(failure.getException());
-        return exception;
+        return new IllegalStateException(failure.getException());
     }
 
     public static final class Builder {
