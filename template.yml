@@ -38,6 +38,12 @@ Parameters:
     Type: String
     Description: Minimum capacity for provisioned concurrency
     Default: 1
+  LambdaMemorySize:
+    Type: Number
+    Default: 256
+  ScaleOutUsageThreshold:
+    Type: Number
+    Default: 0.80
 
 Globals:
   Api:
@@ -55,7 +61,7 @@ Resources:
       Layers:
         - !Ref UserAccessCommonsLayer
       Runtime: java11
-      MemorySize: 1408
+      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -460,7 +466,7 @@ Resources:
       Layers:
         - !Ref UserAccessCommonsLayer
       Runtime: java11
-      MemorySize: 1408
+      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -484,7 +490,7 @@ Resources:
       Layers:
         - !Ref UserAccessCommonsLayer
       Runtime: java11
-      MemorySize: 1408
+      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -507,7 +513,7 @@ Resources:
       Layers:
         - !Ref UserAccessCommonsLayer
       Runtime: java11
-      MemorySize: 1408
+      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -531,7 +537,7 @@ Resources:
       Layers:
         - !Ref UserAccessCommonsLayer
       Runtime: java11
-      MemorySize: 1408
+      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -554,7 +560,7 @@ Resources:
       Layers:
         - !Ref UserAccessCommonsLayer
       Runtime: java11
-      MemorySize: 1408
+      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -577,7 +583,7 @@ Resources:
       Layers:
         - !Ref UserAccessCommonsLayer
       Runtime: java11
-      MemorySize: 1408
+      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -603,7 +609,7 @@ Resources:
       Layers:
         - !Ref UserAccessCommonsLayer
       Runtime: java11
-      MemorySize: 1408
+      MemorySize: !Ref LambdaMemorySize
       AutoPublishAlias: live
       DeploymentPreference:
         Type: AllAtOnce
@@ -631,7 +637,7 @@ Resources:
       Layers:
         - !Ref UserAccessCommonsLayer
       Runtime: java11
-      MemorySize: 1408
+      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -654,7 +660,7 @@ Resources:
       Layers:
         - !Ref UserAccessCommonsLayer
       Runtime: java11
-      MemorySize: 1408
+      MemorySize: !Ref LambdaMemorySize
       AutoPublishAlias: live
       DeploymentPreference:
         Type: AllAtOnce
@@ -692,7 +698,7 @@ Resources:
       PolicyType: TargetTrackingScaling
       ScalingTargetId: !Ref ServiceGetUserScalableTarget
       TargetTrackingScalingPolicyConfiguration:
-        TargetValue: 0.70
+        TargetValue: !Ref ScaleOutUsageThreshold
         PredefinedMetricSpecification:
           PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
 
@@ -713,7 +719,7 @@ Resources:
       PolicyType: TargetTrackingScaling
       ScalingTargetId: !Ref ServiceAddUserScalableTarget
       TargetTrackingScalingPolicyConfiguration:
-        TargetValue: 0.70
+        TargetValue: !Ref ScaleOutUsageThreshold
         PredefinedMetricSpecification:
           PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
 
