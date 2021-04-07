@@ -17,10 +17,13 @@ Metadata:
 
 Parameters:
   CognitoAuthorizerArn:
-    Type: String
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Reference to Cognito UserPool for the stage
+    Default: CognitoAuthorizerArn
+  UserServiceApiSecretArn:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: UserServiceApiSecretArn
   UsersAndRolesTableName:
-    Type: String
-  ApiKeySecretArn:
     Type: String
   StageName:
     Type: String
@@ -38,14 +41,12 @@ Parameters:
     Type: String
     Description: Minimum capacity for provisioned concurrency
     Default: 1
-  LambdaMemorySize:
-    Type: Number
-    Default: 256
-  ScaleOutUsageThreshold:
-    Type: Number
-    Default: 0.80
 
 Globals:
+  Function:
+    MemorySize: 256
+    Timeout: 10
+    Runtime: java11
   Api:
     Cors:
       AllowMethods: '''POST, PUT, GET,OPTIONS'''
@@ -58,10 +59,14 @@ Resources:
     Properties:
       CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.authorizer.LambdaAuthorizer::handleRequest
+      MemorySize: 512
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: AllAtOnce
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 1
       Layers:
         - !Ref UserAccessCommonsLayer
-      Runtime: java11
-      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -72,7 +77,7 @@ Resources:
         - Version: "2012-10-17"
           Statement:
             - Effect: "Allow"
-              Resource:  !Ref ApiKeySecretArn
+              Resource:  !Ref UserServiceApiSecretArn
               Action:
                 - "secretsmanager:GetResourcePolicy"
                 - "secretsmanager:GetSecretValue"
@@ -92,6 +97,8 @@ Resources:
               Headers:
                 - Authorization
               ReauthorizeEvery: 3600
+        DefaultAuthorizer: LambdaRequestAuthorizer
+      OpenApiVersion: 3.0.1
       DefinitionBody:
         openapi: 3.0.1
         info:
@@ -103,7 +110,7 @@ Resources:
             post:
               summary: Adds new user
               security:
-                - ApiKey: []
+                - ApiKey: [ ]
               requestBody:
                 required: true
                 content:
@@ -120,7 +127,7 @@ Resources:
               x-amazon-apigateway-integration:
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ServiceAddUserHandler.Arn}:live/invocations
-                responses: {}
+                responses: { }
                 httpMethod: POST
                 type: aws_proxy
           /service/users/{username}:
@@ -133,10 +140,10 @@ Resources:
                     type: string
                   required: true
               security:
-                - ApiKey: []
+                - ApiKey: [ ]
               responses:
                 '200':
-                  description:  Returns the user.
+                  description: Returns the user.
                   content:
                     "application/json":
                       schema:
@@ -144,7 +151,7 @@ Resources:
               x-amazon-apigateway-integration:
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ServiceGetUserHandler.Arn}:live/invocations
-                responses: {}
+                responses: { }
                 httpMethod: POST
                 type: aws_proxy
             put:
@@ -162,7 +169,7 @@ Resources:
                     schema:
                       $ref: '#/components/schemas/User'
               security:
-                - ApiKey: []
+                - ApiKey: [ ]
               responses:
                 '202':
                   description: Successful request for updating the user. User will be eventually updated
@@ -174,7 +181,7 @@ Resources:
               x-amazon-apigateway-integration:
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ServiceUpdateUserHandler.Arn}/invocations
-                responses: {}
+                responses: { }
                 httpMethod: POST
                 type: aws_proxy
         components:
@@ -222,9 +229,11 @@ Resources:
               x-amazon-apigateway-authtype: custom
               x-amazon-apigateway-authorizer:
                 type: request
-                authorizerUri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaAuthorizer.Arn}/invocations
+                authorizerResultTtlInSeconds: 1
                 identitySource: method.request.header.Authorization
+                authorizerUri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaAuthorizer.Arn}:live/invocations
+
   ExternalApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -465,8 +474,6 @@ Resources:
       Handler: no.unit.nva.handlers.AddRoleHandler::handleRequest
       Layers:
         - !Ref UserAccessCommonsLayer
-      Runtime: java11
-      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -489,8 +496,6 @@ Resources:
       Handler: no.unit.nva.handlers.GetRoleHandler::handleRequest
       Layers:
         - !Ref UserAccessCommonsLayer
-      Runtime: java11
-      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -512,8 +517,6 @@ Resources:
       Handler: no.unit.nva.handlers.AddUserHandler::handleRequest
       Layers:
         - !Ref UserAccessCommonsLayer
-      Runtime: java11
-      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -536,8 +539,6 @@ Resources:
       Handler: no.unit.nva.handlers.GetUserHandler::handleRequest
       Layers:
         - !Ref UserAccessCommonsLayer
-      Runtime: java11
-      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -559,8 +560,6 @@ Resources:
       Handler: no.unit.nva.handlers.UpdateUserHandler::handleRequest
       Layers:
         - !Ref UserAccessCommonsLayer
-      Runtime: java11
-      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -582,8 +581,6 @@ Resources:
       Handler: no.unit.nva.handlers.ListByInstitutionHandler::handleRequest
       Layers:
         - !Ref UserAccessCommonsLayer
-      Runtime: java11
-      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -606,10 +603,10 @@ Resources:
     Properties:
       CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.GetUserHandler::handleRequest
+      MemorySize: 512
+      Tracing: Active
       Layers:
         - !Ref UserAccessCommonsLayer
-      Runtime: java11
-      MemorySize: !Ref LambdaMemorySize
       AutoPublishAlias: live
       DeploymentPreference:
         Type: AllAtOnce
@@ -636,8 +633,6 @@ Resources:
       Handler: no.unit.nva.handlers.UpdateUserHandler::handleRequest
       Layers:
         - !Ref UserAccessCommonsLayer
-      Runtime: java11
-      MemorySize: !Ref LambdaMemorySize
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
@@ -659,8 +654,6 @@ Resources:
       Handler: no.unit.nva.handlers.AddUserHandler::handleRequest
       Layers:
         - !Ref UserAccessCommonsLayer
-      Runtime: java11
-      MemorySize: !Ref LambdaMemorySize
       AutoPublishAlias: live
       DeploymentPreference:
         Type: AllAtOnce
@@ -681,6 +674,28 @@ Resources:
             Method: post
             RestApiId: !Ref InternalApi
 
+
+  LambdaAuthorizerScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: !Ref MaxConcurrency
+      MinCapacity: !Ref MinConcurrency
+      ResourceId: !Sub function:${LambdaAuthorizer}:live
+      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lambda.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_LambdaConcurrency
+      ScalableDimension: lambda:function:ProvisionedConcurrency
+      ServiceNamespace: lambda
+    DependsOn: LambdaAuthorizerAliaslive
+  LambdaAuthorizerScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: utilization
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref LambdaAuthorizerScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 0.8
+        PredefinedMetricSpecification:
+          PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
+
   ServiceGetUserScalableTarget:
     Type: AWS::ApplicationAutoScaling::ScalableTarget
     Properties:
@@ -698,7 +713,7 @@ Resources:
       PolicyType: TargetTrackingScaling
       ScalingTargetId: !Ref ServiceGetUserScalableTarget
       TargetTrackingScalingPolicyConfiguration:
-        TargetValue: !Ref ScaleOutUsageThreshold
+        TargetValue: 0.8
         PredefinedMetricSpecification:
           PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
 
@@ -719,7 +734,7 @@ Resources:
       PolicyType: TargetTrackingScaling
       ScalingTargetId: !Ref ServiceAddUserScalableTarget
       TargetTrackingScalingPolicyConfiguration:
-        TargetValue: !Ref ScaleOutUsageThreshold
+        TargetValue: 0.8
         PredefinedMetricSpecification:
           PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
 
