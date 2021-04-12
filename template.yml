@@ -44,9 +44,10 @@ Parameters:
 
 Globals:
   Function:
-    MemorySize: 256
+    MemorySize: 512
     Timeout: 10
     Runtime: java11
+    Tracing: Active
   Api:
     Cors:
       AllowMethods: '''POST, PUT, GET,OPTIONS'''
@@ -59,7 +60,6 @@ Resources:
     Properties:
       CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.authorizer.LambdaAuthorizer::handleRequest
-      MemorySize: 512
       AutoPublishAlias: live
       DeploymentPreference:
         Type: AllAtOnce
@@ -603,7 +603,6 @@ Resources:
     Properties:
       CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.GetUserHandler::handleRequest
-      MemorySize: 512
       Tracing: Active
       Layers:
         - !Ref UserAccessCommonsLayer
