@@ -52,7 +52,7 @@ public class DatabaseSubService {
     }
 
     protected static <T> InvalidEntryInternalException handleError(Failure<T> fail) {
-        logger.error("Error fetching user:",fail.getException());
+        logger.error("Error fetching user:", fail.getException());
         if (fail.getException() instanceof InvalidEntryInternalException) {
             return (InvalidEntryInternalException) fail.getException();
         } else {
