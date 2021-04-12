@@ -603,7 +603,6 @@ Resources:
     Properties:
       CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.GetUserHandler::handleRequest
-      Tracing: Active
       Layers:
         - !Ref UserAccessCommonsLayer
       AutoPublishAlias: live
