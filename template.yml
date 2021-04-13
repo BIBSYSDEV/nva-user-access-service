@@ -235,7 +235,7 @@ Resources:
                 authorizerResultTtlInSeconds: 1
                 identitySource: method.request.header.Authorization
                 authorizerUri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaAuthorizer.Arn}:live/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaAuthorizer.Arn}/invocations
 
   ExternalApi:
     Type: AWS::Serverless::Api
