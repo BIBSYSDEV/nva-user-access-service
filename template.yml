@@ -97,7 +97,7 @@ Resources:
             Identity:
               Headers:
                 - Authorization
-              ReauthorizeEvery: 3600
+              ReauthorizeEvery: 1
         DefaultAuthorizer: LambdaRequestAuthorizer
       OpenApiVersion: 3.0.1
       DefinitionBody:
