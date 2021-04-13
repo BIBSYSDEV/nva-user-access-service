@@ -181,7 +181,7 @@ Resources:
                       description: Relative path to the user URI
               x-amazon-apigateway-integration:
                 uri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ServiceUpdateUserHandler.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ServiceUpdateUserHandler.Arn}:live/invocations
                 responses: { }
                 httpMethod: POST
                 type: aws_proxy
@@ -604,6 +604,7 @@ Resources:
     Properties:
       CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.GetUserHandler::handleRequest
+      MemorySize: 1408
       Layers:
         - !Ref UserAccessCommonsLayer
       AutoPublishAlias: live
@@ -630,6 +631,7 @@ Resources:
     Properties:
       CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.UpdateUserHandler::handleRequest
+      MemorySize: 1408
       Layers:
         - !Ref UserAccessCommonsLayer
       Environment:
@@ -694,6 +696,30 @@ Resources:
         TargetValue: 0.8
         PredefinedMetricSpecification:
           PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
+
+
+  ServiceUpdateUserScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: !Ref MaxConcurrency
+      MinCapacity: !Ref MinConcurrency
+      ResourceId: !Sub function:${ServiceUpdateUserHandler}:live
+      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lambda.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_LambdaConcurrency
+      ScalableDimension: lambda:function:ProvisionedConcurrency
+      ServiceNamespace: lambda
+    DependsOn: ServiceUpdateUserHandlerAliaslive
+  ServiceUpdateUserScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: utilization
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref ServiceUpdateUserScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 0.8
+        PredefinedMetricSpecification:
+          PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
+
+
 
   ServiceGetUserScalableTarget:
     Type: AWS::ApplicationAutoScaling::ScalableTarget
