@@ -88,16 +88,16 @@ Resources:
     Properties:
       StageName: !Ref StageName
       EndpointConfiguration: REGIONAL
-      Auth:
-        Authorizers:
-          LambdaRequestAuthorizer:
-            FunctionArn: !GetAtt LambdaAuthorizer.Arn
-            FunctionPayloadType: REQUEST
-            Identity:
-              Headers:
-                - Authorization
-              ReauthorizeEvery: 3600
-        DefaultAuthorizer: LambdaRequestAuthorizer
+#      Auth:
+#        Authorizers:
+#          LambdaRequestAuthorizer:
+#            FunctionArn: !GetAtt LambdaAuthorizer.Arn
+#            FunctionPayloadType: REQUEST
+#            Identity:
+#              Headers:
+#                - Authorization
+#              ReauthorizeEvery: 3600
+#        DefaultAuthorizer: LambdaRequestAuthorizer
       OpenApiVersion: 3.0.1
       DefinitionBody:
         openapi: 3.0.1
