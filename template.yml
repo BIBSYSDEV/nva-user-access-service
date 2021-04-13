@@ -91,10 +91,7 @@ Resources:
       Auth:
         Authorizers:
           LambdaRequestAuthorizer:
-            FunctionArn: !Sub
-                           - "${LambdaAuthorizerArn}:${hotInstanceAlias}"
-                           - "LambdaAuthorizerArn": !Ref LambdaAuthorizer
-                             "hotInstanceAlias": "live"
+            FunctionArn: !Join ["",[!GetAtt LambdaAuthorizer.Arn,":","live"]]
             FunctionPayloadType: REQUEST
             Identity:
               Headers:
@@ -235,7 +232,7 @@ Resources:
                 authorizerResultTtlInSeconds: 1
                 identitySource: method.request.header.Authorization
                 authorizerUri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaAuthorizer.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaAuthorizer.Arn}:live/invocations
 
   ExternalApi:
     Type: AWS::Serverless::Api
