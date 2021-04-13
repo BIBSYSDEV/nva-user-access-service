@@ -60,6 +60,7 @@ Resources:
     Properties:
       CodeUri: user-access-handlers
       Handler: no.unit.nva.handlers.authorizer.LambdaAuthorizer::handleRequest
+      MemorySize: 1408
       AutoPublishAlias: live
       DeploymentPreference:
         Type: AllAtOnce
