@@ -633,8 +633,8 @@ Resources:
       Handler: no.unit.nva.handlers.UpdateUserHandler::handleRequest
       MemorySize: 1408
       AutoPublishAlias: live
-        DeploymentPreference:
-          Type: AllAtOnce
+      DeploymentPreference:
+        Type: AllAtOnce
       Layers:
         - !Ref UserAccessCommonsLayer
       Environment:
