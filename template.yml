@@ -22,13 +22,17 @@ Parameters:
     Default: CognitoAuthorizerArn
   UserServiceApiSecretArn:
     Type: 'AWS::SSM::Parameter::Value<String>'
-    Default: UserServiceApiSecretArn
+    Default: /NVA/UserServiceInternalApiKeyArn
   CustomDomain:
     Type: 'AWS::SSM::Parameter::Value<String>'
     Default: CustomDomain
   UsersAndRolesTableName:
     Type: String
   StageName:
+    Type: String
+  CognitoTriggerSecretName:
+    Type: String
+  CognitoTriggerSecretKey:
     Type: String
   InternalApiBasePath:
     Type: String
@@ -73,8 +77,8 @@ Resources:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
-          API_SECRET_NAME: "UserCatalogueApiKey"
-          API_SECRET_KEY: "ApiKey"
+          API_SECRET_NAME: !Ref CognitoTriggerSecretName
+          API_SECRET_KEY: !Ref CognitoTriggerSecretKey
       Policies:
         - Version: "2012-10-17"
           Statement:
