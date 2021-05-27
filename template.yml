@@ -23,6 +23,9 @@ Parameters:
   UserServiceApiSecretArn:
     Type: 'AWS::SSM::Parameter::Value<String>'
     Default: UserServiceApiSecretArn
+  CustomDomain:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: CustomDomain
   UsersAndRolesTableName:
     Type: String
   StageName:
@@ -30,8 +33,6 @@ Parameters:
   InternalApiBasePath:
     Type: String
   ExternalApiBasePath:
-    Type: String
-  CustomDomain:
     Type: String
   MaxConcurrency:
     Type: String
