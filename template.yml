@@ -22,16 +22,21 @@ Parameters:
     Default: CognitoAuthorizerArn
   UserServiceApiSecretArn:
     Type: 'AWS::SSM::Parameter::Value<String>'
-    Default: UserServiceApiSecretArn
+    Default: /NVA/UserServiceInternalApiKeyArn
+  CustomDomain:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: CustomDomain
   UsersAndRolesTableName:
     Type: String
   StageName:
     Type: String
+  CognitoTriggerSecretName:
+    Type: String
+  CognitoTriggerSecretKey:
+    Type: String
   InternalApiBasePath:
     Type: String
   ExternalApiBasePath:
-    Type: String
-  CustomDomain:
     Type: String
   MaxConcurrency:
     Type: String
@@ -72,8 +77,8 @@ Resources:
         Variables:
           ALLOWED_ORIGIN: '*'
           USERS_AND_ROLES_TABLE:  !Ref UsersAndRolesTableName
-          API_SECRET_NAME: "UserCatalogueApiKey"
-          API_SECRET_KEY: "ApiKey"
+          API_SECRET_NAME: !Ref CognitoTriggerSecretName
+          API_SECRET_KEY: !Ref CognitoTriggerSecretKey
       Policies:
         - Version: "2012-10-17"
           Statement:
@@ -770,14 +775,14 @@ Resources:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
       BasePath: !Ref InternalApiBasePath
-      DomainName: !Ref CustomDomain
+      DomainName: !Sub api.${CustomDomain}
       RestApiId: !Ref InternalApi
       Stage: !Ref  InternalApi.Stage
   ExternalApiStaticUrl:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
       BasePath: !Ref ExternalApiBasePath
-      DomainName: !Ref CustomDomain
+      DomainName: !Sub api.${CustomDomain}
       RestApiId: !Ref ExternalApi
       Stage: !Ref ExternalApi.Stage
 
