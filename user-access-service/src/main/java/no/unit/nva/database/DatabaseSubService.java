@@ -13,10 +13,13 @@ import no.unit.nva.useraccessmanagement.exceptions.InvalidInputException;
 import no.unit.nva.useraccessmanagement.model.interfaces.Validable;
 import nva.commons.core.JsonSerializable;
 import nva.commons.core.attempt.Failure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DatabaseSubService {
 
     public static final String EMPTY_INPUT_ERROR_MESSAGE = "Expected non-empty input, but input is empty";
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseSubService.class);
 
     protected Table table;
 
@@ -48,7 +51,11 @@ public class DatabaseSubService {
         );
     }
 
+    // PMD complains about the log error format but this call seems legit according to SLF4J
+    // see http://slf4j.org/faq.html#exception_message
+    @SuppressWarnings("PMD.InvalidLogMessageFormat")
     protected static <T> InvalidEntryInternalException handleError(Failure<T> fail) {
+        logger.error("Error fetching user:", fail.getException());
         if (fail.getException() instanceof InvalidEntryInternalException) {
             return (InvalidEntryInternalException) fail.getException();
         } else {
