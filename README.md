@@ -1,3 +1,5 @@
+Functionality moved to: https://github.com/BIBSYSDEV/nva-identity-service
+
 # Users and Roles service
 
 
